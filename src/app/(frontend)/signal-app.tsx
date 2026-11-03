@@ -16,12 +16,13 @@ import {
   importCalendarAction,
   replanTasksAction,
   setCalendarEventCompletedAction,
+  setTaskCompletedAction,
 } from './actions'
 import { logoutAction } from './auth-actions'
 import type { AssignmentType, ClassLevel } from '@/lib/scoring'
 import type { AppUser } from '@/lib/app-auth'
 
-type Screen = 'dashboard' | 'score' | 'calendar' | 'time' | 'copilot' | 'advisor'
+type Screen = 'dashboard' | 'score' | 'calendar' | 'time' | 'copilot' | 'advisor' | 'completed'
 
 export type TaskView = {
   academicValue: number
@@ -64,6 +65,7 @@ const nav: { id: Screen; label: string; index: string }[] = [
   { id: 'time', label: 'Time allocator', index: '04' },
   { id: 'copilot', label: 'Quick add', index: '05' },
   { id: 'advisor', label: 'AI advisor', index: '06' },
+  { id: 'completed', label: 'Completed', index: '07' },
 ]
 
 function Button({
@@ -174,22 +176,25 @@ function Dashboard({
   selected,
   setSelected,
   tasks,
+  onCompleted,
 }: {
   go: (screen: Screen) => void
+  onCompleted: (task: TaskView) => void
   selected: number
   setSelected: (index: number) => void
   tasks: TaskView[]
 }) {
-  const task = tasks[selected] ?? tasks[0]
+  const upcomingTasks = tasks.filter((item) => item.status !== 'done')
+  const task = upcomingTasks[selected] ?? upcomingTasks[0]
   return (
     <div className="dashboard-grid">
       <Panel className="priority-panel">
         <Kicker right={<span>RANKED / LIVE</span>}>TODAY&apos;S PRIORITIES</Kicker>
-        {!tasks.length ? (
+        {!upcomingTasks.length ? (
           <EmptyState onAdd={() => go('copilot')} />
         ) : (
           <div className="priority-list">
-            {tasks.map((item, index) => (
+            {upcomingTasks.map((item, index) => (
               <button
                 className={`task ${selected === index ? 'task--active' : ''} ${item.status === 'done' ? 'task--done' : ''}`}
                 key={item.id}
@@ -235,6 +240,9 @@ function Dashboard({
               recent neglect. Scores recalculate whenever the task changes.
             </p>
             <Button onClick={() => go('score')}>View all 7 vectors</Button>
+            <Button onClick={() => onCompleted(task)} tone="primary">
+              Mark complete
+            </Button>
           </>
         ) : (
           <div className="empty-state compact">
@@ -249,6 +257,40 @@ function Dashboard({
         <kbd>⌘ K</kbd>
       </button>
     </div>
+  )
+}
+
+function CompletedScreen({
+  onRestore,
+  tasks,
+}: {
+  onRestore: (task: TaskView) => void
+  tasks: TaskView[]
+}) {
+  const completed = tasks.filter((task) => task.status === 'done')
+  return (
+    <Panel className="completed-panel">
+      <Kicker right={<span>{completed.length} ARCHIVED</span>}>COMPLETED TASKS</Kicker>
+      {completed.length ? (
+        <div className="completed-list">
+          {completed.map((task) => (
+            <article className="completed-row" key={task.id}>
+              <span>✓</span>
+              <div>
+                <strong>{task.title}</strong>
+                <small>{task.courseCode ?? task.assignmentType} · COMPLETED</small>
+              </div>
+              <Button onClick={() => onRestore(task)}>Restore</Button>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <strong>No completed tasks yet</strong>
+          <p>Checked assignments and micro-reviews will move here automatically.</p>
+        </div>
+      )}
+    </Panel>
   )
 }
 
@@ -305,6 +347,7 @@ function CalendarScreen({
   const [completingId, setCompletingId] = useState<string>()
   const [status, setStatus] = useState('Ready for an .ics file, Canvas feed, or public calendar URL.')
   const fileRef = useRef<HTMLInputElement>(null)
+  const upcomingEvents = events.filter((event) => !event.completed)
 
   function importCalendar(formData: FormData) {
     startTransition(async () => {
@@ -363,10 +406,10 @@ function CalendarScreen({
         </div>
       </Panel>
       <Panel className="calendar-panel">
-        <Kicker right={<span>{events.length} EVENTS</span>}>SEMESTER MAP / UPCOMING</Kicker>
+        <Kicker right={<span>{upcomingEvents.length} EVENTS</span>}>SEMESTER MAP / UPCOMING</Kicker>
         <div className="event-list">
-          {events.length ? (
-            events.slice(0, 14).map((event) => {
+          {upcomingEvents.length ? (
+            upcomingEvents.slice(0, 14).map((event) => {
               const start = new Date(event.start)
               return (
                 <article
@@ -645,7 +688,7 @@ function AdvisorScreen({
     {
       id: 1,
       role: 'assistant',
-      text: 'I can add a task, explain the selected score, or replan your highest-priority work.',
+      text: 'I can add a task, explain a score, parse a syllabus, build an exam plan, assign team work, or auto-reschedule conflicts.',
     },
   ])
   const [value, setValue] = useState('')
@@ -775,6 +818,7 @@ export default function SignalApp({
 }) {
   const router = useRouter()
   const [authPending, startAuthTransition] = useTransition()
+  const [, startMutationTransition] = useTransition()
   const [screen, setScreen] = useState<Screen>('dashboard')
   const [selected, setSelected] = useState(0)
   const [tasks, setTasks] = useState(initialTasks)
@@ -807,6 +851,15 @@ export default function SignalApp({
     })
   }
 
+  function setCompleted(task: TaskView, completed = true) {
+    startMutationTransition(async () => {
+      const result = await setTaskCompletedAction(task.id, completed)
+      refresh(result.ok ? result.message : result.error)
+    })
+  }
+
+  const upcomingTasks = tasks.filter((task) => task.status !== 'done')
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
@@ -834,16 +887,17 @@ export default function SignalApp({
         </header>
         {notice && <button className="notice" onClick={() => setNotice('')}>{notice}<span>DISMISS</span></button>}
         <div className="screen-title">
-          <div><small>SCREEN {active.index} / 06</small><h1>{active.label}</h1></div>
+          <div><small>SCREEN {active.index} / 07</small><h1>{active.label}</h1></div>
           <span>{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase()}</span>
         </div>
         <div className="screen">
-          {screen === 'dashboard' && <Dashboard go={setScreen} selected={selected} setSelected={setSelected} tasks={tasks} />}
-          {screen === 'score' && <ScoreScreen task={tasks[selected] ?? tasks[0]} />}
+          {screen === 'dashboard' && <Dashboard go={setScreen} onCompleted={(task) => setCompleted(task)} selected={selected} setSelected={setSelected} tasks={tasks} />}
+          {screen === 'score' && <ScoreScreen task={upcomingTasks[selected] ?? upcomingTasks[0]} />}
           {screen === 'calendar' && <CalendarScreen events={events} onImported={refresh} />}
           {screen === 'time' && <TimeScreen events={events} onReplanned={refresh} tasks={tasks} />}
           {screen === 'copilot' && <QuickAdd onAdded={refresh} onOpenAdvisor={() => setScreen('advisor')} />}
-          {screen === 'advisor' && <AdvisorScreen onChanged={refresh} selectedTask={tasks[selected] ?? tasks[0]} />}
+          {screen === 'advisor' && <AdvisorScreen onChanged={refresh} selectedTask={upcomingTasks[selected] ?? upcomingTasks[0]} />}
+          {screen === 'completed' && <CompletedScreen onRestore={(task) => setCompleted(task, false)} tasks={tasks} />}
         </div>
         <div className="mobile-nav">
           {nav.map((item) => <button className={screen === item.id ? 'active' : ''} key={item.id} onClick={() => setScreen(item.id)}>{item.index}</button>)}

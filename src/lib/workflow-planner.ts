@@ -138,7 +138,10 @@ export function buildExamPlan(prompt: string, now = new Date()): WorkflowPlan {
 function membersFromPrompt(prompt: string) {
   const match = prompt.match(/members?\s*:\s*([^\n]+)/i)
   if (!match) return ['Unassigned']
-  const members = match[1].split(/,|&|\band\b/i).map((name) => name.trim()).filter(Boolean)
+  const members = match[1]
+    .split(/,|&|\band\b/i)
+    .map((name) => name.replace(/[.\s]+$/g, '').trim())
+    .filter(Boolean)
   return members.length ? members : ['Unassigned']
 }
 

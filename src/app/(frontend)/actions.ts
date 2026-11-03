@@ -171,34 +171,96 @@ export async function createWorkflowAction(
   try {
     const payload = await getPayload({ config })
     const user = asPayloadUser(appUser)
-    const eventResult = await createInBatches(plan.events, (event) =>
-      payload.create({
-        collection: 'calendar-events',
-        data: {
-          ...event,
-          source: 'manual',
-          uid: `workflow-${crypto.randomUUID()}`,
-        },
-        overrideAccess: false,
-        user,
-      }),
-    )
-    const taskResult = await createInBatches(plan.tasks, (task) =>
-      payload.create({
-        collection: 'tasks',
-        data: { ...task, status: 'open' },
-        overrideAccess: false,
-        user,
-      }),
-    )
-    if (!taskResult.created) return { ok: false, error: 'Signal could not save the generated plan.' }
+    const eventIds: string[] = []
+    let eventFailures = 0
+    for (const event of plan.events) {
+      try {
+        const created = await payload.create({
+          collection: 'calendar-events',
+          data: {
+            ...event,
+            source: 'manual',
+            uid: `workflow-${crypto.randomUUID()}`,
+          },
+          overrideAccess: false,
+          user,
+        })
+        eventIds.push(String(created.id))
+      } catch {
+        eventFailures += 1
+        eventIds.push('')
+      }
+    }
+    let tasksCreated = 0
+    for (const [index, task] of plan.tasks.entries()) {
+      try {
+        await payload.create({
+          collection: 'tasks',
+          data: {
+            ...task,
+            calendarEvent:
+              eventIds.length === plan.tasks.length ? eventIds[index] || undefined : undefined,
+            status: 'open',
+          },
+          overrideAccess: false,
+          user,
+        })
+        tasksCreated += 1
+      } catch {
+        // Keep successfully created plan items and report the partial result.
+      }
+    }
+    if (!tasksCreated) return { ok: false, error: 'Signal could not save the generated plan.' }
+    const eventsCreated = plan.events.length - eventFailures
     return {
       ok: true,
-      data: { eventsCreated: eventResult.created, tasksCreated: taskResult.created },
-      message: `Created ${taskResult.created} ${plan.label} and ${eventResult.created} calendar block${eventResult.created === 1 ? '' : 's'}.`,
+      data: { eventsCreated, tasksCreated },
+      message: `Created ${tasksCreated} ${plan.label} and ${eventsCreated} calendar block${eventsCreated === 1 ? '' : 's'}.`,
     }
   } catch {
     return { ok: false, error: 'Signal could not save the generated plan.' }
+  }
+}
+
+export async function setTaskCompletedAction(
+  id: string,
+  completed: boolean,
+): Promise<ActionResult<{ completed: boolean; id: string }>> {
+  if (!id || id.length > 100 || id.startsWith('calendar-')) {
+    return { ok: false, error: 'That task is invalid.' }
+  }
+  try {
+    const appUser = await requireAppUser()
+    if (!appUser) return { ok: false, error: 'Sign in to update tasks.' }
+    const user = asPayloadUser(appUser)
+    const payload = await getPayload({ config })
+    const task = await payload.update({
+      collection: 'tasks',
+      id,
+      data: { status: completed ? 'done' : 'open' },
+      overrideAccess: false,
+      user,
+    })
+    const eventId =
+      typeof task.calendarEvent === 'object' && task.calendarEvent
+        ? task.calendarEvent.id
+        : task.calendarEvent
+    if (eventId) {
+      await payload.update({
+        collection: 'calendar-events',
+        id: eventId,
+        data: { completed },
+        overrideAccess: false,
+        user,
+      })
+    }
+    return {
+      ok: true,
+      data: { completed, id: String(task.id) },
+      message: completed ? 'Task moved to Completed.' : 'Task restored to the upcoming plan.',
+    }
+  } catch {
+    return { ok: false, error: 'Signal could not update that task.' }
   }
 }
 
