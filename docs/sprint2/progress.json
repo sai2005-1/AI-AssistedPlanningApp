@@ -1,0 +1,1794 @@
+{
+  "data_format": "JSON",
+  "document_type": "itsc3155_sprint2_agent_progress_tracker",
+  "tracker_version": "1.1.0",
+  "created_on": "2026-11-15",
+  "last_updated_on": "2026-11-15",
+  "state": "planning_baseline_not_team_approved",
+  "repo": {
+    "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp",
+    "name": "AI-AssistedPlanningApp",
+    "default_branch": "main",
+    "audited_branch": "main",
+    "audited_head_sha": "8dd2e0f298b35932caa0c5f97cb3e83c0c5bb782",
+    "audited_on": "2026-11-15",
+    "repository_mode": "GitHub + VS Code/GitHub Copilot Agent Mode",
+    "figma_design_reference": "https://scroll-font-26457270.figma.site/",
+    "repo_tracker_path": "docs/sprint2/progress.json",
+    "repo_agent_instructions_path": "docs/sprint2/AGENT_INSTRUCTIONS.md",
+    "implementation_notes": "Commit 8dd2e0f adds Firestore server SDK and Team Deliverables UI, docs and UML, .env.example, Vitest tests. These are source observations; no live runtime, app restart, database connection or test execution independently verified."
+  },
+  "assignment": {
+    "course": "ITSC 3155",
+    "term": "Fall 2026",
+    "name": "Implementation Sprint 2: ORM Generation, Database Integration, and Feature Development",
+    "primary_reference": "ITSC 3155 Fall 2026 Sprint 2.pdf (23 pages)",
+    "total_points": 100,
+    "required_technology_workflow": [
+      "VS Code",
+      "GitHub Copilot Agent Mode",
+      "Figma MCP",
+      "GitHub Issues/Project",
+      "GitHub release"
+    ],
+    "required_submission": [
+      "GitHub repository URL",
+      "Sprint 2 GitHub release URL"
+    ],
+    "required_release_tag": "v0.2.0-sprint2",
+    "requires_one_database_integrated_user_story": true,
+    "requires_one_meaningful_commit_per_member": true,
+    "requires_local_database_per_member": true,
+    "requires_shared_cloud_development_environment": "For non-SQLite selections; SQLite has same-schema local exception described on assignment page 7"
+  },
+  "how_to_use": {
+    "read_first": [
+      "docs/sprint2/AGENT_INSTRUCTIONS.md",
+      "docs/sprint2/progress.json",
+      "AGENTS.md",
+      "relevant GitHub Issue and current code"
+    ],
+    "status_enum": [
+      "not_started",
+      "partial",
+      "in_progress",
+      "blocked",
+      "verified",
+      "not_applicable"
+    ],
+    "status_meanings": {
+      "not_started": "No verified work completed for this task at the audited state.",
+      "partial": "Some source code or preparation exists, but acceptance proof is incomplete.",
+      "in_progress": "Named owner has started active work on a branch/PR; record link.",
+      "blocked": "Requires unresolved decision, permission or dependency before implementation can proceed.",
+      "verified": "All listed acceptance checks passed; each has evidence references; human review confirmed.",
+      "not_applicable": "Team approved an explicit documented reason this item is inapplicable. Must not be used to skip mandatory rubric items."
+    },
+    "update_policy": [
+      "Recheck repo HEAD and Issue statuses at start; stale baseline is not evidence of current reality.",
+      "Change only your assigned task and evidence fields, keeping unrelated status untouched.",
+      "Move a task to verified only with commit/PR references and actual test/demo/log evidence.",
+      "For blocked task, record blocker and dependency; do not silently assume approval.",
+      "Update last_updated_on and append chronological change_log entry with what changed, actor and evidence.",
+      "Run node scripts/validate-sprint2-progress.mjs before committing.",
+      "Do not place credentials, secrets, student information, private URLs, or copied access tokens in JSON.",
+      "Use separate feature branches/PRs and request a teammate review before merge."
+    ]
+  },
+  "current_implementation": {
+    "observed_not_runtime_verified": true,
+    "stack": [
+      "Next.js 16.4.6",
+      "React 19.2.1",
+      "TypeScript",
+      "Payload CMS 4.0.0-beta.3",
+      "Figma-managed Payload buildFigmaConfig",
+      "Tailwind CSS 4",
+      "Firebase Admin SDK (server-only; Team Deliverables in Firestore)",
+      "Vitest test script and rule tests"
+    ],
+    "source_inventory": [
+      {
+        "component": "Frontend app and calendar import UI",
+        "paths": [
+          "src/app/(frontend)/signal-app.tsx",
+          "src/app/(frontend)/page.tsx"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "User authentication / ownership",
+        "paths": [
+          "src/collections/Users.ts",
+          "src/lib/app-auth.ts",
+          "src/lib/app-access.ts"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "Typed Payload data models",
+        "paths": [
+          "src/collections/Tasks.ts",
+          "src/collections/CalendarEvents.ts",
+          "src/collections/Courses.ts",
+          "src/payload-types.ts"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "Create/find/update server actions",
+        "paths": [
+          "src/app/(frontend)/actions.ts"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "ICS parser",
+        "paths": [
+          "src/lib/ics.ts"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "Rule-based planning and scoring",
+        "paths": [
+          "src/lib/workflow-planner.ts",
+          "src/lib/scoring.ts"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "Figma-managed database configuration",
+        "paths": [
+          "src/payload.config.ts",
+          "AGENTS.md"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "New Firestore-backed Issue #4 team feature",
+        "paths": [
+          "src/lib/firebase-admin.ts",
+          "src/lib/team-types.ts",
+          "src/lib/team-deliverables.ts",
+          "src/app/(frontend)/team-actions.ts",
+          "src/app/(frontend)/team-deliverables.tsx"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "PlantUML class and sequence diagram source and SVG renderings",
+        "paths": [
+          "docs/uml/sprint-2-data-model.puml",
+          "docs/uml/sprint-2-data-model.svg",
+          "docs/uml/team-deliverable-sequence.puml",
+          "docs/uml/team-deliverable-sequence.svg"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "Firebase setup and credential placeholders",
+        "paths": [
+          "docs/firestore-setup.md",
+          ".env.example",
+          ".gitignore"
+        ],
+        "state": "present_source_only"
+      },
+      {
+        "component": "Vitest deadline validation unit tests",
+        "paths": [
+          "src/lib/team-deliverable-rules.test.ts",
+          "package.json"
+        ],
+        "state": "present_source_only"
+      }
+    ],
+    "known_technical_gaps": [
+      "Current source uses Payload CMS for users/tasks/calendar and server-only Firestore for team projects. The team must confirm and document this scoped hybrid, not silently rewrite the backend.",
+      "Firestore setup guide describes separate cloud development projects; local emulator and shared dev DB operation have not been tested.",
+      "Figma-managed Payload via buildFigmaConfig remains; clean local VS Code startup and app auth compatibility are not verified.",
+      "No firebase.json, firestore.rules or firestore.indexes.json observed at audited HEAD. Assess what is needed for a server-only Admin SDK design and class requirements.",
+      "Two source and rendered UML diagrams exist but Figma MCP correspondence and reviewer approval are not independently verified.",
+      "Vitest test file and script exist, but tests were not run during this review; no observed successful database integration test, app restart proof or team connectivity table.",
+      "No lint script or docs/ai-design-review.md was observed. No Sprint 2 release observed.",
+      "GitHub Issue #4 is now the natural team-deliverable story candidate; verify the full issue acceptance criteria against behavior."
+    ]
+  },
+  "decisions": [
+    {
+      "id": "D01",
+      "topic": "Approve scoped Payload + Firestore architecture and local reproducibility",
+      "status": "implemented_in_source_awaiting_team_approval",
+      "options": [
+        "Retain Payload for existing users/tasks/calendar and Firestore for Issue #4 team projects; prove local emulator and shared dev DB",
+        "Revise architecture only after an approved migration plan"
+      ],
+      "team_discussion": "Main commit 8dd2e0f implements Firestore for team projects without replacing Figma-managed Payload. Team approval, local developer setup and tests remain unverified.",
+      "required_before": [
+        "T08",
+        "T11",
+        "T14",
+        "T19"
+      ],
+      "decision": null,
+      "approved_by": [],
+      "approved_on": null
+    },
+    {
+      "id": "D02",
+      "topic": "Confirm Issue #4 as graded Sprint 2 database-backed user story",
+      "status": "candidate_in_source_not_approved",
+      "options": [
+        "GitHub Issue #4: Team Deliverable Allocation & Sub-Task Delegation (implemented in source; needs verification)",
+        "Alternate feature only after team approval, issue criteria, UML and test plan updates"
+      ],
+      "recommended": "Issue #6 because server actions, UI and ICS parser already exist, reducing risk",
+      "decision": null,
+      "approved_by": [],
+      "approved_on": null
+    },
+    {
+      "id": "D03",
+      "topic": "GitHub collaboration workflow",
+      "status": "team_direction_confirmed_details_pending",
+      "decision": "Use GitHub/VS Code; make changes in feature branches and review PRs; do not push concurrently to main",
+      "approved_by": [],
+      "approved_on": null
+    },
+    {
+      "id": "D04",
+      "topic": "Team file ownership",
+      "status": "proposed_not_approved",
+      "decision": null,
+      "approved_by": [],
+      "approved_on": null
+    }
+  ],
+  "proposed_team": [
+    {
+      "name": "Julian",
+      "ownership": "AI/workflow integration, agent coordination, UML/review/docs, test contribution",
+      "confirmed": false
+    },
+    {
+      "name": "Tyler",
+      "ownership": "Database decision, setup, migrations or Firebase models/rules, environment documentation",
+      "confirmed": false
+    },
+    {
+      "name": "Sai",
+      "ownership": "Persistence feature/ICS implementation, selected GitHub Issue, release integration",
+      "confirmed": false
+    },
+    {
+      "name": "Chris",
+      "ownership": "Frontend polish/integration, demo flow, lint",
+      "confirmed": false
+    },
+    {
+      "name": "Cos",
+      "ownership": "Frontend/test contribution, input/error tests, presentation demo",
+      "confirmed": false
+    }
+  ],
+  "github_issues": [
+    {
+      "number": 1,
+      "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/1",
+      "title": "Importing Canvas .ics file",
+      "note": "Body actually describes syllabus parsing with editable preview; do not treat as equivalent to basic ICS import"
+    },
+    {
+      "number": 2,
+      "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/2",
+      "title": "Spaced Repetition Exam Study Plan Generator",
+      "note": "Existing generator is not proof all criteria (including micro-review UI) pass"
+    },
+    {
+      "number": 3,
+      "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/3",
+      "title": "Conflict-Aware Focus Block Auto-Rescheduler",
+      "note": "Existing replanner exists; strict story criteria unverified"
+    },
+    {
+      "number": 4,
+      "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/4",
+      "title": "Team Deliverable Allocation & Sub-Task Delegation",
+      "note": "Existing team planner does not prove collaborator board feature"
+    },
+    {
+      "number": 5,
+      "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/5",
+      "title": "Importing Canvas .ics file",
+      "note": "Body calls for paste/file syllabus, editable preview and warnings; scope wider than ICS importer"
+    },
+    {
+      "number": 6,
+      "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/6",
+      "title": "Work on import .ics",
+      "note": "Recommended grading candidate; acceptance criteria need completion"
+    },
+    {
+      "number": 8,
+      "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/8",
+      "title": "Work on a AI ChatBot",
+      "note": "Agent AI feature scope sparse and requires team definition"
+    },
+    {
+      "number": 10,
+      "url": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/10",
+      "title": "Create Signup & Login Page",
+      "note": "Auth UI/backend source present, runtime tests absent"
+    }
+  ],
+  "phases": [
+    {
+      "id": "P0-alignment",
+      "goal": "Align agents and owners without modifying working code",
+      "exit_gates": [
+        "Team work ownership confirmed",
+        "DB decision owner named",
+        "Copilot/Figma connection verified",
+        "Audit current HEAD"
+      ]
+    },
+    {
+      "id": "P1-design",
+      "goal": "Approved data model and truthful diagrams",
+      "exit_gates": [
+        "Database approach formally approved",
+        "Entity/relationship constraints reviewed",
+        "UML class and sequence sources plus renders reviewed"
+      ]
+    },
+    {
+      "id": "P2-database",
+      "goal": "Repeatable secure local persistence and shared integration environment",
+      "exit_gates": [
+        "Local DB/emulator reproducible",
+        "Data layer and migrations or Firestore rules/indexes committed",
+        "Seed data works",
+        "Secrets excluded"
+      ]
+    },
+    {
+      "id": "P3-integration",
+      "goal": "One real persistent GitHub user story verified end to end",
+      "exit_gates": [
+        "Issue acceptance criteria documented",
+        "UI create/read working in approved DB",
+        "Validation/error handling passes",
+        "Data survives restart",
+        "Five members verify connectivity"
+      ]
+    },
+    {
+      "id": "P4-quality",
+      "goal": "Automated tests and lint evidence",
+      "exit_gates": [
+        "Success/error/story tests pass",
+        "Lint command passes",
+        "Results recorded"
+      ]
+    },
+    {
+      "id": "P5-delivery",
+      "goal": "GitHub Scrum evidence, reviewed tag, proper submission",
+      "exit_gates": [
+        "Five meaningful individual commits",
+        "Project status reflects actual work",
+        "Release contains run instructions/results/limitations",
+        "Submit repo and release URLs"
+      ]
+    }
+  ],
+  "rubric": [
+    {
+      "id": "R01",
+      "criterion": "Data models / ORM or equivalent",
+      "max_points": 15,
+      "status": "partial",
+      "source_pdf_pages": [
+        19,
+        20
+      ],
+      "work_item_ids": [
+        "T02",
+        "T05",
+        "T09"
+      ],
+      "acceptance_checks": [
+        "Entities and attributes follow application requirements",
+        "Identifiers, relationships, and constraints are correct",
+        "Models are integrated with selected database",
+        "One AI-generated assumption/correction is documented"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R02",
+      "criterion": "UML class and sequence diagrams",
+      "max_points": 10,
+      "status": "not_started",
+      "source_pdf_pages": [
+        3,
+        19,
+        20
+      ],
+      "work_item_ids": [
+        "T06",
+        "T07"
+      ],
+      "acceptance_checks": [
+        "Class diagram has attributes, types, relationships, multiplicities, and identifiers",
+        "Sequence diagram has actor, interface, service, data-access layer, database",
+        "Both PlantUML sources and rendered PNG/SVG diagrams match implementation"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R03",
+      "criterion": "Database selection/configuration",
+      "max_points": 10,
+      "status": "blocked",
+      "source_pdf_pages": [
+        4,
+        5,
+        6,
+        20
+      ],
+      "work_item_ids": [
+        "T03",
+        "T08",
+        "T09",
+        "T10"
+      ],
+      "acceptance_checks": [
+        "Database selected and rationale documented",
+        "Every team member can use an approved local database or emulator",
+        "Connection, setup/migrations or indexes/rules, and development seeds work",
+        "Application uses the selected database instead of mock data"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R04",
+      "criterion": "Team database connectivity",
+      "max_points": 5,
+      "status": "blocked",
+      "source_pdf_pages": [
+        6,
+        7,
+        20
+      ],
+      "work_item_ids": [
+        "T11",
+        "T14",
+        "T15"
+      ],
+      "acceptance_checks": [
+        "All five members demonstrate installation, startup, connection, and one database operation",
+        "Cloud shared-data verification or consistent local-schema tests documented per team member"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R05",
+      "criterion": "Credential security and gitignore",
+      "max_points": 10,
+      "status": "partial",
+      "source_pdf_pages": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        21
+      ],
+      "work_item_ids": [
+        "T12",
+        "T13",
+        "T15"
+      ],
+      "acceptance_checks": [
+        "Root gitignore excludes sensitive files and local DB files as applicable",
+        "Root .env.example is committed and contains only placeholders",
+        "No real credentials are tracked or committed; history exposure handled by rotation",
+        "Secure database setup is documented"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R06",
+      "criterion": "Database-integrated user story",
+      "max_points": 25,
+      "status": "partial",
+      "source_pdf_pages": [
+        11,
+        21
+      ],
+      "work_item_ids": [
+        "T16",
+        "T17",
+        "T18",
+        "T19",
+        "T20"
+      ],
+      "acceptance_checks": [
+        "Selected story links to an existing GitHub Issue with acceptance criteria",
+        "Feature is reachable through existing interface",
+        "Feature uses the actual persistence layer, including real reads/writes",
+        "Data survives application restart and can be retrieved",
+        "Validation and error messages work"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R07",
+      "criterion": "Meaningful individual commits",
+      "max_points": 5,
+      "status": "not_started",
+      "source_pdf_pages": [
+        12,
+        22
+      ],
+      "work_item_ids": [
+        "T26"
+      ],
+      "acceptance_checks": [
+        "Each of five members has at least one meaningful Sprint 2 commit using their own GitHub identity",
+        "Commit messages are descriptive and connect to sprint work"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R08",
+      "criterion": "GitHub Project and Scrum evidence",
+      "max_points": 5,
+      "status": "partial",
+      "source_pdf_pages": [
+        12,
+        22
+      ],
+      "work_item_ids": [
+        "T04",
+        "T27",
+        "T28"
+      ],
+      "acceptance_checks": [
+        "Issues assigned and contain acceptance criteria",
+        "GitHub Project statuses and sprint backlog reflect real work",
+        "Commits and PRs are linked to corresponding Issues"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R09",
+      "criterion": "Automated tests",
+      "max_points": 8,
+      "status": "not_started",
+      "source_pdf_pages": [
+        13,
+        22
+      ],
+      "work_item_ids": [
+        "T21",
+        "T22",
+        "T23",
+        "T24"
+      ],
+      "acceptance_checks": [
+        "At least one successful database operation tested",
+        "Invalid input or error condition tested",
+        "Selected database user story covered",
+        "Test execution passes, with recorded commands and outputs"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R10",
+      "criterion": "Lint / code quality",
+      "max_points": 2,
+      "status": "not_started",
+      "source_pdf_pages": [
+        13,
+        22
+      ],
+      "work_item_ids": [
+        "T25"
+      ],
+      "acceptance_checks": [
+        "Configured lint/check command executes without unresolved errors",
+        "Results documented"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    },
+    {
+      "id": "R11",
+      "criterion": "Sprint 2 tag and release",
+      "max_points": 5,
+      "status": "not_started",
+      "source_pdf_pages": [
+        14,
+        23
+      ],
+      "work_item_ids": [
+        "T29",
+        "T30",
+        "T31"
+      ],
+      "acceptance_checks": [
+        "Release tag v0.2.0-sprint2 (or approved equivalent) points to graded code",
+        "Release notes include stories, model/database status, tests, limitations, and run instructions",
+        "Submit repository URL and release URL"
+      ],
+      "evidence": [],
+      "points_awarded": null
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T01",
+      "title": "Connect GitHub Copilot Agent Mode to the Figma design",
+      "phase": "P0-alignment",
+      "priority": "P0",
+      "status": "not_started",
+      "owner_proposed": "Sai",
+      "owner_confirmed": false,
+      "depends_on": [],
+      "rubric_ids": [
+        "R01",
+        "R02"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "VS Code Copilot Agent Mode",
+        "Figma MCP"
+      ],
+      "observed_baseline": "Figma Make files and a design reference exist in repository; active MCP connection not verified",
+      "definition_of_done": [
+        "Each contributor can identify the Figma design and inspect a relevant component through MCP",
+        "Document connection verification without credentials"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T02",
+      "title": "Audit existing UI, user stories, persistent entities, and model constraints",
+      "phase": "P0-alignment",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [],
+      "rubric_ids": [
+        "R01"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "src/collections/",
+        "src/app/(frontend)/",
+        "GitHub Issues #1–#10"
+      ],
+      "observed_baseline": "Source review found Users, Tasks, CalendarEvents, Courses, Payload actions and app UI; not runtime-verified",
+      "definition_of_done": [
+        "Record persistent entities, attributes, relationships, ownership, and actual implemented workflow",
+        "Map Figma screens/user stories to data needs and state assumptions plainly"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T03",
+      "title": "Decide one authoritative database approach and migration strategy",
+      "phase": "P1-design",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Tyler",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T02"
+      ],
+      "rubric_ids": [
+        "R03"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "src/payload.config.ts",
+        "AGENTS.md",
+        "src/app/(frontend)/actions.ts"
+      ],
+      "observed_baseline": "Firestore implemented only for team projects while Payload remains for accounts/tasks/calendar. Formal team acceptance, local emulator and production/dev separation unverified.",
+      "definition_of_done": [
+        "Team records an approved decision for Firebase Firestore or a compatible local-development database stack",
+        "State whether Payload remains, is migrated, or is replaced; document migration plan, auth ownership, local setup, and shared dev environment",
+        "No second authoritative datastore is introduced without approval"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T04",
+      "title": "Confirm team owners, branches, and GitHub Issues",
+      "phase": "P0-alignment",
+      "priority": "P0",
+      "status": "not_started",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [],
+      "rubric_ids": [
+        "R08"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "GitHub Issues",
+        "GitHub Project",
+        "branch policy"
+      ],
+      "observed_baseline": "Screenshot indicated Julian=AI coordination, Tyler=backend, Sai=backend, Chris/Cos=frontend/demo; assignments are proposals only",
+      "definition_of_done": [
+        "All five members accept workstream ownership and the review process",
+        "Each owned workstream links to at least one assigned Issue and meaningful deliverable",
+        "One person is responsible for integration when source files overlap"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T05",
+      "title": "Review AI-generated data-model assumptions and log corrections",
+      "phase": "P1-design",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T02",
+        "T03"
+      ],
+      "rubric_ids": [
+        "R01"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "src/collections/",
+        "docs/ai-design-review.md"
+      ],
+      "observed_baseline": "UML README now records design assumptions; actual AI-generated assumption/correction, reviewer and before/after still need docs/ai-design-review.md.",
+      "definition_of_done": [
+        "Review model proposals against source/UI/acceptance criteria",
+        "Document at least one specific generated assumption, team correction, rationale, and affected code/diagram",
+        "Do not claim a correction happened unless change or review evidence exists"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T06",
+      "title": "Produce accurate PlantUML class diagram + rendered SVG/PNG",
+      "phase": "P1-design",
+      "priority": "P1",
+      "status": "partial",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T03",
+        "T05"
+      ],
+      "rubric_ids": [
+        "R02"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "docs/uml/sprint-2-data-model.puml",
+        "docs/uml/sprint-2-data-model.svg"
+      ],
+      "observed_baseline": "Source and rendered class diagram exist in docs/uml/sprint-2-data-model.*; correctness vs current Firestore implementation and Figma design needs review.",
+      "definition_of_done": [
+        "Diagram shows actual entities, attributes/data types, identifiers, constraints, multiplicities and relationships",
+        "Save source and rendered visual under docs/uml; peer-review against implementation"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T07",
+      "title": "Produce accurate database user-story sequence diagram + render",
+      "phase": "P1-design",
+      "priority": "P1",
+      "status": "partial",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T16",
+        "T09"
+      ],
+      "rubric_ids": [
+        "R02"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "docs/uml/team-deliverable-sequence.puml",
+        "docs/uml/team-deliverable-sequence.svg"
+      ],
+      "observed_baseline": "Sequence source and SVG exist in docs/uml/team-deliverable-sequence.* for Issue #4; validate against running flow.",
+      "definition_of_done": [
+        "Sequence shows actor, UI, service/server action, data-access/ORM/repository, database",
+        "Depict actual database user story and error path; save puml and rendered image"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T08",
+      "title": "Make development database reproducible locally",
+      "phase": "P2-database",
+      "priority": "P0",
+      "status": "blocked",
+      "owner_proposed": "Tyler",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T03"
+      ],
+      "rubric_ids": [
+        "R03"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "database adapter OR Firebase emulator",
+        "local run configuration"
+      ],
+      "observed_baseline": "Per-developer Firestore cloud setup documented but local emulator for each developer and clean-start runbook not verified.",
+      "definition_of_done": [
+        "A teammate can follow instructions to install/use a local database/emulator and successfully connect",
+        "Does not depend on live Figma-only secrets",
+        "No production/user data in development database"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T09",
+      "title": "Generate/integrate typed data layer and schema migrations OR Firestore rules/indexes",
+      "phase": "P2-database",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Tyler",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T03",
+        "T08"
+      ],
+      "rubric_ids": [
+        "R01",
+        "R03"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "src/lib/team-types.ts",
+        "src/lib/team-deliverables.ts",
+        "src/lib/firebase-admin.ts"
+      ],
+      "observed_baseline": "Firestore Admin SDK, typed models, repository classes and server actions are in source. Runtime writes, rules/index requirements and authorizations unverified.",
+      "definition_of_done": [
+        "Entities have correct types, relationships, ownership/access constraints",
+        "Version-controlled setup/migrations (relational) OR typed models/indexes/rules (Firestore)",
+        "Code path in selected feature points to exactly one authoritative database"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T10",
+      "title": "Add repeatable development seeds and verify database initialization",
+      "phase": "P2-database",
+      "priority": "P1",
+      "status": "blocked",
+      "owner_proposed": "Tyler",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T09"
+      ],
+      "rubric_ids": [
+        "R03"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "seed script or documented seed mechanism"
+      ],
+      "observed_baseline": "No repeatable local seed/demo initialization was observed.",
+      "definition_of_done": [
+        "Create sample development records without secrets/real student information",
+        "Fresh local database initializes and seed data can be read/written"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T11",
+      "title": "Configure shared cloud development database securely",
+      "phase": "P2-database",
+      "priority": "P1",
+      "status": "blocked",
+      "owner_proposed": "Tyler",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T03",
+        "T09"
+      ],
+      "rubric_ids": [
+        "R04"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "Firebase Spark OR no-cost PostgreSQL integration service OR approved alternative"
+      ],
+      "observed_baseline": "Shared cloud development Firestore project and actual CRUD from each teammate unverified.",
+      "definition_of_done": [
+        "Selected dev integration environment is documented and isolated from production",
+        "Access controls/credentials shared through approved secure method",
+        "Team confirms no required paid service; cost terms checked"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T12",
+      "title": "Fix gitignore and create secret-free env example",
+      "phase": "P2-database",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Tyler",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T03"
+      ],
+      "rubric_ids": [
+        "R05"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        ".gitignore",
+        ".env.example"
+      ],
+      "observed_baseline": "Repo now has .env.example placeholders and .gitignore with !.env.example. Verify local ignore, tracking and history.",
+      "definition_of_done": [
+        "Real .env, private keys, local database artifacts excluded",
+        "!.env.example exception permits committing safe placeholders",
+        "No provider secrets/API tokens in committed files"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T13",
+      "title": "Verify secret hygiene and history exposure",
+      "phase": "P2-database",
+      "priority": "P0",
+      "status": "not_started",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T12"
+      ],
+      "rubric_ids": [
+        "R05"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "git status",
+        "git check-ignore -v .env",
+        "git ls-files .env",
+        "git diff --cached"
+      ],
+      "observed_baseline": "No verified git check-ignore, git ls-files or secret history scan recorded.",
+      "definition_of_done": [
+        "Evidence documents local ignore/tracking checks and review of staged diff",
+        "GitHub current files and relevant history checked for secrets",
+        "Any exposed secrets are revoked/rotated rather than merely deleting latest file"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T14",
+      "title": "Verify every team member can start app and operate the database",
+      "phase": "P3-integration",
+      "priority": "P0",
+      "status": "blocked",
+      "owner_proposed": "All team members",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T08",
+        "T09",
+        "T10",
+        "T11"
+      ],
+      "rubric_ids": [
+        "R04"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "docs/database-setup.md"
+      ],
+      "observed_baseline": "",
+      "definition_of_done": [
+        "Julian, Tyler, Sai, Chris, and Cos each demonstrate app start and at least one database read/write",
+        "Use shared A-create/B-read/C-update test if applicable, else prove consistent local schema for each",
+        "Record actual commands/results and date per member without credentials"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T15",
+      "title": "Write secure database setup and team verification instructions",
+      "phase": "P3-integration",
+      "priority": "P1",
+      "status": "partial",
+      "owner_proposed": "Tyler",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T08",
+        "T09",
+        "T14"
+      ],
+      "rubric_ids": [
+        "R04",
+        "R05"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "docs/database-setup.md"
+      ],
+      "observed_baseline": "docs/firestore-setup.md exists but does not yet provide a completed team connectivity table, local emulator runbook and shared dev proof.",
+      "definition_of_done": [
+        "Document selected database/rationale, local setup, shared integration setup, migration/seed commands, secure env instructions",
+        "Include short per-member connection/operation/result table with actual evidence",
+        "Remove all sensitive values from published documentation"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T16",
+      "title": "Choose existing GitHub Issue and finalize acceptance criteria",
+      "phase": "P3-integration",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Sai",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T04"
+      ],
+      "rubric_ids": [
+        "R06"
+      ],
+      "github_issue": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/6",
+      "files_or_areas": [
+        "GitHub Issue #6 proposed",
+        "Issue #5 separate broader syllabus flow"
+      ],
+      "observed_baseline": "Issue #4 team-deliverables has implementation and diagrams. Team still must approve selected issue and verify acceptance criteria.",
+      "definition_of_done": [
+        "Choose one existing Issue approved by team",
+        "Issue has testable acceptance criteria and an assignee",
+        "Do not conflate basic ICS import with editable syllabus-parsing UI"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T17",
+      "title": "Connect chosen feature end-to-end to selected persistent store",
+      "phase": "P3-integration",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Sai",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T09",
+        "T16"
+      ],
+      "rubric_ids": [
+        "R06"
+      ],
+      "github_issue": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/6",
+      "files_or_areas": [
+        "src/app/(frontend)/team-deliverables.tsx",
+        "src/app/(frontend)/team-actions.ts",
+        "src/lib/team-deliverables.ts"
+      ],
+      "observed_baseline": "Team Deliverables UI, server actions, Firestore Admin client, Firestore repository functions present; real database writes not independently observed.",
+      "definition_of_done": [
+        "User can create/import relevant records through UI and approved data-access layer",
+        "Persisted records can be retrieved without hardcoded state/mocks",
+        "Created event/task ownership and duplicate handling use selected datastore"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T18",
+      "title": "Validate malformed inputs, duplicate behavior and per-user access",
+      "phase": "P3-integration",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Sai",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T17"
+      ],
+      "rubric_ids": [
+        "R06"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "src/lib/ics.ts",
+        "src/app/(frontend)/actions.ts",
+        "authentication/access rules"
+      ],
+      "observed_baseline": "Input allowlisting, deadlines, owner/member permissions and structured errors exist in source; actual negative/authorization tests unverified.",
+      "definition_of_done": [
+        "Invalid or empty input produces human-readable error",
+        "Reimport duplicates handled within same account",
+        "User B cannot read or update User A private events/tasks",
+        "Errors do not expose private internals or secrets"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T19",
+      "title": "Demonstrate persistence after app restart and fresh sign-in",
+      "phase": "P3-integration",
+      "priority": "P0",
+      "status": "not_started",
+      "owner_proposed": "Sai",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T17"
+      ],
+      "rubric_ids": [
+        "R06"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "demo evidence",
+        "docs/database-setup.md or story-test evidence"
+      ],
+      "observed_baseline": "No verified app restart followed by reloading persisted Issue #4 project/deliverable.",
+      "definition_of_done": [
+        "Create a test record, record returned ID, restart app, re-login, retrieve same record from database/UI",
+        "Capture sanitized evidence of before/after and identify database used"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T20",
+      "title": "Verify selected feature is functional from existing UI",
+      "phase": "P3-integration",
+      "priority": "P1",
+      "status": "partial",
+      "owner_proposed": "Chris",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T17"
+      ],
+      "rubric_ids": [
+        "R06"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "src/app/(frontend)/signal-app.tsx",
+        "src/app/(frontend)/styles.css"
+      ],
+      "observed_baseline": "Team Deliverables frontend exists. Figma MCP comparison and working UI end-to-end test unverified.",
+      "definition_of_done": [
+        "Existing calendar/import UI invokes live backend",
+        "Shows success/error status and persisted items; UI reflects server state",
+        "Demonstrate selected GitHub acceptance criteria against Figma-design intent"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T21",
+      "title": "Add automated successful database operation test",
+      "phase": "P4-quality",
+      "priority": "P0",
+      "status": "not_started",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T09",
+        "T24"
+      ],
+      "rubric_ids": [
+        "R09"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "src/lib/team-deliverables.test.ts (not observed)",
+        "Firebase emulator/test database"
+      ],
+      "observed_baseline": "No automated successful Firestore write/read operation test observed.",
+      "definition_of_done": [
+        "A repeatable test proves at least one successful operation against isolated test database/repository",
+        "Test assertions verify resulting record or returned value"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T22",
+      "title": "Add automated invalid-input or error-handling test",
+      "phase": "P4-quality",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Cos",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T24"
+      ],
+      "rubric_ids": [
+        "R09"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "project test directory"
+      ],
+      "observed_baseline": "Vitest deadline-rule tests cover invalid dates and 72-hour boundary, but execution and action error tests unverified.",
+      "definition_of_done": [
+        "Test rejects malformed/empty calendar input or other invalid user input",
+        "Assert error message/side effects and ensure no record is created"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T23",
+      "title": "Add automated coverage for selected user story",
+      "phase": "P4-quality",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Sai",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T17",
+        "T24"
+      ],
+      "rubric_ids": [
+        "R09"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "project test directory"
+      ],
+      "observed_baseline": "Vitest deadline-rule unit tests exist, but project membership/assignee integration tests not observed.",
+      "definition_of_done": [
+        "Cover valid ICS parse/import or approved alternative selected user story",
+        "Include persistence/duplicate/restart or integration test appropriate to the selected database",
+        "Run against test data only"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T24",
+      "title": "Configure test runner and document repeatable test command",
+      "phase": "P4-quality",
+      "priority": "P0",
+      "status": "partial",
+      "owner_proposed": "Cos",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T03"
+      ],
+      "rubric_ids": [
+        "R09"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "package.json",
+        "test config"
+      ],
+      "observed_baseline": "package.json includes test: vitest run and Vitest dep; no recorded successful test run.",
+      "definition_of_done": [
+        "Install/configure approved test framework, e.g. Vitest, Jest, or Mocha",
+        "Provide one reliable npm/pnpm command and documented results; no tests modify shared user data"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T25",
+      "title": "Configure lint and run checks without errors",
+      "phase": "P4-quality",
+      "priority": "P1",
+      "status": "not_started",
+      "owner_proposed": "Chris",
+      "owner_confirmed": false,
+      "depends_on": [],
+      "rubric_ids": [
+        "R10"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "package.json",
+        "lint config"
+      ],
+      "observed_baseline": "package.json has format: oxfmt but no lint script or passing lint evidence.",
+      "definition_of_done": [
+        "Add an appropriate lint/check command",
+        "Run it, address reported issues, and capture command/result"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T26",
+      "title": "Collect a meaningful individual Sprint 2 commit from each member",
+      "phase": "P5-delivery",
+      "priority": "P0",
+      "status": "not_started",
+      "owner_proposed": "All team members",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T04"
+      ],
+      "rubric_ids": [
+        "R07"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "Git commit history",
+        "GitHub Issues"
+      ],
+      "observed_baseline": "Existing historical commits not sufficient proof that all five contributed during Sprint 2",
+      "definition_of_done": [
+        "Five unique identities each have meaningful sprint contributions (feature, model correction, UML, tests, integration fix)",
+        "Evidence contains commit hash + task/Issue relation for each",
+        "Reject empty/format-only commits as evidence"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T27",
+      "title": "Maintain assigned GitHub Issues and accurate Scrum board",
+      "phase": "P5-delivery",
+      "priority": "P1",
+      "status": "partial",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T04",
+        "T16"
+      ],
+      "rubric_ids": [
+        "R08"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "GitHub Issues",
+        "GitHub Project"
+      ],
+      "observed_baseline": "GitHub Issues #1–#10 exist; board status and current assignments not verified",
+      "definition_of_done": [
+        "Issue assignments and acceptance criteria match plan",
+        "In-progress/done statuses updated as work genuinely moves",
+        "PRs/commits link to Issues; unresolved work remains visible"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T28",
+      "title": "Review feature branches/PRs before merge",
+      "phase": "P5-delivery",
+      "priority": "P1",
+      "status": "not_started",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T04"
+      ],
+      "rubric_ids": [
+        "R08"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "GitHub Pull Requests"
+      ],
+      "observed_baseline": "No pull requests observed in inspected snapshot",
+      "definition_of_done": [
+        "Each significant change reviewed against assignment/rubric and adjacent work",
+        "PR includes tests/evidence and is linked to Issue",
+        "Avoid direct pushes to main and concurrent agent edits to same files"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T29",
+      "title": "Write truthful AI design review and implementation summary",
+      "phase": "P5-delivery",
+      "priority": "P1",
+      "status": "partial",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T05",
+        "T09"
+      ],
+      "rubric_ids": [
+        "R01",
+        "R11"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "docs/ai-design-review.md"
+      ],
+      "observed_baseline": "docs/uml/README.md documents design assumptions, but the explicit human-reviewed AI-design correction log is missing.",
+      "definition_of_done": [
+        "At least one reviewed/corrected AI-generated design decision includes before/after, reasoning, and reviewer",
+        "Summary identifies generated files, data models, tests, limitations",
+        "Do not invent performed review actions"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T30",
+      "title": "Create v0.2.0-sprint2 GitHub tag and release",
+      "phase": "P5-delivery",
+      "priority": "P0",
+      "status": "not_started",
+      "owner_proposed": "Sai",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T19",
+        "T21",
+        "T22",
+        "T23",
+        "T25",
+        "T26",
+        "T27",
+        "T29"
+      ],
+      "rubric_ids": [
+        "R11"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "GitHub Releases"
+      ],
+      "observed_baseline": "No releases observed at inspected snapshot",
+      "definition_of_done": [
+        "Create tag v0.2.0-sprint2 referencing reviewed grading commit",
+        "Release notes include completed stories, models, database integration, tests/results, limitations, run instructions"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T31",
+      "title": "Check submitted release matches code and submit URLs",
+      "phase": "P5-delivery",
+      "priority": "P0",
+      "status": "not_started",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T30",
+        "T14"
+      ],
+      "rubric_ids": [
+        "R11"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "GitHub repository URL",
+        "GitHub release URL"
+      ],
+      "observed_baseline": "",
+      "definition_of_done": [
+        "Confirm release SHA is tested/graded version",
+        "Submit verified repo URL and GitHub release URL",
+        "Team ready to demonstrate UML, database, and functional feature"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T32",
+      "title": "Review and commit sprint tracker updates after each PR",
+      "phase": "P5-delivery",
+      "priority": "P1",
+      "status": "not_started",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T04"
+      ],
+      "rubric_ids": [
+        "R08"
+      ],
+      "github_issue": null,
+      "files_or_areas": [
+        "docs/sprint2/progress.json",
+        "docs/sprint2/AGENT_INSTRUCTIONS.md"
+      ],
+      "observed_baseline": "Tracking artifact newly drafted outside repository; not yet committed",
+      "definition_of_done": [
+        "Each update references actual work, relevant evidence and dated change log",
+        "Agent does not mark verified without reproducible evidence",
+        "Conflicting edits resolved in human-reviewed PR"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    },
+    {
+      "id": "T33",
+      "title": "Scope the advisor/AI functionality without overstating capabilities",
+      "phase": "P3-integration",
+      "priority": "P2",
+      "status": "partial",
+      "owner_proposed": "Julian",
+      "owner_confirmed": false,
+      "depends_on": [
+        "T04"
+      ],
+      "rubric_ids": [],
+      "github_issue": "https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/8",
+      "files_or_areas": [
+        "src/app/(frontend)/signal-app.tsx",
+        "src/lib/workflow-planner.ts",
+        "GitHub Issue #8"
+      ],
+      "observed_baseline": "Advisor UI dispatches rule-based create/exam/syllabus/team actions; this is not a verified external LLM integration",
+      "definition_of_done": [
+        "Describe current rule-based commands accurately",
+        "If expanding to external AI, agree on minimal feature, secrets boundary, validation, and tests",
+        "Do not replace required database story with a cosmetic chatbot"
+      ],
+      "evidence": [],
+      "implementation_notes": [],
+      "last_updated_on": "2026-11-15"
+    }
+  ],
+  "required_artifacts": [
+    {
+      "path": "docs/uml/sprint-2-data-model.puml",
+      "description": "File exists; review correctness and rendered parity",
+      "status": "partial",
+      "task_id": "T06"
+    },
+    {
+      "path": "docs/uml/sprint-2-data-model.svg",
+      "description": "File exists; review correctness and rendered parity",
+      "status": "partial",
+      "task_id": "T06"
+    },
+    {
+      "path": "docs/uml/team-deliverable-sequence.puml",
+      "description": "File exists; review sequence against application",
+      "status": "partial",
+      "task_id": "T07"
+    },
+    {
+      "path": "docs/uml/team-deliverable-sequence.svg",
+      "description": "File exists; review sequence against application",
+      "status": "partial",
+      "task_id": "T07"
+    },
+    {
+      "path": "docs/firestore-setup.md",
+      "description": "Local/shared database, secrets procedure, per-member verification",
+      "status": "partial",
+      "task_id": "T15"
+    },
+    {
+      "path": "docs/ai-design-review.md",
+      "description": "Actual AI model decision reviewed and corrected",
+      "status": "not_started",
+      "task_id": "T29"
+    },
+    {
+      "path": ".gitignore",
+      "description": "Existing but needs .env.example exception and secret audit",
+      "status": "partial",
+      "task_id": "T12"
+    },
+    {
+      "path": ".env.example",
+      "description": "Required variable names, placeholders only",
+      "status": "partial",
+      "task_id": "T12"
+    },
+    {
+      "path": "src/collections/ OR approved typed model directory",
+      "description": "Models + relationships, migrated if needed",
+      "status": "partial",
+      "task_id": "T09"
+    },
+    {
+      "path": "schema migrations OR firestore.rules/firestore.indexes.json",
+      "description": "Appropriate selected database setup",
+      "status": "blocked",
+      "task_id": "T09"
+    },
+    {
+      "path": "project test directory",
+      "description": "Automated success/error/story tests",
+      "status": "not_started",
+      "task_id": "T21"
+    },
+    {
+      "path": "package.json test and lint scripts",
+      "description": "Repeatable checks",
+      "status": "not_started",
+      "task_id": "T24"
+    },
+    {
+      "path": "GitHub Issues + GitHub Project",
+      "description": "Assigned/issues acceptance criteria and status",
+      "status": "partial",
+      "task_id": "T27"
+    },
+    {
+      "path": "GitHub release v0.2.0-sprint2",
+      "description": "Tag and release matching graded code",
+      "status": "not_started",
+      "task_id": "T30"
+    },
+    {
+      "path": "docs/sprint2/progress.json",
+      "description": "This evolving machine-readable tracker",
+      "status": "not_started",
+      "task_id": "T32"
+    },
+    {
+      "path": "docs/sprint2/AGENT_INSTRUCTIONS.md",
+      "description": "Rules for every AI coding agent",
+      "status": "not_started",
+      "task_id": "T32"
+    }
+  ],
+  "evidence_register": {
+    "test_runs": [],
+    "team_database_verifications": [],
+    "meaningful_member_commits": [],
+    "pr_reviews": [],
+    "secret_hygiene_checks": [],
+    "release": null
+  },
+  "risks": [
+    {
+      "id": "K01",
+      "severity": "critical",
+      "description": "Hybrid Payload and Firestore domains implemented but ownership/approval and local reproducibility not yet demonstrated",
+      "mitigation": "Record the D01 approved domain boundary and prove each teammate's setup"
+    },
+    {
+      "id": "K02",
+      "severity": "high",
+      "description": "Figma-managed Payload may not be reproducible in an ordinary local VS Code checkout",
+      "mitigation": "Test clean clone, authentication and DB path; document limitations to instructor"
+    },
+    {
+      "id": "K03",
+      "severity": "high",
+      "description": "Multiple Copilot agents could collide in team-actions.ts, team-deliverables.tsx and team-deliverables.ts",
+      "mitigation": "Assign single file owner per branch and use PR reviews"
+    },
+    {
+      "id": "K04",
+      "severity": "high",
+      "description": "Agent may mistake source-present features for tested features",
+      "mitigation": "Require test output and reviewer evidence before verified"
+    },
+    {
+      "id": "K05",
+      "severity": "high",
+      "description": "Five local dev environment demonstrations and five individual commits required",
+      "mitigation": "Keep member-by-member evidence log"
+    },
+    {
+      "id": "K06",
+      "severity": "high",
+      "description": "Issue #4 Team Deliverables implemented but persistence, restart and membership tests are missing",
+      "mitigation": "Test CRUD with emulator/dev DB; restart and re-login; compare acceptance criteria"
+    },
+    {
+      "id": "K07",
+      "severity": "high",
+      "description": "Firebase service-account secrets might be accidentally committed",
+      "mitigation": "Keep .env local only; inspect staged files, history and logs"
+    },
+    {
+      "id": "K08",
+      "severity": "medium",
+      "description": "Vitest rule tests do not yet prove Firestore integration; lint script missing",
+      "mitigation": "Add emulator integration tests, CI/runnable commands and lint evidence"
+    }
+  ],
+  "next_actions_in_order": [
+    "Confirm team approval for scoped Payload/Firestore boundary; record D01 and high-collision file owners.",
+    "Approve Issue #4 as the sprint database-integrated user story; verify acceptance criteria and Figma MCP design.",
+    "Prove clean local VS Code startup including Payload auth; configure per-member Firestore emulator and shared dev database without production access.",
+    "Review existing PlantUML sources/SVGs; capture one actual AI design assumption corrected by students in docs/ai-design-review.md.",
+    "Run tests, add positive Firestore CRUD and negative input/auth cases; demonstrate persistence after restart.",
+    "Verify secrets, collect five meaningful teammate commits, maintain GitHub Project assignments and statuses.",
+    "Add lint, cut and verify v0.2.0-sprint2 GitHub release, submit repo and release URLs."
+  ],
+  "change_log": [
+    {
+      "on": "2026-11-15",
+      "actor": "planning-assistant",
+      "change": "Created baseline machine-readable tracker from 23-page Sprint 2 assignment, GitHub main source snapshot, and teammate discussion; no application changes, runtime tests, or team sign-offs performed.",
+      "evidence": [
+        "https://github.com/sai2005-1/AI-AssistedPlanningApp/tree/main",
+        "ITSC 3155 Fall 2026 Sprint 2.pdf"
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "actor": "ChatGPT audit, source-only",
+      "summary": "Revalidated main at 8dd2e0f. Added newly committed Firestore Issue #4 feature, UML source/SVG, secure env sample, Vitest unit test observations; no claims of running app/DB/tests.",
+      "evidence": [
+        "https://github.com/sai2005-1/AI-AssistedPlanningApp/commit/8dd2e0f298b35932caa0c5f97cb3e83c0c5bb782",
+        "docs/firestore-setup.md",
+        "src/lib/team-deliverables.ts",
+        "docs/uml/README.md",
+        "src/lib/team-deliverable-rules.test.ts"
+      ]
+    }
+  ]
+}
