@@ -1,5 +1,5 @@
 @startuml
-title Sprint 2 - Current and Proposed Data Model
+title Sprint 2 - Implemented Domain Model
 hide methods
 skinparam classAttributeIconSize 0
 skinparam shadowing false
@@ -9,6 +9,7 @@ legend right
   Existing Payload collections are inside "Current app".
   Sprint 2 additions for issue #4 are Cloud Firestore documents.
   Existing app users are referenced by their Payload string IDs.
+  Selected domain fields are shown; this is not a full schema export.
 endlegend
 
 package "Current app" {
@@ -38,7 +39,7 @@ package "Current app" {
     estimatedMinutes: number
     status: open | scheduled | done
     score: number [computed]
-    owner: User
+    owner: User?
     course: Course?
     calendarEvent: CalendarEvent?
   }
@@ -56,7 +57,7 @@ package "Current app" {
     uid: string
     source: ics-file | ics-url | manual
     sourceKey: string? {indexed}
-    owner: User
+    owner: User?
     course: Course?
   }
 }
@@ -65,7 +66,7 @@ package "Sprint 2 - Cloud Firestore" {
   class TeamProject {
     id: string [document ID]
     title: string
-    description: string?
+    description: string [may be empty]
     finalDeadline: Timestamp
     ownerId: string
     createdAt: Timestamp
@@ -89,7 +90,7 @@ package "Sprint 2 - Cloud Firestore" {
     assigneeName: string
     assigneeUsername: string
     title: string
-    description: string?
+    description: string [may be empty]
     dueAt: Timestamp
     status: open | in-progress | done
     createdAt: Timestamp
@@ -113,10 +114,10 @@ package "Sprint 2 - Cloud Firestore" {
   }
 }
 
-User "1" <-- "0..*" Task : owns
+User "0..1" <-- "0..*" Task : owns
 Course "0..1" <-- "0..*" Task : for
 CalendarEvent "0..1" <-- "0..*" Task : imported from
-User "1" <-- "0..*" CalendarEvent : owns
+User "0..1" <-- "0..*" CalendarEvent : owns
 Course "0..1" <-- "0..*" CalendarEvent : for
 
 User "1" <-- "0..*" TeamProject : ownerId reference
@@ -125,7 +126,7 @@ User "1" <-- "0..*" ProjectMember : userId reference
 TeamProject "1" <-- "0..*" Deliverable : deliverables subcollection
 Deliverable "0..1" <-- "0..*" Deliverable : parent / children
 ProjectMember "1" <-- "0..*" Deliverable : assignee membership
-User "1" <-- "1" TeamUserDirectory : userId reference
+User "1" <-- "0..1" TeamUserDirectory : userId reference
 TeamUserDirectory "1" <-- "0..*" UserProjectIndex : projects subcollection
 TeamProject "1" <-- "0..*" UserProjectIndex : projectId reference
 
@@ -143,8 +144,17 @@ note right of ProjectMember
 end note
 
 note right of TeamUserDirectory
+  Created lazily by workspace loading,
+  directory search (2+ normalized characters),
+  or project creation; not by Payload signup.
   Contains only a user's name and username
   plus normalized search fields. No email
   or credentials are copied from Payload.
+end note
+
+note bottom of Task
+  Task and CalendarEvent owner fields are optional
+  in the Payload schema. App-user creates assign
+  the owner in a hook; CMS-admin creates may omit it.
 end note
 @enduml

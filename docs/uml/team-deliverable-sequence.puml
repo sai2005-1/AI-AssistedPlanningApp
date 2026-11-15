@@ -12,40 +12,75 @@ database "Payload" as Payload
 database "Cloud Firestore" as Firestore
 
 Owner -> UI: Enter title, description, assignee,\nand target deadline
-UI -> Action: createDeliverable(projectId, input)
-Action -> Auth: require authenticated app user
-Auth -> Payload: Verify app-session JWT
-Payload --> Auth: AppUser or unauthenticated
-Auth --> Action: AppUser or null
+note over UI
+  Creation path for an already loaded project.
+  UI rejects invalid dates and deadlines after the freeze
+  before submitting; server checks remain authoritative.
+end note
+UI -> Action: createProjectDeliverableAction(projectId, input)
+Action -> Auth: requireAppUser()
+opt app-session cookie exists
+  Auth -> Payload: JWTAuthentication()
+  Payload --> Auth: Authentication result (or throw)
+end
+Auth --> Action: AppUser, null, or throw
 
-alt unauthenticated
-  Action --> UI: structured sign-in error
+alt unauthenticated or authentication failure
+  Action --> UI: Structured sign-in error or generic fallback
   UI --> Owner: Show error
 else authenticated
-  Action -> Action: Allowlist, validate, and normalize input
-  Action -> Store: createProjectDeliverable(user, projectId, input)
-  Store -> Firestore: Begin transaction; read project,\nowner membership, and assignee membership
-  Firestore --> Store: Project and membership documents
-  Store -> Firestore: Read optional parent chain
-  Firestore --> Store: Parent documents
-  Store -> Store: Check owner, membership, same-project parent,\nand dueAt <= finalDeadline - 72h
+  Action -> Action: Validate project ID; allowlist, validate,\nand normalize input
 
-  alt invalid project, membership, parent, or deadline
-    Store --> Action: Throw domain validation error
-    Action --> UI: Structured error result
+  alt invalid submitted fields
+    Action --> UI: Structured input error; no repository call
     UI --> Owner: Show error
-  else valid
-    Store -> Firestore: Write deliverable in transaction\n(status=open, timestamps, assignee snapshot)
-    Firestore --> Store: Commit succeeds
-    Store --> Action: Deliverable ID
-    Action --> UI: Serializable success result
-    UI -> Action: Reload project board
-    Action -> Store: loadTeamProjectBoard(user, projectId)
-    Store -> Firestore: Read project, members, deliverables
-    Firestore --> Store: Board documents
-    Store --> Action: TeamProjectBoard
-    Action --> UI: Serializable board
-    UI --> Owner: Display in assignee lane
+  else valid submitted fields
+    Action -> Store: createProjectDeliverable(user, projectId, input)
+    Store -> Store: getTeamFirestore() (may throw)
+    opt Firestore configured
+      group Firestore transaction (abort on a failed check)
+        Store -> Firestore: Read project, requester membership,\nand assignee membership
+        Firestore --> Store: Project and membership documents
+        Store -> Store: Check project, requester membership, owner,\nassignee membership, then dueAt <= finalDeadline - 72h
+        opt preceding checks pass and parent supplied
+          Store -> Firestore: Read parent chain within this project
+          Firestore --> Store: Parent documents
+          Store -> Store: Reject missing parent, cycle, or depth > 50
+        end
+        opt all checks pass
+          Store -> Firestore: Write deliverable in transaction\n(status=open, timestamps, assignee snapshot)
+          Firestore --> Store: Commit succeeds (or throws)
+        end
+      end
+    end
+
+    alt validation, configuration, or database failure
+      Store --> Action: Throw error
+      Action --> UI: Structured domain/configuration error\nor generic failure for unexpected errors
+      UI --> Owner: Show error
+    else committed
+      Store --> Action: { id }
+      Action --> UI: Serializable success result
+      UI -> Action: loadTeamProjectBoardAction(projectId)
+      Action -> Auth: requireAppUser() again
+      opt app-session cookie exists
+        Auth -> Payload: JWTAuthentication()
+        Payload --> Auth: Authentication result (or throw)
+      end
+      Auth --> Action: Current AppUser, null, or throw
+      opt authenticated and valid project ID
+        Action -> Store: loadTeamProjectBoard(user.id, projectId)
+        Store -> Firestore: Read project and requester membership;\nif authorized, read members and deliverables
+        Firestore --> Store: Documents (or error)
+        Store --> Action: TeamProjectBoard (or throw)
+      end
+      Action --> UI: Serializable success or error result
+      alt reload succeeded
+        UI --> Owner: Display updated board in assignee lanes
+      else reload failed
+        UI --> Owner: Saved, but board could not be refreshed
+      end
+    end
   end
 end
 @enduml
