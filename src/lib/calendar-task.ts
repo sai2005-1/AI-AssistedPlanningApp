@@ -40,7 +40,7 @@ export function taskDataFromCalendarAssignment(event: CalendarAssignmentInput) {
 
   return {
     assignmentType,
-    calendarEvent: String(event.id),
+    calendarEventId: String(event.id),
     careerAlignment: assignmentType === 'lab' || assignmentType === 'project' ? 70 : 42,
     classLevel,
     consequence: assignmentType === 'exam' ? 92 : assignmentType === 'project' ? 84 : 72,

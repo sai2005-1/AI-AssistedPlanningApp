@@ -1,9 +1,8 @@
-import { getPayload } from 'payload'
-import config from '@payload-config'
 import SignalApp, { type CalendarEventView, type TaskView } from './signal-app'
 import { taskDataFromCalendarAssignment } from '@/lib/calendar-task'
 import { calculateScore } from '@/lib/scoring'
-import { asPayloadUser, requireAppUser } from '@/lib/app-auth'
+import { requireAppUser } from '@/lib/app-auth'
+import { getCoursesByIds, listUserEvents, listUserTasks } from '@/lib/app-data'
 import AuthScreen from './auth-screen'
 
 export const dynamic = 'force-dynamic'
@@ -11,46 +10,26 @@ export const dynamic = 'force-dynamic'
 export default async function HomePage() {
   const user = await requireAppUser()
   if (!user) return <AuthScreen />
-  const payload = await getPayload({ config })
-  const payloadUser = asPayloadUser(user)
-  const [taskResult, eventResult] = await Promise.all([
-    payload.find({
-      collection: 'tasks',
-      depth: 1,
-      limit: 50,
-      overrideAccess: false,
-      sort: '-score',
-      user: payloadUser,
-    }),
-    payload.find({
-      collection: 'calendar-events',
-      depth: 1,
-      limit: 100,
-      overrideAccess: false,
-      sort: 'start',
-      user: payloadUser,
-      where: { start: { greater_than_equal: new Date().toISOString() } },
-    }),
+  const [taskRecords, events] = await Promise.all([
+    listUserTasks(user.id, 50),
+    listUserEvents(user.id),
   ])
+  const courseCodes = await getCoursesByIds(
+    taskRecords.map((task) => task.courseId).filter((id): id is string => Boolean(id)),
+  )
 
-  const tasks: TaskView[] = taskResult.docs.map((task) => ({
+  const tasks: TaskView[] = taskRecords.map((task) => ({
     academicValue: Number(task.academicValue ?? 0),
     assignmentType: task.assignmentType,
     careerValue: Number(task.careerValue ?? 0),
     classLevel: task.classLevel,
     consequence: Number(task.consequence ?? 0),
-    courseCode:
-      typeof task.course === 'object' && task.course ? String(task.course.code) : undefined,
+    courseCode: task.courseId ? String(courseCodes.get(task.courseId) ?? '') || undefined : undefined,
     dueDate: task.dueDate ?? undefined,
     estimatedMinutes: Number(task.estimatedMinutes ?? 60),
     goalAlignment: Number(task.goalAlignment ?? 0),
     id: String(task.id),
-    calendarEventId:
-      typeof task.calendarEvent === 'object' && task.calendarEvent
-        ? String(task.calendarEvent.id)
-        : task.calendarEvent
-          ? String(task.calendarEvent)
-          : undefined,
+    calendarEventId: task.calendarEventId,
     neglectFactor: Number(task.neglectFactor ?? 0),
     plannedStart: task.plannedStart ?? undefined,
     score: Number(task.score ?? 0),
@@ -60,7 +39,7 @@ export default async function HomePage() {
     workload: Number(task.workload ?? 0),
   }))
 
-  const events: CalendarEventView[] = eventResult.docs.map((event) => ({
+  const calendarEvents: CalendarEventView[] = events.map((event) => ({
     allDay: Boolean(event.allDay),
     completed: Boolean(event.completed),
     end: event.end,
@@ -72,7 +51,7 @@ export default async function HomePage() {
   }))
 
   const persistedEventIds = new Set(tasks.map((task) => task.calendarEventId).filter(Boolean))
-  for (const event of events) {
+  for (const event of calendarEvents) {
     if (event.kind !== 'deadline' || persistedEventIds.has(event.id)) continue
     const inferred = taskDataFromCalendarAssignment(event)
     tasks.push({
@@ -91,5 +70,5 @@ export default async function HomePage() {
     return b.score - a.score
   })
 
-  return <SignalApp currentUser={user} initialEvents={events} initialTasks={tasks} />
+  return <SignalApp currentUser={user} initialEvents={calendarEvents} initialTasks={tasks} />
 }

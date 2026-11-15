@@ -11,6 +11,7 @@ import {
 } from "react"
 
 import { useRouter } from "next/navigation"
+import { signOut as signOutFirebase } from "firebase/auth"
 
 import {
   createTaskAction,
@@ -28,6 +29,7 @@ import TeamDeliverables from "./team-deliverables"
 import type { AssignmentType, ClassLevel } from "@/lib/scoring"
 
 import type { AppUser } from "@/lib/app-auth"
+import { getFirebaseClientAuth } from "@/lib/firebase-client"
 
 type Screen = "dashboard" | "score" | "calendar" | "time" | "copilot" | "advisor" | "team" | "completed"
 
@@ -1316,6 +1318,11 @@ export default function SignalApp({
   function signOut() {
     startAuthTransition(async () => {
       await logoutAction()
+      try {
+        await signOutFirebase(getFirebaseClientAuth())
+      } catch {
+        // The server session is already cleared; client config may be unavailable locally.
+      }
 
       router.refresh()
     })
