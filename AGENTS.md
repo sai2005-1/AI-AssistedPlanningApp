@@ -1,5 +1,9 @@
 # figma-make-app
 
+## Sprint 2 team coordination (GitHub / VS Code)
+
+Before making Sprint 2 changes, read `docs/sprint2/AGENT_INSTRUCTIONS.md` and `docs/sprint2/progress.json`, verify the current HEAD and relevant Issue, and select an assigned `T##` task. Respect existing file ownership, use reviewable feature branches and PRs, and record actual test/commit evidence before marking work verified. The tracker is a dated planning baseline, not proof of runtime behavior. Preserve the Figma-managed Payload configuration and existing Firestore team feature unless the team approves an architecture change.
+
 React + Next.js + Payload + Tailwind CSS project running inside Figma Make.
 
 This file is supplied as project instructions at the start of each task. Do not
