@@ -8,6 +8,7 @@
     "build": "payload build",
     "start": "next start",
     "format": "oxfmt",
+    "test": "vitest run",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types",
     "payload": "payload"
@@ -20,6 +21,7 @@
     "@payloadcms/richtext-lexical": "4.0.0-beta.3",
     "@payloadcms/translations": "4.0.0-beta.3",
     "@payloadcms/ui": "4.0.0-beta.3",
+    "firebase-admin": "^14.5.1",
     "graphql": "^16.8.1",
     "html-react-parser": "^5.2.10",
     "monaco-editor": "0.55.1",
@@ -37,7 +39,8 @@
     "oxfmt": "^0.2.0",
     "postcss": "^8.5.0",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^5.1.0"
   },
   "engines": {
     "node": ">=20.9.0",

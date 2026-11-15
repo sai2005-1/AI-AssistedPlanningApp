@@ -1,0 +1,51 @@
+@startuml
+title Issue #4 - Create and Assign a Team Deliverable
+hide footbox
+skinparam shadowing false
+
+actor "Project owner" as Owner
+boundary "Deliverable board" as UI
+control "Server Action" as Action
+control "Team data-access layer" as Store
+control "App authentication" as Auth
+database "Payload" as Payload
+database "Cloud Firestore" as Firestore
+
+Owner -> UI: Enter title, description, assignee,\nand target deadline
+UI -> Action: createDeliverable(projectId, input)
+Action -> Auth: require authenticated app user
+Auth -> Payload: Verify app-session JWT
+Payload --> Auth: AppUser or unauthenticated
+Auth --> Action: AppUser or null
+
+alt unauthenticated
+  Action --> UI: structured sign-in error
+  UI --> Owner: Show error
+else authenticated
+  Action -> Action: Allowlist, validate, and normalize input
+  Action -> Store: createProjectDeliverable(user, projectId, input)
+  Store -> Firestore: Begin transaction; read project,\nowner membership, and assignee membership
+  Firestore --> Store: Project and membership documents
+  Store -> Firestore: Read optional parent chain
+  Firestore --> Store: Parent documents
+  Store -> Store: Check owner, membership, same-project parent,\nand dueAt <= finalDeadline - 72h
+
+  alt invalid project, membership, parent, or deadline
+    Store --> Action: Throw domain validation error
+    Action --> UI: Structured error result
+    UI --> Owner: Show error
+  else valid
+    Store -> Firestore: Write deliverable in transaction\n(status=open, timestamps, assignee snapshot)
+    Firestore --> Store: Commit succeeds
+    Store --> Action: Deliverable ID
+    Action --> UI: Serializable success result
+    UI -> Action: Reload project board
+    Action -> Store: loadTeamProjectBoard(user, projectId)
+    Store -> Firestore: Read project, members, deliverables
+    Firestore --> Store: Board documents
+    Store --> Action: TeamProjectBoard
+    Action --> UI: Serializable board
+    UI --> Owner: Display in assignee lane
+  end
+end
+@enduml
