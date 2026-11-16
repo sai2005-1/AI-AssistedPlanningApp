@@ -7,6 +7,11 @@ import { calculateScore, type ScoreInput } from './scoring'
 import { taskDataFromCalendarAssignment } from './calendar-task'
 import type { ParsedCalendarEvent } from './ics'
 import type { WorkflowPlan } from './workflow-planner'
+import type {
+  FirestoreCalendarEventDocument,
+  FirestoreCourseDocument,
+  FirestoreTaskDocument,
+} from './firestore-models'
 
 const TASKS = 'tasks'
 const EVENTS = 'calendarEvents'
@@ -152,16 +157,18 @@ export async function createUserCourse(
   const db = getTeamFirestore()
   const code = input.code.trim().toUpperCase()
   const reference = db.collection(COURSES).doc(`course_${deterministicId(userId, code)}`)
+  const now = new Date().toISOString()
+  const document: FirestoreCourseDocument = {
+    ...input,
+    code,
+    ownerId: userId,
+    createdAt: now,
+    updatedAt: now,
+  }
   await db.runTransaction(async (transaction) => {
     const existing = await transaction.get(reference)
     if (existing.exists) throw new Error('You already have a course with that code.')
-    transaction.set(reference, {
-      ...input,
-      code,
-      ownerId: userId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    })
+    transaction.set(reference, document)
   })
   return { ...input, code, id: reference.id }
 }
@@ -222,7 +229,7 @@ export async function createUserTask(userId: string, input: AppTaskInput) {
   const reference = db.collection(TASKS).doc()
   const score = calculateScore(input)
   const now = new Date().toISOString()
-  const taskData = {
+  const taskData: FirestoreTaskDocument = {
     assignmentType: input.assignmentType,
     classLevel: input.classLevel,
     estimatedMinutes: input.estimatedMinutes,
@@ -249,7 +256,7 @@ export async function createWorkflow(userId: string, plan: WorkflowPlan) {
   const now = new Date().toISOString()
   const eventWrites = plan.events.map((event, index) => ({ event, reference: eventRefs[index] }))
   await commitInBatches(eventWrites, (batch, { event, reference }) => {
-    batch.set(reference, {
+    const document: FirestoreCalendarEventDocument = {
       ...event,
       completed: false,
       ownerId: userId,
@@ -258,7 +265,8 @@ export async function createWorkflow(userId: string, plan: WorkflowPlan) {
       uid: `workflow-${reference.id}`,
       createdAt: now,
       updatedAt: now,
-    })
+    }
+    batch.set(reference, document)
   })
 
   const taskWrites = plan.tasks.map((task, index) => ({
@@ -267,7 +275,7 @@ export async function createWorkflow(userId: string, plan: WorkflowPlan) {
     calendarEventId: eventRefs.length === taskRefs.length ? eventRefs[index].id : undefined,
   }))
   await commitInBatches(taskWrites, (batch, { reference, task, calendarEventId }) => {
-    batch.set(reference, {
+    const document: FirestoreTaskDocument = {
       ...task,
       ...calculateScore(task),
       ...(calendarEventId ? { calendarEventId } : {}),
@@ -275,7 +283,8 @@ export async function createWorkflow(userId: string, plan: WorkflowPlan) {
       status: 'open',
       createdAt: now,
       updatedAt: now,
-    })
+    }
+    batch.set(reference, document)
   })
   return { eventsCreated: eventRefs.length, tasksCreated: taskRefs.length }
 }
@@ -353,14 +362,15 @@ export async function importUserCalendar(
     return { event, reference, sourceKey }
   })
   await commitInBatches(createdEvents, (batch, { event, reference, sourceKey }) => {
-    batch.set(reference, {
+    const document: FirestoreCalendarEventDocument = {
       ...event,
       ownerId: userId,
       source,
       sourceKey,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    })
+    }
+    batch.set(reference, document)
   })
 
   const imported = new Map(existingEvents)

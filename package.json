@@ -12,6 +12,7 @@
     "test:firestore": "firebase emulators:exec --project demo-signal --only firestore \"vitest run src/lib/app-data.test.ts\"",
     "test:firebase": "firebase emulators:exec --project demo-signal --only auth,firestore \"vitest run src/lib/app-data.test.ts src/lib/firebase-auth.test.ts\"",
     "emulators": "firebase emulators:start --project demo-signal --only auth,firestore,storage",
+    "seed:emulator": "tsx scripts/seed-firestore.ts",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types",
     "payload": "payload"
@@ -45,6 +46,7 @@
     "oxfmt": "^0.2.0",
     "postcss": "^8.5.0",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.0",
     "vitest": "^5.1.0"
   },
