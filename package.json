@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "firebase emulators:exec --project demo-signal --only auth,firestore \"next dev --hostname 0.0.0.0\"",
+    "dev": "pnpm dev:emulator",
+    "dev:emulator": "FIREBASE_MODE=emulator NEXT_PUBLIC_FIREBASE_MODE=emulator firebase emulators:exec --project demo-signal --only auth,firestore,storage \"next dev --hostname 0.0.0.0\"",
+    "dev:cloud": "FIREBASE_MODE=cloud NEXT_PUBLIC_FIREBASE_MODE=cloud next dev --hostname 0.0.0.0",
     "build": "payload build",
     "start": "next start",
     "format": "oxfmt",
