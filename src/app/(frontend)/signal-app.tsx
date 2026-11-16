@@ -80,6 +80,107 @@ type Message = {
   text: string
 }
 
+type ThemeColors = {
+  accent: string
+  background: string
+  card: string
+  surface: string
+  text: string
+}
+
+type ThemeColorKey = keyof ThemeColors
+
+const themeColorKeys: ThemeColorKey[] = [
+  "accent",
+  "background",
+  "surface",
+  "card",
+  "text",
+]
+
+const defaultTheme: ThemeColors = {
+  accent: "#3a76f0",
+  background: "#0b0c0e",
+  surface: "#121212",
+  card: "#1e1e1e",
+  text: "#f3f4f6",
+}
+
+const themePresets: { id: string; label: string; colors: ThemeColors }[] = [
+  { id: "signal", label: "Signal", colors: defaultTheme },
+  {
+    id: "forest",
+    label: "Forest",
+    colors: {
+      accent: "#38b58d",
+      background: "#0d1412",
+      surface: "#141d1a",
+      card: "#202b26",
+      text: "#f1f5f2",
+    },
+  },
+  {
+    id: "ember",
+    label: "Ember",
+    colors: {
+      accent: "#f08a55",
+      background: "#17110e",
+      surface: "#211814",
+      card: "#30211b",
+      text: "#f8f2ed",
+    },
+  },
+  {
+    id: "orchid",
+    label: "Orchid",
+    colors: {
+      accent: "#b18cf3",
+      background: "#120f19",
+      surface: "#1b1724",
+      card: "#292235",
+      text: "#f6f1fb",
+    },
+  },
+  {
+    id: "tide",
+    label: "Tide",
+    colors: {
+      accent: "#6ab4c2",
+      background: "#0e1418",
+      surface: "#151e23",
+      card: "#202d33",
+      text: "#edf4f6",
+    },
+  },
+]
+
+const themeColorOptions: { key: ThemeColorKey; label: string }[] = [
+  { key: "accent", label: "Accent" },
+  { key: "background", label: "Page background" },
+  { key: "surface", label: "Panel surface" },
+  { key: "card", label: "Card surface" },
+  { key: "text", label: "Main text" },
+]
+
+const themeStorageKey = "signal-theme-colors"
+
+function isThemeColors(value: unknown): value is ThemeColors {
+  if (typeof value !== "object" || value === null) return false
+
+  for (const key of themeColorKeys) {
+    const color = (value as Record<string, unknown>)[key]
+    if (typeof color !== "string" || !/^#[0-9a-f]{6}$/i.test(color)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+function matchesTheme(left: ThemeColors, right: ThemeColors) {
+  return themeColorKeys.every((key) => left[key] === right[key])
+}
+
 const nav: { id: Screen; label: string; index: string }[] = [
   { id: "dashboard", label: "Priority feed", index: "01" },
 
@@ -1463,6 +1564,14 @@ export default function SignalApp({
 
   const [notice, setNotice] = useState("")
 
+  const [theme, setTheme] = useState<ThemeColors>(defaultTheme)
+
+  const [themeReady, setThemeReady] = useState(false)
+
+  const [themePanelOpen, setThemePanelOpen] = useState(false)
+
+  const themePanelRef = useRef<HTMLDivElement>(null)
+
   const active = nav.find((item) => item.id === screen)!
 
   useEffect(() => setTasks(initialTasks), [initialTasks])
@@ -1470,6 +1579,70 @@ export default function SignalApp({
   useEffect(() => setEvents(initialEvents), [initialEvents])
 
   useEffect(() => setCourses(initialCourses), [initialCourses])
+
+  useEffect(() => {
+    let savedTheme = defaultTheme
+    let warning = ""
+
+    try {
+      const saved = window.localStorage.getItem(themeStorageKey)
+      if (saved) {
+        const parsed: unknown = JSON.parse(saved)
+        if (isThemeColors(parsed)) {
+          savedTheme = parsed
+        } else {
+          window.localStorage.removeItem(themeStorageKey)
+          warning = "Saved theme settings were invalid and have been reset."
+        }
+      }
+    } catch {
+      warning = "Saved theme settings couldn't be loaded; default colors are active."
+    }
+
+    setTheme(savedTheme)
+    setThemeReady(true)
+    if (warning) setNotice(warning)
+  }, [])
+
+  useEffect(() => {
+    if (!themeReady) return
+
+    const root = document.documentElement
+    root.style.setProperty("--blue", theme.accent)
+    root.style.setProperty("--bg", theme.background)
+    root.style.setProperty("--surface", theme.surface)
+    root.style.setProperty("--card", theme.card)
+    root.style.setProperty("--text", theme.text)
+
+    try {
+      window.localStorage.setItem(themeStorageKey, JSON.stringify(theme))
+    } catch {
+      setNotice("Theme changes couldn't be saved in this browser.")
+    }
+  }, [theme, themeReady])
+
+  useEffect(() => {
+    if (!themePanelOpen) return
+
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !themePanelRef.current?.contains(event.target)
+      ) {
+        setThemePanelOpen(false)
+      }
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setThemePanelOpen(false)
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsideClick)
+    document.addEventListener("keydown", closeOnEscape)
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick)
+      document.removeEventListener("keydown", closeOnEscape)
+    }
+  }, [themePanelOpen])
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -1555,6 +1728,90 @@ export default function SignalApp({
           </div>
           <div>
             <Tag tone="green">PRIVATE / {currentUser.username}</Tag>
+            <div className="theme-control" ref={themePanelRef}>
+              <button
+                aria-controls="theme-panel"
+                aria-expanded={themePanelOpen}
+                aria-haspopup="dialog"
+                className="button theme-trigger"
+                onClick={() => setThemePanelOpen((open) => !open)}
+                type="button"
+              >
+                <span aria-hidden="true">◉</span>
+                <span className="theme-trigger-label">Theme</span>
+              </button>
+              {themePanelOpen && (
+                <section
+                  aria-label="Personalize your theme"
+                  className="theme-panel"
+                  id="theme-panel"
+                  role="dialog"
+                >
+                  <div className="theme-panel-heading">
+                    <div>
+                      <small>YOUR WORKSPACE</small>
+                      <h2>Make it yours</h2>
+                    </div>
+                    <button
+                      aria-label="Close theme settings"
+                      className="theme-close"
+                      onClick={() => setThemePanelOpen(false)}
+                      type="button"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <p>Pick a color mood, then fine-tune each part of the app.</p>
+                  <div aria-label="Theme presets" className="theme-presets">
+                    {themePresets.map((preset) => (
+                      <button
+                        aria-pressed={matchesTheme(theme, preset.colors)}
+                        className="theme-preset"
+                        key={preset.id}
+                        onClick={() => setTheme(preset.colors)}
+                        type="button"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="theme-preset-swatch"
+                          style={{ backgroundColor: preset.colors.accent }}
+                        />
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="theme-color-list">
+                    {themeColorOptions.map(({ key, label }) => (
+                      <label className="theme-color-option" key={key}>
+                        <span>{label}</span>
+                        <input
+                          aria-label={label}
+                          onChange={(event) =>
+                            setTheme((current) => ({
+                              ...current,
+                              [key]: event.target.value,
+                            }))
+                          }
+                          type="color"
+                          value={theme[key]}
+                        />
+                        <code>{theme[key].toUpperCase()}</code>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="theme-panel-footer">
+                    <span>Saved on this device</span>
+                    <button
+                      className="theme-reset"
+                      onClick={() => setTheme(defaultTheme)}
+                      type="button"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </section>
+              )}
+            </div>
             <Button onClick={() => setScreen("advisor")}>Ask advisor</Button>
             <Button disabled={authPending} onClick={signOut}>
               {authPending ? "Signing out…" : "Sign out"}
