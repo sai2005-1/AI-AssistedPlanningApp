@@ -6,13 +6,17 @@ import { parseICS } from '@/lib/ics'
 import type { AssignmentType, ClassLevel } from '@/lib/scoring'
 import { requireAppUser } from '@/lib/app-auth'
 import {
+  createUserCourse,
   createUserTask,
   createWorkflow,
+  deleteUserCourse,
   importUserCalendar,
   replanUserTasks,
   setUserEventCompleted,
   setUserTaskCompleted,
+  updateUserCourse,
 } from '@/lib/app-data'
+import type { AppCourse } from '@/lib/app-data'
 import {
   buildExamPlan,
   buildSyllabusPlan,
@@ -29,6 +33,7 @@ type NewTask = {
   careerAlignment?: number
   classLevel: ClassLevel
   consequence?: number
+  courseId?: string
   dueDate?: string
   estimatedMinutes: number
   goalAlignment?: number
@@ -45,6 +50,7 @@ const taskTypes = new Set([
   'personal',
 ])
 const classLevels = new Set(['1000', '2000', '3000', '4000', 'graduate', 'independent'])
+const courseColors = new Set(['blue', 'green', 'gray'])
 const MAX_CALENDAR_BYTES = 5_000_000
 
 function asNumber(value: unknown, fallback: number, min = 0, max = 100) {
@@ -70,6 +76,7 @@ export async function createTaskAction(input: NewTask): Promise<ActionResult<{ i
       careerAlignment: asNumber(input.careerAlignment, 35),
       classLevel: input.classLevel,
       consequence: asNumber(input.consequence, 55),
+      courseId: input.courseId,
       dueDate: dueDate?.toISOString(),
       estimatedMinutes: asNumber(input.estimatedMinutes, 60, 15, 1440),
       goalAlignment: asNumber(input.goalAlignment, 50),
@@ -78,6 +85,100 @@ export async function createTaskAction(input: NewTask): Promise<ActionResult<{ i
     return { ok: true, data: { id: task.id }, message: `${title} was added to the plan.` }
   } catch {
     return { ok: false, error: 'Signal could not save that task. Try again.' }
+  }
+}
+
+export async function createCourseAction(
+  input: unknown,
+): Promise<ActionResult<AppCourse>> {
+  const appUser = await requireAppUser()
+  if (!appUser) return { ok: false, error: 'Sign in to add courses.' }
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    return { ok: false, error: 'The course details are invalid.' }
+  }
+  const values = input as Record<string, unknown>
+  if (Object.keys(values).some((key) => !['code', 'name', 'level', 'color'].includes(key))) {
+    return { ok: false, error: 'The course details contain unsupported fields.' }
+  }
+  const code = typeof values.code === 'string' ? values.code.trim().toUpperCase() : ''
+  const name = typeof values.name === 'string' ? values.name.trim() : ''
+  const level = typeof values.level === 'string' ? values.level : ''
+  const color = typeof values.color === 'string' ? values.color : 'blue'
+  if (!/^[A-Z0-9][A-Z0-9 -]{1,19}$/.test(code)) {
+    return { ok: false, error: 'Use a course code between 2 and 20 letters or numbers.' }
+  }
+  if (!name || name.length > 120) return { ok: false, error: 'Enter a course name up to 120 characters.' }
+  if (!classLevels.has(level)) return { ok: false, error: 'Choose a valid course level.' }
+  if (!courseColors.has(color)) return { ok: false, error: 'Choose a valid course color.' }
+
+  try {
+    const course = await createUserCourse(appUser.id, {
+      code,
+      color: color as AppCourse['color'],
+      level: level as AppCourse['level'],
+      name,
+    })
+    return { ok: true, data: course, message: `${course.code} was added to your courses.` }
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Signal could not save that course.',
+    }
+  }
+}
+
+export async function updateCourseAction(
+  courseIdValue: unknown,
+  input: unknown,
+): Promise<ActionResult<AppCourse>> {
+  const appUser = await requireAppUser()
+  if (!appUser) return { ok: false, error: 'Sign in to update courses.' }
+  if (typeof courseIdValue !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(courseIdValue)) {
+    return { ok: false, error: 'That course is invalid.' }
+  }
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    return { ok: false, error: 'The course details are invalid.' }
+  }
+  const values = input as Record<string, unknown>
+  if (Object.keys(values).some((key) => !['name', 'level', 'color'].includes(key))) {
+    return { ok: false, error: 'The course details contain unsupported fields.' }
+  }
+  const name = typeof values.name === 'string' ? values.name.trim() : ''
+  const level = typeof values.level === 'string' ? values.level : ''
+  const color = typeof values.color === 'string' ? values.color : ''
+  if (!name || name.length > 120) return { ok: false, error: 'Enter a course name up to 120 characters.' }
+  if (!classLevels.has(level)) return { ok: false, error: 'Choose a valid course level.' }
+  if (!courseColors.has(color)) return { ok: false, error: 'Choose a valid course color.' }
+
+  try {
+    const course = await updateUserCourse(appUser.id, courseIdValue, {
+      color: color as AppCourse['color'],
+      level: level as AppCourse['level'],
+      name,
+    })
+    return { ok: true, data: course, message: `${course.code} was updated.` }
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Signal could not update that course.',
+    }
+  }
+}
+
+export async function deleteCourseAction(courseIdValue: unknown): Promise<ActionResult<{ id: string }>> {
+  const appUser = await requireAppUser()
+  if (!appUser) return { ok: false, error: 'Sign in to remove courses.' }
+  if (typeof courseIdValue !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(courseIdValue)) {
+    return { ok: false, error: 'That course is invalid.' }
+  }
+  try {
+    await deleteUserCourse(appUser.id, courseIdValue)
+    return { ok: true, data: { id: courseIdValue }, message: 'Course removed.' }
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Signal could not remove that course.',
+    }
   }
 }
 
