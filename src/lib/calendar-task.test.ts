@@ -15,7 +15,7 @@ describe("taskDataFromCalendarAssignment", () => {
   it("maps a calendar assignment to a linked, scored-input-ready task", () => {
     expect(taskDataFromCalendarAssignment(event)).toEqual({
       assignmentType: "project",
-      calendarEvent: "synthetic-event-1",
+      calendarEventId: "synthetic-event-1",
       careerAlignment: 70,
       classLevel: "3000",
       consequence: 84,
@@ -83,7 +83,7 @@ describe("taskDataFromCalendarAssignment", () => {
     "preserves event identity %j as a string",
     (id) => {
       expect(
-        taskDataFromCalendarAssignment({ ...event, id }).calendarEvent,
+        taskDataFromCalendarAssignment({ ...event, id }).calendarEventId,
       ).toBe(String(id))
     },
   )
