@@ -11,7 +11,7 @@ const appName = "signal-team-workspace"
 export class FirestoreConfigurationError extends Error {
   constructor() {
     super(
-      "Firebase Admin is not configured. Set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY.",
+      'Firebase Admin cloud mode requires FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY.',
     )
 
     this.name = "FirestoreConfigurationError"
@@ -21,16 +21,29 @@ export class FirestoreConfigurationError extends Error {
 export function getFirebaseAdminApp(): App {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim()
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n")
-  const localEmulator =
-    process.env.NODE_ENV === 'development' && !clientEmail && !privateKey
-  const emulator = Boolean(
+  const emulatorHostsConfigured = Boolean(
     process.env.FIRESTORE_EMULATOR_HOST ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST ||
-      localEmulator,
+      process.env.STORAGE_EMULATOR_HOST,
   )
+  const defaultMode =
+    process.env.NODE_ENV === 'development' && !clientEmail && !privateKey
+      ? 'emulator'
+      : emulatorHostsConfigured
+        ? 'emulator'
+        : 'cloud'
+  const mode = process.env.FIREBASE_MODE?.trim() || defaultMode
+  if (mode !== 'emulator' && mode !== 'cloud') {
+    throw new FirestoreConfigurationError()
+  }
+  const emulator = mode === 'emulator'
+  if (!emulator && emulatorHostsConfigured) {
+    throw new Error('FIREBASE_MODE=cloud cannot use Firebase Emulator Suite hosts.')
+  }
   if (emulator) {
     process.env.FIRESTORE_EMULATOR_HOST ||= '127.0.0.1:8080'
     process.env.FIREBASE_AUTH_EMULATOR_HOST ||= '127.0.0.1:9099'
+    process.env.STORAGE_EMULATOR_HOST ||= '127.0.0.1:9199'
   }
   const projectId =
     process.env.FIREBASE_PROJECT_ID?.trim() || (emulator ? 'demo-signal' : '')
