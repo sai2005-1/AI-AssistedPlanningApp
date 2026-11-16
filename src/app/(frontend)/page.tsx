@@ -2,7 +2,7 @@ import SignalApp, { type CalendarEventView, type TaskView } from './signal-app'
 import { taskDataFromCalendarAssignment } from '@/lib/calendar-task'
 import { calculateScore } from '@/lib/scoring'
 import { requireAppUser } from '@/lib/app-auth'
-import { getCoursesByIds, listUserEvents, listUserTasks } from '@/lib/app-data'
+import { listUserCourses, listUserEvents, listUserTasks } from '@/lib/app-data'
 import AuthScreen from './auth-screen'
 
 export const dynamic = 'force-dynamic'
@@ -10,13 +10,12 @@ export const dynamic = 'force-dynamic'
 export default async function HomePage() {
   const user = await requireAppUser()
   if (!user) return <AuthScreen />
-  const [taskRecords, events] = await Promise.all([
+  const [taskRecords, events, courses] = await Promise.all([
     listUserTasks(user.id, 50),
     listUserEvents(user.id),
+    listUserCourses(user.id),
   ])
-  const courseCodes = await getCoursesByIds(
-    taskRecords.map((task) => task.courseId).filter((id): id is string => Boolean(id)),
-  )
+  const courseCodes = new Map(courses.map((course) => [course.id, course.code]))
 
   const tasks: TaskView[] = taskRecords.map((task) => ({
     academicValue: Number(task.academicValue ?? 0),
@@ -70,5 +69,12 @@ export default async function HomePage() {
     return b.score - a.score
   })
 
-  return <SignalApp currentUser={user} initialEvents={calendarEvents} initialTasks={tasks} />
+  return (
+    <SignalApp
+      currentUser={user}
+      initialCourses={courses}
+      initialEvents={calendarEvents}
+      initialTasks={tasks}
+    />
+  )
 }

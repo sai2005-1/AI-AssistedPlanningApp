@@ -5,9 +5,14 @@ vi.mock('server-only', () => ({}))
 import { getTeamFirestore } from './firebase-admin'
 import {
   importUserCalendar,
+  createUserCourse,
+  createUserTask,
+  deleteUserCourse,
+  listUserCourses,
   listUserEvents,
   listUserTasks,
   setUserEventCompleted,
+  updateUserCourse,
 } from './app-data'
 
 const emulatorAvailable = Boolean(process.env.FIRESTORE_EMULATOR_HOST)
@@ -27,6 +32,7 @@ describe.skipIf(!emulatorAvailable)('Firestore app-data repository', () => {
       testUserIds.flatMap((userId) => [
         clearOwnedRecords('tasks', userId),
         clearOwnedRecords('calendarEvents', userId),
+        clearOwnedRecords('courses', userId),
       ]),
     )
   })
@@ -62,5 +68,45 @@ describe.skipIf(!emulatorAvailable)('Firestore app-data repository', () => {
     expect((await listUserTasks(ownerId))[0].status).toBe('done')
     expect((await listUserEvents(ownerId, new Date(0).toISOString()))[0].completed).toBe(true)
     expect(await listUserTasks(otherUserId)).toHaveLength(0)
+  })
+
+  it('creates, updates, and safely removes user-owned courses', async () => {
+    const [ownerId, otherUserId] = testUserIds
+    const input = {
+      code: 'ITSC 3155',
+      color: 'blue' as const,
+      level: '3000' as const,
+      name: 'Software Engineering',
+    }
+
+    const course = await createUserCourse(ownerId, input)
+    expect(await listUserCourses(ownerId)).toEqual([course])
+    expect(await listUserCourses(otherUserId)).toHaveLength(0)
+    await expect(createUserCourse(ownerId, input)).rejects.toThrow('already have a course')
+
+    const updated = await updateUserCourse(ownerId, course.id, {
+      color: 'green',
+      level: '4000',
+      name: 'Advanced Software Engineering',
+    })
+    expect(updated).toMatchObject({
+      code: 'ITSC 3155',
+      color: 'green',
+      level: '4000',
+      name: 'Advanced Software Engineering',
+    })
+
+    await createUserTask(ownerId, {
+      assignmentType: 'project',
+      classLevel: '4000',
+      courseId: course.id,
+      estimatedMinutes: 90,
+      title: 'Course project',
+    })
+    await expect(deleteUserCourse(ownerId, course.id)).rejects.toThrow('linked tasks and events')
+
+    await clearOwnedRecords('tasks', ownerId)
+    await deleteUserCourse(ownerId, course.id)
+    expect(await listUserCourses(ownerId)).toHaveLength(0)
   })
 })
