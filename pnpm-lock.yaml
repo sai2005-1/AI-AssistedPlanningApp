@@ -8,33 +8,36 @@ importers:
 
   .:
     dependencies:
+      '@google/genai':
+        specifier: ^3.3.0
+        version: 3.3.0(@modelcontextprotocol/sdk@1.32.2(zod@4.6.5))
       '@payloadcms/figma':
         specifier: 1.0.0-beta.1
-        version: 1.0.0-beta.1(243fb7821a9b837774096d7920a4e00e)
+        version: 1.0.0-beta.1(@payloadcms/plugin-cloud-storage@4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3))(@payloadcms/richtext-lexical@4.0.0-beta.3(@faceless-ui/modal@3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)(yjs@13.6.33))(@payloadcms/translations@4.0.0-beta.3)(@payloadcms/ui@4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3))(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react@19.2.1)
       '@payloadcms/next':
         specifier: 4.0.0-beta.3
-        version: 4.0.0-beta.3(@types/react@19.3.0)(graphql@16.14.2)(monaco-editor@0.55.1)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)
+        version: 4.0.0-beta.3(@types/react@19.3.0)(graphql@16.14.2)(monaco-editor@0.55.1)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
       '@payloadcms/plugin-cloud-storage':
         specifier: 4.0.0-beta.3
-        version: 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)
+        version: 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
       '@payloadcms/plugin-mcp':
         specifier: 4.0.0-beta.3
-        version: 4.0.0-beta.3(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))
+        version: 4.0.0-beta.3(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))
       '@payloadcms/richtext-lexical':
         specifier: 4.0.0-beta.3
-        version: 4.0.0-beta.3(@faceless-ui/modal@3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)(yjs@13.6.33)
+        version: 4.0.0-beta.3(@faceless-ui/modal@3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)(yjs@13.6.33)
       '@payloadcms/translations':
         specifier: 4.0.0-beta.3
         version: 4.0.0-beta.3
       '@payloadcms/ui':
         specifier: 4.0.0-beta.3
-        version: 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)
+        version: 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
       firebase:
         specifier: ^13.3.0
-        version: 13.3.0(@types/react@19.3.0)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)(supports-color@10.2.2)
+        version: 13.3.0(@types/react@19.3.0)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)
       firebase-admin:
         specifier: ^14.5.1
-        version: 14.5.1(@firebase/app-compat@0.5.22)(@firebase/app@0.16.6)(supports-color@10.2.2)
+        version: 14.5.1(@firebase/app-compat@0.5.22)(@firebase/app@0.16.6)
       graphql:
         specifier: ^16.8.1
         version: 16.14.2
@@ -46,10 +49,10 @@ importers:
         version: 0.55.1
       next:
         specifier: 16.4.6
-        version: 16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
+        version: 16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
       payload:
         specifier: 4.0.0-beta.3
-        version: 4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3)
+        version: 4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3)
       react:
         specifier: 19.2.1
         version: 19.2.1
@@ -74,7 +77,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       firebase-tools:
         specifier: ^15.36.0
-        version: 15.36.0(@types/node@22.20.5)(supports-color@10.2.2)
+        version: 15.36.0(@types/node@22.20.5)
       oxfmt:
         specifier: ^0.2.0
         version: 0.2.0
@@ -783,6 +786,15 @@ packages:
   '@google-cloud/storage@8.4.0':
     resolution: {integrity: sha512-M3kA6UA2Tjp5aznCrgKcm9CzOjiQyRMnquqalqXAeS5wvkqqZxN8wpNjjHafOSYs6lQ82U7f2i8we4eTfIrpkA==}
     engines: {node: '>=22'}
+
+  '@google/genai@3.3.0':
+    resolution: {integrity: sha512-XLjXedj0X8UrULZz1GnlTMSQxBDFdr+NCKZkOBaSVVYqmK30C6FCnKW31Ppn0ItO9DpNspCHFui257kPNpumKQ==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@modelcontextprotocol/sdk': ^1.25.2
+    peerDependenciesMeta:
+      '@modelcontextprotocol/sdk':
+        optional: true
 
   '@googleapis/sqladmin@42.0.0':
     resolution: {integrity: sha512-ptSB/ayrMyXH7j7v37664EqxlJLHR4Wo64Wl6/Cn2zC5fHZecCWIhj+JQgZtLtZGGT6WijcGXrYs+Xu4S/k7Nw==}
@@ -2050,6 +2062,9 @@ packages:
 
   '@types/react@19.3.0':
     resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
+
+  '@types/retry@0.12.0':
+    resolution: {integrity: sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==}
 
   '@types/triple-beam@1.3.5':
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
@@ -4295,6 +4310,10 @@ packages:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
     engines: {node: '>=10'}
 
+  p-retry@4.6.2:
+    resolution: {integrity: sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==}
+    engines: {node: '>=8'}
+
   p-throttle@8.1.1:
     resolution: {integrity: sha512-xxWFBUyvbrQ10XC3VAr0SoXoOCKXqCX/yvbFIkBE98upphHFwjIKR6AId13ZH3jngFfF6yK43QTOtrngYAmFMA==}
     engines: {node: '>=20'}
@@ -5564,9 +5583,9 @@ snapshots:
 
   '@babel/helper-globals@7.29.7': {}
 
-  '@babel/helper-module-imports@7.29.7(supports-color@10.2.2)':
+  '@babel/helper-module-imports@7.29.7':
     dependencies:
-      '@babel/traverse': 7.29.10(supports-color@10.2.2)
+      '@babel/traverse': 7.29.10
       '@babel/types': 7.29.8
     transitivePeerDependencies:
       - supports-color
@@ -5587,7 +5606,7 @@ snapshots:
       '@babel/parser': 7.29.9
       '@babel/types': 7.29.8
 
-  '@babel/traverse@7.29.10(supports-color@10.2.2)':
+  '@babel/traverse@7.29.10':
     dependencies:
       '@babel/code-frame': 7.29.7
       '@babel/generator': 7.29.8
@@ -5595,7 +5614,7 @@ snapshots:
       '@babel/parser': 7.29.9
       '@babel/template': 7.29.7
       '@babel/types': 7.29.8
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
@@ -5695,9 +5714,9 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@emotion/babel-plugin@11.13.5(supports-color@10.2.2)':
+  '@emotion/babel-plugin@11.13.5':
     dependencies:
-      '@babel/helper-module-imports': 7.29.7(supports-color@10.2.2)
+      '@babel/helper-module-imports': 7.29.7
       '@babel/runtime': 7.29.10
       '@emotion/hash': 0.9.2
       '@emotion/memoize': 0.9.0
@@ -5723,10 +5742,10 @@ snapshots:
 
   '@emotion/memoize@0.9.0': {}
 
-  '@emotion/react@11.14.0(@types/react@19.3.0)(react@19.2.1)(supports-color@10.2.2)':
+  '@emotion/react@11.14.0(@types/react@19.3.0)(react@19.2.1)':
     dependencies:
       '@babel/runtime': 7.29.10
-      '@emotion/babel-plugin': 11.13.5(supports-color@10.2.2)
+      '@emotion/babel-plugin': 11.13.5
       '@emotion/cache': 11.14.0
       '@emotion/serialize': 1.3.3
       '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@19.2.1)
@@ -5966,7 +5985,7 @@ snapshots:
       '@firebase/util': 1.15.3
       tslib: 2.8.1
 
-  '@firebase/crashlytics@0.1.1(@firebase/app-types@0.9.6)(@firebase/app@0.16.6)(@types/react@19.3.0)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)(supports-color@10.2.2)':
+  '@firebase/crashlytics@0.1.1(@firebase/app-types@0.9.6)(@firebase/app@0.16.6)(@types/react@19.3.0)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)':
     dependencies:
       '@firebase/app': 0.16.6
       '@firebase/app-types': 0.9.6
@@ -5975,14 +5994,14 @@ snapshots:
       '@firebase/util': 1.15.3
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.220.0
-      '@opentelemetry/browser-instrumentation': 0.6.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+      '@opentelemetry/browser-instrumentation': 0.6.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/exporter-logs-otlp-http': 0.220.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/exporter-trace-otlp-proto': 0.220.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
-      '@opentelemetry/instrumentation-document-load': 0.65.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
-      '@opentelemetry/instrumentation-fetch': 0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
-      '@opentelemetry/instrumentation-xml-http-request': 0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/instrumentation-document-load': 0.65.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/instrumentation-fetch': 0.220.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/instrumentation-xml-http-request': 0.220.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/otlp-exporter-base': 0.220.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/otlp-transformer': 0.220.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/resources': 2.10.0(@opentelemetry/api@1.9.1)
@@ -5993,7 +6012,7 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.3.0
-      next: 16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
+      next: 16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
       react: 19.2.1
     transitivePeerDependencies:
       - supports-color
@@ -6239,32 +6258,32 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@google-cloud/cloud-sql-connector@1.13.0(supports-color@10.2.2)':
+  '@google-cloud/cloud-sql-connector@1.13.0':
     dependencies:
-      '@google-cloud/sql': 0.32.0(supports-color@10.2.2)
-      '@googleapis/sqladmin': 42.0.0(supports-color@10.2.2)
+      '@google-cloud/sql': 0.32.0
+      '@googleapis/sqladmin': 42.0.0
       '@grpc/grpc-js': 1.14.7
-      gaxios: 8.3.3(supports-color@10.2.2)
-      google-auth-library: 11.3.4(supports-color@10.2.2)
+      gaxios: 8.3.3
+      google-auth-library: 11.3.4
       p-throttle: 8.1.1
     transitivePeerDependencies:
       - supports-color
 
-  '@google-cloud/firestore-api@0.7.1(supports-color@10.2.2)':
+  '@google-cloud/firestore-api@0.7.1':
     dependencies:
-      google-gax: 6.17.0(supports-color@10.2.2)
+      google-gax: 6.17.0
       long: 5.3.2
     transitivePeerDependencies:
       - supports-color
     optional: true
 
-  '@google-cloud/firestore@9.4.1(supports-color@10.2.2)':
+  '@google-cloud/firestore@9.4.1':
     dependencies:
-      '@google-cloud/firestore-api': 0.7.1(supports-color@10.2.2)
+      '@google-cloud/firestore-api': 0.7.1
       '@opentelemetry/api': 1.10.0
       fast-deep-equal: 3.1.3
       functional-red-black-tree: 1.0.1
-      google-gax: 6.17.0(supports-color@10.2.2)
+      google-gax: 6.17.0
       protobufjs: 7.6.6
     transitivePeerDependencies:
       - supports-color
@@ -6291,7 +6310,7 @@ snapshots:
   '@google-cloud/promisify@6.2.1':
     optional: true
 
-  '@google-cloud/pubsub@5.3.1(supports-color@10.2.2)':
+  '@google-cloud/pubsub@5.3.1':
     dependencies:
       '@google-cloud/paginator': 6.1.0
       '@google-cloud/precise-date': 5.2.0
@@ -6302,8 +6321,8 @@ snapshots:
       '@opentelemetry/semantic-conventions': 1.39.0
       arrify: 2.0.1
       extend: 3.0.2
-      google-auth-library: 10.9.1(supports-color@10.2.2)
-      google-gax: 5.0.8(supports-color@10.2.2)
+      google-auth-library: 10.9.1
+      google-gax: 5.0.8
       google-logging-utils: 1.2.0
       heap-js: 2.7.1
       is-stream-ended: 0.1.4
@@ -6313,13 +6332,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google-cloud/sql@0.32.0(supports-color@10.2.2)':
+  '@google-cloud/sql@0.32.0':
     dependencies:
-      google-gax: 6.17.0(supports-color@10.2.2)
+      google-gax: 6.17.0
     transitivePeerDependencies:
       - supports-color
 
-  '@google-cloud/storage@8.4.0(supports-color@10.2.2)':
+  '@google-cloud/storage@8.4.0':
     dependencies:
       '@google-cloud/paginator': 7.2.0
       '@google-cloud/projectify': 6.2.1
@@ -6328,20 +6347,33 @@ snapshots:
       async-retry: 1.3.3
       duplexify: 4.1.3
       fast-xml-parser: 5.12.1
-      gaxios: 7.3.1(supports-color@10.2.2)
-      google-auth-library: 11.3.4(supports-color@10.2.2)
+      gaxios: 7.3.1
+      google-auth-library: 11.3.4
       html-entities: 2.6.0
       mime: 3.0.0
       p-limit: 3.1.0
       retry-request: 9.1.0
-      teeny-request: 11.1.1(supports-color@10.2.2)
+      teeny-request: 11.1.1
     transitivePeerDependencies:
       - supports-color
     optional: true
 
-  '@googleapis/sqladmin@42.0.0(supports-color@10.2.2)':
+  '@google/genai@3.3.0(@modelcontextprotocol/sdk@1.32.2(zod@4.6.5))':
     dependencies:
-      googleapis-common: 9.3.1(supports-color@10.2.2)
+      google-auth-library: 10.9.1
+      p-retry: 4.6.2
+      protobufjs: 7.6.6
+      ws: 8.22.0
+    optionalDependencies:
+      '@modelcontextprotocol/sdk': 1.32.2(zod@4.6.5)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@googleapis/sqladmin@42.0.0':
+    dependencies:
+      googleapis-common: 9.3.1
     transitivePeerDependencies:
       - supports-color
 
@@ -6887,18 +6919,18 @@ snapshots:
     dependencies:
       zod: 4.6.5
 
-  '@modelcontextprotocol/sdk@1.32.2(supports-color@10.2.2)(zod@4.6.5)':
+  '@modelcontextprotocol/sdk@1.32.2(zod@4.6.5)':
     dependencies:
       '@hono/node-server': 2.1.8(hono@4.13.18)
       ajv: 8.20.0
-      ajv-formats: 3.0.1
+      ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
       cors: 2.8.6
       cross-spawn: 7.0.6
       eventsource: 3.0.7
       eventsource-parser: 3.1.1
-      express: 5.3.0(supports-color@10.2.2)
-      express-rate-limit: 8.7.4(express@5.3.0(supports-color@10.2.2))(supports-color@10.2.2)
+      express: 5.3.0
+      express-rate-limit: 8.7.4(express@5.3.0)
       hono: 4.13.18
       jose: 6.2.12
       json-schema-typed: 8.0.2
@@ -6983,12 +7015,12 @@ snapshots:
 
   '@opentelemetry/api@1.9.1': {}
 
-  '@opentelemetry/browser-instrumentation@0.6.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
+  '@opentelemetry/browser-instrumentation@0.6.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.220.0
       '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
       web-vitals: 5.3.0
     transitivePeerDependencies:
@@ -7027,42 +7059,42 @@ snapshots:
       '@opentelemetry/resources': 2.9.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-trace': 2.9.0(@opentelemetry/api@1.9.1)
 
-  '@opentelemetry/instrumentation-document-load@0.65.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
+  '@opentelemetry/instrumentation-document-load@0.65.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-trace-web': 2.10.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/instrumentation-fetch@0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
+  '@opentelemetry/instrumentation-fetch@0.220.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.9.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-trace-web': 2.9.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/instrumentation-xml-http-request@0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
+  '@opentelemetry/instrumentation-xml-http-request@0.220.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.9.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+      '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-trace-web': 2.9.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/instrumentation@0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
+  '@opentelemetry/instrumentation@0.220.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.220.0
       import-in-the-middle: 3.6.0
-      require-in-the-middle: 8.0.1(supports-color@10.2.2)
+      require-in-the-middle: 8.0.1
     transitivePeerDependencies:
       - supports-color
 
@@ -7182,13 +7214,13 @@ snapshots:
   '@oxfmt/win32-x64@0.2.0':
     optional: true
 
-  '@payloadcms/figma@1.0.0-beta.1(243fb7821a9b837774096d7920a4e00e)':
+  '@payloadcms/figma@1.0.0-beta.1(@payloadcms/plugin-cloud-storage@4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3))(@payloadcms/richtext-lexical@4.0.0-beta.3(@faceless-ui/modal@3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)(yjs@13.6.33))(@payloadcms/translations@4.0.0-beta.3)(@payloadcms/ui@4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3))(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react@19.2.1)':
     dependencies:
       '@clack/prompts': 0.11.0
       '@cloudflare/workers-types': 5.20260716.1
       '@figma/rest-api-spec': 0.34.0
       '@payloadcms/translations': 4.0.0-beta.3
-      '@payloadcms/ui': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)
+      '@payloadcms/ui': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
       '@sindresorhus/slugify': 3.0.1
       archiver: 7.0.1
       arg: 5.0.2
@@ -7201,7 +7233,7 @@ snapshots:
       jsonwebtoken: 9.0.3
       open: 10.2.0
       openapi-fetch: 0.15.0
-      payload: 4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3)
+      payload: 4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3)
       picocolors: 1.1.1
       qs-esm: 8.0.2
       react: 19.2.1
@@ -7212,41 +7244,41 @@ snapshots:
       ts-morph: 21.0.1
       uuid: 10.0.0
     optionalDependencies:
-      '@payloadcms/plugin-cloud-storage': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)
-      '@payloadcms/richtext-lexical': 4.0.0-beta.3(@faceless-ui/modal@3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)(yjs@13.6.33)
+      '@payloadcms/plugin-cloud-storage': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
+      '@payloadcms/richtext-lexical': 4.0.0-beta.3(@faceless-ui/modal@3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)(yjs@13.6.33)
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
       - react-native-b4a
 
-  '@payloadcms/graphql@4.0.0-beta.3(graphql@16.14.2)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(typescript@5.9.3)':
+  '@payloadcms/graphql@4.0.0-beta.3(graphql@16.14.2)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(typescript@5.9.3)':
     dependencies:
       graphql: 16.14.2
       graphql-scalars: 1.22.2(graphql@16.14.2)
-      payload: 4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3)
+      payload: 4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3)
       pluralize: 8.0.0
       ts-essentials: 10.0.3(typescript@5.9.3)
       tsx: 4.23.15
     transitivePeerDependencies:
       - typescript
 
-  '@payloadcms/next@4.0.0-beta.3(@types/react@19.3.0)(graphql@16.14.2)(monaco-editor@0.55.1)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)':
+  '@payloadcms/next@4.0.0-beta.3(@types/react@19.3.0)(graphql@16.14.2)(monaco-editor@0.55.1)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)':
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@dnd-kit/modifiers': 9.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)
       '@dnd-kit/sortable': 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)
-      '@payloadcms/graphql': 4.0.0-beta.3(graphql@16.14.2)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(typescript@5.9.3)
+      '@payloadcms/graphql': 4.0.0-beta.3(graphql@16.14.2)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(typescript@5.9.3)
       '@payloadcms/translations': 4.0.0-beta.3
-      '@payloadcms/ui': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)
+      '@payloadcms/ui': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
       busboy: 1.6.0
       dequal: 2.0.3
-      file-type: 22.0.1(supports-color@10.2.2)
+      file-type: 22.0.1
       graphql: 16.14.2
       graphql-http: 1.22.4(graphql@16.14.2)
       graphql-playground-html: 1.6.30
-      next: 16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
+      next: 16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
       path-to-regexp: 6.3.0
-      payload: 4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3)
+      payload: 4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3)
       qs-esm: 8.0.1
       sass: 1.77.4
       uuid: 14.0.0
@@ -7259,11 +7291,11 @@ snapshots:
       - supports-color
       - typescript
 
-  '@payloadcms/plugin-cloud-storage@4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)':
+  '@payloadcms/plugin-cloud-storage@4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)':
     dependencies:
-      '@payloadcms/ui': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)
+      '@payloadcms/ui': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
       find-node-modules: 2.1.3
-      payload: 4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3)
+      payload: 4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3)
       range-parser: 1.3.0
       react: 19.2.1
       react-dom: 19.2.1(react@19.2.1)
@@ -7274,13 +7306,13 @@ snapshots:
       - supports-color
       - typescript
 
-  '@payloadcms/plugin-mcp@4.0.0-beta.3(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))':
+  '@payloadcms/plugin-mcp@4.0.0-beta.3(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))':
     dependencies:
       '@modelcontextprotocol/server': 2.3.1
-      payload: 4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3)
+      payload: 4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3)
       tsx: 4.23.15
 
-  '@payloadcms/richtext-lexical@4.0.0-beta.3(@faceless-ui/modal@3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)(yjs@13.6.33)':
+  '@payloadcms/richtext-lexical@4.0.0-beta.3(@faceless-ui/modal@3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)(yjs@13.6.33)':
     dependencies:
       '@faceless-ui/modal': 3.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@faceless-ui/scroll-info': 2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -7297,7 +7329,7 @@ snapshots:
       '@lexical/table': 0.52.0(typescript@5.9.3)
       '@lexical/utils': 0.52.0(typescript@5.9.3)
       '@payloadcms/translations': 4.0.0-beta.3
-      '@payloadcms/ui': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)
+      '@payloadcms/ui': 4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
       acorn: 8.16.0
       bson-objectid: 2.0.4
       csstype: 3.2.3
@@ -7305,10 +7337,10 @@ snapshots:
       escape-html: 1.0.3
       jsox: 1.2.125
       lexical: 0.52.0(typescript@5.9.3)
-      mdast-util-from-markdown: 2.0.3(supports-color@10.2.2)
-      mdast-util-mdx-jsx: 3.2.0(supports-color@10.2.2)
+      mdast-util-from-markdown: 2.0.3
+      mdast-util-mdx-jsx: 3.2.0
       micromark-extension-mdx-jsx: 3.0.2
-      payload: 4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3)
+      payload: 4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3)
       qs-esm: 8.0.1
       react: 19.2.1
       react-dom: 19.2.1(react@19.2.1)
@@ -7329,7 +7361,7 @@ snapshots:
     dependencies:
       date-fns: 4.4.0
 
-  '@payloadcms/ui@4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)(typescript@5.9.3)':
+  '@payloadcms/ui@4.0.0-beta.3(@types/react@19.3.0)(monaco-editor@0.55.1)(payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)':
     dependencies:
       '@date-fns/tz': 1.2.0
       '@dnd-kit/core': 6.3.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -7349,13 +7381,13 @@ snapshots:
       md5: 2.3.0
       object-to-formdata: 4.5.1
       path-to-regexp: 6.3.0
-      payload: 4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3)
+      payload: 4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3)
       qs-esm: 8.0.1
       react: 19.2.1
       react-datepicker: 9.1.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       react-dom: 19.2.1(react@19.2.1)
       react-image-crop: 10.1.8(react@19.2.1)
-      react-select: 5.9.0(@types/react@19.3.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2)
+      react-select: 5.9.0(@types/react@19.3.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       scheduler: 0.25.0
       sonner: 1.7.4(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       ts-essentials: 10.0.3(typescript@5.9.3)
@@ -7550,9 +7582,9 @@ snapshots:
       postcss: 8.5.29
       tailwindcss: 4.3.3
 
-  '@tokenizer/inflate@0.4.1(supports-color@10.2.2)':
+  '@tokenizer/inflate@0.4.1':
     dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       token-types: 6.1.2
     transitivePeerDependencies:
       - supports-color
@@ -7629,6 +7661,8 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
+  '@types/retry@0.12.0': {}
+
   '@types/triple-beam@1.3.5': {}
 
   '@types/trusted-types@2.0.7': {}
@@ -7679,8 +7713,8 @@ snapshots:
     optionalDependencies:
       ajv: 8.20.0
 
-  ajv-formats@3.0.1:
-    dependencies:
+  ajv-formats@3.0.1(ajv@8.20.0):
+    optionalDependencies:
       ajv: 8.20.0
 
   ajv@8.20.0:
@@ -7833,11 +7867,11 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
 
-  body-parser@1.20.9(supports-color@10.2.2):
+  body-parser@1.20.9:
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
-      debug: 2.6.9(supports-color@10.2.2)
+      debug: 2.6.9
       depd: 2.0.0
       destroy: 1.2.0
       http-errors: 2.0.1
@@ -7850,11 +7884,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  body-parser@2.4.0(supports-color@10.2.2):
+  body-parser@2.4.0:
     dependencies:
       bytes: 3.1.2
       content-type: 2.1.0
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       http-errors: 2.0.1
       iconv-lite: 0.7.3
       on-finished: 2.4.2
@@ -8083,11 +8117,11 @@ snapshots:
     dependencies:
       mime-db: 1.54.0
 
-  compression@1.8.2(supports-color@10.2.2):
+  compression@1.8.2:
     dependencies:
       bytes: 3.1.2
       compressible: 2.0.18
-      debug: 2.6.9(supports-color@10.2.2)
+      debug: 2.6.9
       destroy: 1.2.0
       negotiator: 0.6.4
       on-headers: 1.1.0
@@ -8101,7 +8135,7 @@ snapshots:
   conf@13.1.0:
     dependencies:
       ajv: 8.20.0
-      ajv-formats: 3.0.1
+      ajv-formats: 3.0.1(ajv@8.20.0)
       atomically: 2.1.1
       debounce-fn: 6.0.0
       dot-prop: 9.0.0
@@ -8124,10 +8158,10 @@ snapshots:
       write-file-atomic: 3.0.3
       xdg-basedir: 4.0.0
 
-  connect@3.7.0(supports-color@10.2.2):
+  connect@3.7.0:
     dependencies:
-      debug: 2.6.9(supports-color@10.2.2)
-      finalhandler: 1.1.2(supports-color@10.2.2)
+      debug: 2.6.9
+      finalhandler: 1.1.2
       parseurl: 1.3.3
       utils-merge: 1.0.1
     transitivePeerDependencies:
@@ -8211,23 +8245,17 @@ snapshots:
     dependencies:
       mimic-function: 5.0.1
 
-  debug@2.6.9(supports-color@10.2.2):
+  debug@2.6.9:
     dependencies:
       ms: 2.0.0
-    optionalDependencies:
-      supports-color: 10.2.2
 
-  debug@4.3.1(supports-color@10.2.2):
+  debug@4.3.1:
     dependencies:
       ms: 2.1.2
-    optionalDependencies:
-      supports-color: 10.2.2
 
-  debug@4.4.3(supports-color@10.2.2):
+  debug@4.4.3:
     dependencies:
       ms: 2.1.3
-    optionalDependencies:
-      supports-color: 10.2.2
 
   decode-named-character-reference@1.3.0:
     dependencies:
@@ -8461,18 +8489,18 @@ snapshots:
     dependencies:
       eventsource-parser: 3.1.1
 
-  exegesis-express@4.0.0(supports-color@10.2.2):
+  exegesis-express@4.0.0:
     dependencies:
-      exegesis: 4.3.0(supports-color@10.2.2)
+      exegesis: 4.3.0
     transitivePeerDependencies:
       - supports-color
 
-  exegesis@4.3.0(supports-color@10.2.2):
+  exegesis@4.3.0:
     dependencies:
       '@apidevtools/json-schema-ref-parser': 9.1.2
       ajv: 8.20.0
       ajv-formats: 2.1.1(ajv@8.20.0)
-      body-parser: 1.20.9(supports-color@10.2.2)
+      body-parser: 1.20.9
       content-type: 1.0.5
       deep-freeze: 0.0.1
       events-listener: 1.1.0
@@ -8497,29 +8525,29 @@ snapshots:
   exponential-backoff@3.1.3:
     optional: true
 
-  express-rate-limit@8.7.4(express@5.3.0(supports-color@10.2.2))(supports-color@10.2.2):
+  express-rate-limit@8.7.4(express@5.3.0):
     dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
-      express: 5.3.0(supports-color@10.2.2)
+      debug: 4.4.3
+      express: 5.3.0
       ip-address: 10.7.6
     transitivePeerDependencies:
       - supports-color
 
-  express@4.22.3(supports-color@10.2.2):
+  express@4.22.3:
     dependencies:
       accepts: 1.3.8
       array-flatten: 1.1.1
-      body-parser: 1.20.9(supports-color@10.2.2)
+      body-parser: 1.20.9
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookie: 0.7.2
       cookie-signature: 1.0.7
-      debug: 2.6.9(supports-color@10.2.2)
+      debug: 2.6.9
       depd: 2.0.0
       encodeurl: 2.0.3
       escape-html: 1.0.3
       etag: 1.8.1
-      finalhandler: 1.3.2(supports-color@10.2.2)
+      finalhandler: 1.3.2
       fresh: 0.5.2
       http-errors: 2.0.1
       merge-descriptors: 1.0.3
@@ -8531,8 +8559,8 @@ snapshots:
       qs: 6.16.2
       range-parser: 1.2.1
       safe-buffer: 5.2.1
-      send: 0.19.2(supports-color@10.2.2)
-      serve-static: 1.16.3(supports-color@10.2.2)
+      send: 0.19.2
+      serve-static: 1.16.3
       setprototypeof: 1.2.0
       statuses: 2.0.2
       type-is: 1.6.18
@@ -8541,20 +8569,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  express@5.3.0(supports-color@10.2.2):
+  express@5.3.0:
     dependencies:
       accepts: 2.0.0
-      body-parser: 2.4.0(supports-color@10.2.2)
+      body-parser: 2.4.0
       content-disposition: 2.0.1
       content-type: 2.1.0
       cookie: 0.7.2
       cookie-signature: 1.2.2
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       depd: 2.0.0
       encodeurl: 2.0.3
       escape-html: 1.0.3
       etag: 1.8.1
-      finalhandler: 2.1.1(supports-color@10.2.2)
+      finalhandler: 2.1.1
       fresh: 2.0.0
       http-errors: 2.0.1
       merge-descriptors: 2.0.0
@@ -8565,9 +8593,9 @@ snapshots:
       proxy-addr: 2.0.8
       qs: 6.17.1
       range-parser: 1.3.0
-      router: 2.2.0(supports-color@10.2.2)
-      send: 1.2.1(supports-color@10.2.2)
-      serve-static: 2.2.1(supports-color@10.2.2)
+      router: 2.2.0
+      send: 1.2.1
+      serve-static: 2.2.1
       statuses: 2.0.2
       type-is: 2.1.0
       vary: 1.1.2
@@ -8633,9 +8661,9 @@ snapshots:
     dependencies:
       is-unicode-supported: 2.1.0
 
-  file-type@22.0.1(supports-color@10.2.2):
+  file-type@22.0.1:
     dependencies:
-      '@tokenizer/inflate': 0.4.1(supports-color@10.2.2)
+      '@tokenizer/inflate': 0.4.1
       strtok3: 10.3.5
       token-types: 6.1.2
       uint8array-extras: 1.6.0
@@ -8646,9 +8674,9 @@ snapshots:
     dependencies:
       to-regex-range: 5.0.1
 
-  finalhandler@1.1.2(supports-color@10.2.2):
+  finalhandler@1.1.2:
     dependencies:
-      debug: 2.6.9(supports-color@10.2.2)
+      debug: 2.6.9
       encodeurl: 1.0.4
       escape-html: 1.0.3
       on-finished: 2.3.0
@@ -8658,9 +8686,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  finalhandler@1.3.2(supports-color@10.2.2):
+  finalhandler@1.3.2:
     dependencies:
-      debug: 2.6.9(supports-color@10.2.2)
+      debug: 2.6.9
       encodeurl: 2.0.3
       escape-html: 1.0.3
       on-finished: 2.4.2
@@ -8670,9 +8698,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  finalhandler@2.1.1(supports-color@10.2.2):
+  finalhandler@2.1.1:
     dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       encodeurl: 2.0.3
       escape-html: 1.0.3
       on-finished: 2.4.2
@@ -8695,37 +8723,37 @@ snapshots:
       micromatch: 4.0.8
       resolve-dir: 1.0.1
 
-  firebase-admin@14.5.1(@firebase/app-compat@0.5.22)(@firebase/app@0.16.6)(supports-color@10.2.2):
+  firebase-admin@14.5.1(@firebase/app-compat@0.5.22)(@firebase/app@0.16.6):
     dependencies:
       '@fastify/busboy': 3.2.5
       '@firebase/database-compat': 2.1.8(@firebase/app-compat@0.5.22)(@firebase/app@0.16.6)
       '@firebase/database-types': 1.0.22
       fast-deep-equal: 3.1.3
-      google-auth-library: 11.3.4(supports-color@10.2.2)
+      google-auth-library: 11.3.4
       jsonwebtoken: 9.0.3
-      jwks-rsa: 4.1.0(supports-color@10.2.2)
+      jwks-rsa: 4.1.0
     optionalDependencies:
-      '@google-cloud/firestore': 9.4.1(supports-color@10.2.2)
-      '@google-cloud/storage': 8.4.0(supports-color@10.2.2)
+      '@google-cloud/firestore': 9.4.1
+      '@google-cloud/storage': 8.4.0
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-compat'
       - supports-color
 
-  firebase-tools@15.36.0(@types/node@22.20.5)(supports-color@10.2.2):
+  firebase-tools@15.36.0(@types/node@22.20.5):
     dependencies:
       '@electric-sql/pglite': 0.3.16
       '@electric-sql/pglite-tools': 0.2.21(@electric-sql/pglite@0.3.16)
-      '@google-cloud/cloud-sql-connector': 1.13.0(supports-color@10.2.2)
-      '@google-cloud/pubsub': 5.3.1(supports-color@10.2.2)
+      '@google-cloud/cloud-sql-connector': 1.13.0
+      '@google-cloud/pubsub': 5.3.1
       '@inquirer/prompts': 7.10.1(@types/node@22.20.5)
-      '@modelcontextprotocol/sdk': 1.32.2(supports-color@10.2.2)(zod@4.6.5)
+      '@modelcontextprotocol/sdk': 1.32.2(zod@4.6.5)
       abort-controller: 3.0.0
       ajv: 8.20.0
-      ajv-formats: 3.0.1
+      ajv-formats: 3.0.1(ajv@8.20.0)
       archiver: 7.0.1
       async-lock: 1.4.1
-      body-parser: 1.20.9(supports-color@10.2.2)
+      body-parser: 1.20.9
       chokidar: 4.0.3
       cjson: 0.3.3
       cli-table3: 0.6.5
@@ -8736,15 +8764,15 @@ snapshots:
       cross-env: 7.0.3
       cross-spawn: 7.0.6
       csv-parse: 7.0.3
-      exegesis: 4.3.0(supports-color@10.2.2)
-      exegesis-express: 4.0.0(supports-color@10.2.2)
-      express: 4.22.3(supports-color@10.2.2)
+      exegesis: 4.3.0
+      exegesis-express: 4.0.0
+      express: 4.22.3
       form-data: 4.0.6
       fs-extra: 10.1.0
       fuzzy: 0.1.3
-      gaxios: 6.7.1(supports-color@10.2.2)
+      gaxios: 6.7.1
       glob: 10.5.0
-      google-auth-library: 9.15.1(supports-color@10.2.2)
+      google-auth-library: 9.15.1
       ignore: 7.0.14
       js-yaml: 4.3.2
       jsonwebtoken: 9.0.3
@@ -8754,23 +8782,23 @@ snapshots:
       marked: 13.0.3
       marked-terminal: 7.3.1(marked@13.0.3)
       minimatch: 3.1.5
-      morgan: 1.12.1(supports-color@10.2.2)
+      morgan: 1.12.1
       node-fetch: 2.7.0
       open: 6.4.0
       ora: 5.4.1
       pg: 8.23.1
       pg-gateway: 0.3.0-beta.4
       pglite-2: '@electric-sql/pglite@0.2.17'
-      portfinder: 1.0.38(supports-color@10.2.2)
+      portfinder: 1.0.38
       progress: 2.0.3
       retry: 0.13.1
       semver: 7.8.5
       sql-formatter: 15.9.0
       stream-chain: 4.4.2
       stream-json: 3.9.0
-      superstatic: 10.0.0(supports-color@10.2.2)
+      superstatic: 10.0.0
       tar: 7.5.22
-      tcp-port-used: 1.0.3(supports-color@10.2.2)
+      tcp-port-used: 1.0.3
       tmp: 0.2.7
       triple-beam: 1.4.1
       undici: 6.29.1
@@ -8792,7 +8820,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  firebase@13.3.0(@types/react@19.3.0)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)(supports-color@10.2.2):
+  firebase@13.3.0(@types/react@19.3.0)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1):
     dependencies:
       '@firebase/ai': 3.1.0(@firebase/app-types@0.9.6)(@firebase/app@0.16.6)
       '@firebase/analytics': 0.10.25(@firebase/app@0.16.6)
@@ -8804,7 +8832,7 @@ snapshots:
       '@firebase/app-types': 0.9.6
       '@firebase/auth': 1.13.10(@firebase/app@0.16.6)
       '@firebase/auth-compat': 0.6.15(@firebase/app-compat@0.5.22)(@firebase/app-types@0.9.6)(@firebase/app@0.16.6)
-      '@firebase/crashlytics': 0.1.1(@firebase/app-types@0.9.6)(@firebase/app@0.16.6)(@types/react@19.3.0)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)(supports-color@10.2.2)
+      '@firebase/crashlytics': 0.1.1(@firebase/app-types@0.9.6)(@firebase/app@0.16.6)(@types/react@19.3.0)(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)
       '@firebase/data-connect': 0.7.4(@firebase/app@0.16.6)
       '@firebase/database': 1.1.6
       '@firebase/database-compat': 2.1.8(@firebase/app-compat@0.5.22)(@firebase/app@0.16.6)
@@ -8878,10 +8906,10 @@ snapshots:
 
   fuzzy@0.1.3: {}
 
-  gaxios@6.7.1(supports-color@10.2.2):
+  gaxios@6.7.1:
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.2)
+      https-proxy-agent: 7.0.6
       is-stream: 2.0.1
       node-fetch: 2.7.0
       uuid: 9.0.1
@@ -8889,59 +8917,59 @@ snapshots:
       - encoding
       - supports-color
 
-  gaxios@7.1.3(supports-color@10.2.2):
+  gaxios@7.1.3:
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.2)
+      https-proxy-agent: 7.0.6
       node-fetch: 3.3.2
       rimraf: 5.0.10
     transitivePeerDependencies:
       - supports-color
 
-  gaxios@7.3.1(supports-color@10.2.2):
+  gaxios@7.3.1:
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.2)
+      https-proxy-agent: 7.0.6
       node-fetch: 3.3.2
     transitivePeerDependencies:
       - supports-color
 
-  gaxios@8.3.3(supports-color@10.2.2):
+  gaxios@8.3.3:
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.2)
+      https-proxy-agent: 7.0.6
       node-fetch: 3.3.2
     transitivePeerDependencies:
       - supports-color
 
-  gcp-metadata@6.1.1(supports-color@10.2.2):
+  gcp-metadata@6.1.1:
     dependencies:
-      gaxios: 6.7.1(supports-color@10.2.2)
+      gaxios: 6.7.1
       google-logging-utils: 0.0.2
       json-bigint: 1.0.0
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  gcp-metadata@8.1.2(supports-color@10.2.2):
+  gcp-metadata@8.1.2:
     dependencies:
-      gaxios: 7.3.1(supports-color@10.2.2)
+      gaxios: 7.3.1
       google-logging-utils: 1.2.0
       json-bigint: 1.0.0
     transitivePeerDependencies:
       - supports-color
 
-  gcp-metadata@8.1.4(supports-color@10.2.2):
+  gcp-metadata@8.1.4:
     dependencies:
-      gaxios: 7.1.3(supports-color@10.2.2)
+      gaxios: 7.1.3
       google-logging-utils: 1.1.3
       json-bigint: 1.0.0
     transitivePeerDependencies:
       - supports-color
 
-  gcp-metadata@9.2.3(supports-color@10.2.2):
+  gcp-metadata@9.2.3:
     dependencies:
-      gaxios: 8.3.3(supports-color@10.2.2)
+      gaxios: 8.3.3
       google-logging-utils: 2.2.0
       json-bigint: 1.0.0
     transitivePeerDependencies:
@@ -9010,75 +9038,75 @@ snapshots:
       is-windows: 1.0.2
       which: 1.3.1
 
-  google-auth-library@10.5.0(supports-color@10.2.2):
+  google-auth-library@10.5.0:
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 7.3.1(supports-color@10.2.2)
-      gcp-metadata: 8.1.4(supports-color@10.2.2)
+      gaxios: 7.3.1
+      gcp-metadata: 8.1.4
       google-logging-utils: 1.2.0
-      gtoken: 8.0.0(supports-color@10.2.2)
+      gtoken: 8.0.0
       jws: 4.0.1
     transitivePeerDependencies:
       - supports-color
 
-  google-auth-library@10.9.1(supports-color@10.2.2):
+  google-auth-library@10.9.1:
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 7.3.1(supports-color@10.2.2)
-      gcp-metadata: 8.1.2(supports-color@10.2.2)
+      gaxios: 7.3.1
+      gcp-metadata: 8.1.2
       google-logging-utils: 1.1.3
       jws: 4.0.1
     transitivePeerDependencies:
       - supports-color
 
-  google-auth-library@11.3.4(supports-color@10.2.2):
+  google-auth-library@11.3.4:
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 8.3.3(supports-color@10.2.2)
-      gcp-metadata: 9.2.3(supports-color@10.2.2)
+      gaxios: 8.3.3
+      gcp-metadata: 9.2.3
       google-logging-utils: 2.2.0
       jws: 4.0.1
     transitivePeerDependencies:
       - supports-color
 
-  google-auth-library@9.15.1(supports-color@10.2.2):
+  google-auth-library@9.15.1:
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 6.7.1(supports-color@10.2.2)
-      gcp-metadata: 6.1.1(supports-color@10.2.2)
-      gtoken: 7.1.0(supports-color@10.2.2)
+      gaxios: 6.7.1
+      gcp-metadata: 6.1.1
+      gtoken: 7.1.0
       jws: 4.0.1
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  google-gax@5.0.8(supports-color@10.2.2):
+  google-gax@5.0.8:
     dependencies:
       '@grpc/grpc-js': 1.14.7
       '@grpc/proto-loader': 0.8.1
       duplexify: 4.1.3
-      google-auth-library: 10.5.0(supports-color@10.2.2)
+      google-auth-library: 10.5.0
       google-logging-utils: 1.1.3
       node-fetch: 3.3.2
       object-hash: 3.0.0
       proto3-json-serializer: 3.0.4
       protobufjs: 7.6.6
-      retry-request: 8.0.4(supports-color@10.2.2)
+      retry-request: 8.0.4
       rimraf: 5.0.10
     transitivePeerDependencies:
       - supports-color
 
-  google-gax@6.17.0(supports-color@10.2.2):
+  google-gax@6.17.0:
     dependencies:
       '@grpc/grpc-js': 1.14.7
       '@grpc/proto-loader': 0.8.1
       '@opentelemetry/api': 1.10.0
       duplexify: 4.1.3
-      google-auth-library: 11.3.4(supports-color@10.2.2)
+      google-auth-library: 11.3.4
       google-logging-utils: 2.2.0
       node-fetch: 3.3.2
       object-hash: 3.0.0
@@ -9096,11 +9124,11 @@ snapshots:
 
   google-logging-utils@2.2.0: {}
 
-  googleapis-common@9.3.1(supports-color@10.2.2):
+  googleapis-common@9.3.1:
     dependencies:
       extend: 3.0.2
-      gaxios: 8.3.3(supports-color@10.2.2)
-      google-auth-library: 11.3.4(supports-color@10.2.2)
+      gaxios: 8.3.3
+      google-auth-library: 11.3.4
       google-logging-utils: 2.2.0
       qs: 6.17.1
       url-template: 2.0.8
@@ -9128,17 +9156,17 @@ snapshots:
 
   graphql@16.14.2: {}
 
-  gtoken@7.1.0(supports-color@10.2.2):
+  gtoken@7.1.0:
     dependencies:
-      gaxios: 6.7.1(supports-color@10.2.2)
+      gaxios: 6.7.1
       jws: 4.0.1
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  gtoken@8.0.0(supports-color@10.2.2):
+  gtoken@8.0.0:
     dependencies:
-      gaxios: 7.3.1(supports-color@10.2.2)
+      gaxios: 7.3.1
       jws: 4.0.1
     transitivePeerDependencies:
       - supports-color
@@ -9223,17 +9251,17 @@ snapshots:
 
   http-parser-js@0.5.10: {}
 
-  http-proxy-agent@7.0.2(supports-color@10.2.2):
+  http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
-  https-proxy-agent@7.0.6(supports-color@10.2.2):
+  https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
@@ -9481,10 +9509,10 @@ snapshots:
       ecdsa-sig-formatter: 1.0.11
       safe-buffer: 5.2.1
 
-  jwks-rsa@4.1.0(supports-color@10.2.2):
+  jwks-rsa@4.1.0:
     dependencies:
       '@types/jsonwebtoken': 9.0.10
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       jose: 6.2.12
       limiter: 1.1.5
       lru-cache: 11.5.3
@@ -9717,14 +9745,14 @@ snapshots:
       crypt: 0.0.2
       is-buffer: 1.1.6
 
-  mdast-util-from-markdown@2.0.3(supports-color@10.2.2):
+  mdast-util-from-markdown@2.0.3:
     dependencies:
       '@types/mdast': 4.0.4
       '@types/unist': 3.0.3
       decode-named-character-reference: 1.3.0
       devlop: 1.1.0
       mdast-util-to-string: 4.0.0
-      micromark: 4.0.3(supports-color@10.2.2)
+      micromark: 4.0.3
       micromark-util-decode-numeric-character-reference: 2.0.2
       micromark-util-decode-string: 2.0.1
       micromark-util-normalize-identifier: 2.0.1
@@ -9734,7 +9762,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  mdast-util-mdx-jsx@3.2.0(supports-color@10.2.2):
+  mdast-util-mdx-jsx@3.2.0:
     dependencies:
       '@types/estree-jsx': 1.0.5
       '@types/hast': 3.0.5
@@ -9742,7 +9770,7 @@ snapshots:
       '@types/unist': 3.0.3
       ccount: 2.0.1
       devlop: 1.1.0
-      mdast-util-from-markdown: 2.0.3(supports-color@10.2.2)
+      mdast-util-from-markdown: 2.0.3
       mdast-util-to-markdown: 2.2.0
       parse-entities: 4.0.2
       stringify-entities: 4.0.4
@@ -9941,10 +9969,10 @@ snapshots:
 
   micromark-util-types@2.0.3: {}
 
-  micromark@4.0.3(supports-color@10.2.2):
+  micromark@4.0.3:
     dependencies:
       '@types/debug': 4.1.13
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       decode-named-character-reference: 1.3.0
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.4
@@ -10025,10 +10053,10 @@ snapshots:
 
   moo@0.5.3: {}
 
-  morgan@1.12.1(supports-color@10.2.2):
+  morgan@1.12.1:
     dependencies:
       basic-auth: 2.0.1
-      debug: 2.6.9(supports-color@10.2.2)
+      debug: 2.6.9
       depd: 2.0.0
       on-finished: 2.4.2
       on-headers: 1.1.0
@@ -10069,7 +10097,7 @@ snapshots:
     dependencies:
       content-type: 2.1.0
 
-  next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4):
+  next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4):
     dependencies:
       '@next/env': 16.4.6
       '@swc/helpers': 0.5.23
@@ -10078,7 +10106,7 @@ snapshots:
       postcss: 8.5.23
       react: 19.2.1
       react-dom: 19.2.1(react@19.2.1)
-      styled-jsx: 5.1.6(babel-plugin-macros@3.1.0)(react@19.2.1)
+      styled-jsx: 5.1.6(react@19.2.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.4.6
       '@next/swc-darwin-x64': 16.4.6
@@ -10221,6 +10249,11 @@ snapshots:
       yocto-queue: 0.1.0
     optional: true
 
+  p-retry@4.6.2:
+    dependencies:
+      '@types/retry': 0.12.0
+      retry: 0.13.1
+
   p-throttle@8.1.1: {}
 
   package-json-from-dist@1.0.1: {}
@@ -10284,7 +10317,7 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  payload@4.0.0-beta.3(graphql@16.14.2)(supports-color@10.2.2)(typescript@5.9.3):
+  payload@4.0.0-beta.3(graphql@16.14.2)(typescript@5.9.3):
     dependencies:
       '@next/env': 16.4.2
       '@payloadcms/translations': 4.0.0-beta.3
@@ -10300,7 +10333,7 @@ snapshots:
       deepmerge: 4.3.1
       dotenv: 16.4.5
       dotenv-expand: 11.0.6
-      file-type: 22.0.1(supports-color@10.2.2)
+      file-type: 22.0.1
       get-tsconfig: 4.14.0
       graphql: 16.14.2
       image-dimensions: 2.5.1
@@ -10410,10 +10443,10 @@ snapshots:
 
   pluralize@8.0.0: {}
 
-  portfinder@1.0.38(supports-color@10.2.2):
+  portfinder@1.0.38:
     dependencies:
       async: 3.2.6
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
@@ -10588,11 +10621,11 @@ snapshots:
 
   react-property@2.0.2: {}
 
-  react-select@5.9.0(@types/react@19.3.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(supports-color@10.2.2):
+  react-select@5.9.0(@types/react@19.3.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
     dependencies:
       '@babel/runtime': 7.29.10
       '@emotion/cache': 11.14.0
-      '@emotion/react': 11.14.0(@types/react@19.3.0)(react@19.2.1)(supports-color@10.2.2)
+      '@emotion/react': 11.14.0(@types/react@19.3.0)(react@19.2.1)
       '@floating-ui/dom': 1.8.0
       '@types/react-transition-group': 4.4.12(@types/react@19.3.0)
       memoize-one: 6.0.0
@@ -10666,9 +10699,9 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  require-in-the-middle@8.0.1(supports-color@10.2.2):
+  require-in-the-middle@8.0.1:
     dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       module-details-from-path: 1.0.4
     transitivePeerDependencies:
       - supports-color
@@ -10696,10 +10729,10 @@ snapshots:
 
   ret@0.1.15: {}
 
-  retry-request@8.0.4(supports-color@10.2.2):
+  retry-request@8.0.4:
     dependencies:
       extend: 3.0.2
-      teeny-request: 10.1.4(supports-color@10.2.2)
+      teeny-request: 10.1.4
     transitivePeerDependencies:
       - supports-color
 
@@ -10737,9 +10770,9 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.2.19
       '@rolldown/binding-win32-x64-msvc': 1.2.19
 
-  router@2.2.0(supports-color@10.2.2):
+  router@2.2.0:
     dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       depd: 2.0.0
       is-promise: 4.0.0
       parseurl: 1.3.3
@@ -10787,9 +10820,9 @@ snapshots:
 
   semver@7.8.5: {}
 
-  send@0.19.2(supports-color@10.2.2):
+  send@0.19.2:
     dependencies:
-      debug: 2.6.9(supports-color@10.2.2)
+      debug: 2.6.9
       depd: 2.0.0
       destroy: 1.2.0
       encodeurl: 2.0.3
@@ -10805,9 +10838,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  send@1.2.1(supports-color@10.2.2):
+  send@1.2.1:
     dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
+      debug: 4.4.3
       encodeurl: 2.0.3
       escape-html: 1.0.3
       etag: 1.8.1
@@ -10821,21 +10854,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  serve-static@1.16.3(supports-color@10.2.2):
+  serve-static@1.16.3:
     dependencies:
       encodeurl: 2.0.3
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 0.19.2(supports-color@10.2.2)
+      send: 0.19.2
     transitivePeerDependencies:
       - supports-color
 
-  serve-static@2.2.1(supports-color@10.2.2):
+  serve-static@2.2.1:
     dependencies:
       encodeurl: 2.0.3
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 1.2.1(supports-color@10.2.2)
+      send: 1.2.1
     transitivePeerDependencies:
       - supports-color
 
@@ -11037,21 +11070,19 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.7
 
-  styled-jsx@5.1.6(babel-plugin-macros@3.1.0)(react@19.2.1):
+  styled-jsx@5.1.6(react@19.2.1):
     dependencies:
       client-only: 0.0.1
       react: 19.2.1
-    optionalDependencies:
-      babel-plugin-macros: 3.1.0
 
   stylis@4.2.0: {}
 
-  superstatic@10.0.0(supports-color@10.2.2):
+  superstatic@10.0.0:
     dependencies:
       basic-auth-connect: 1.1.0
       commander: 10.0.1
-      compression: 1.8.2(supports-color@10.2.2)
-      connect: 3.7.0(supports-color@10.2.2)
+      compression: 1.8.2
+      connect: 3.7.0
       destroy: 1.2.0
       glob-slasher: 1.0.1
       is-url: 1.2.4
@@ -11059,11 +11090,11 @@ snapshots:
       lodash: 4.18.1
       mime-types: 2.1.35
       minimatch: 6.2.3
-      morgan: 1.12.1(supports-color@10.2.2)
+      morgan: 1.12.1
       on-finished: 2.4.2
       on-headers: 1.1.0
       path-to-regexp: 1.9.0
-      router: 2.2.0(supports-color@10.2.2)
+      router: 2.2.0
       update-notifier-cjs: 5.1.7
     optionalDependencies:
       re2: 1.27.1
@@ -11114,26 +11145,26 @@ snapshots:
       minizlib: 3.1.0
       yallist: 5.0.0
 
-  tcp-port-used@1.0.3(supports-color@10.2.2):
+  tcp-port-used@1.0.3:
     dependencies:
-      debug: 4.3.1(supports-color@10.2.2)
+      debug: 4.3.1
       is2: 2.0.1
     transitivePeerDependencies:
       - supports-color
 
-  teeny-request@10.1.4(supports-color@10.2.2):
+  teeny-request@10.1.4:
     dependencies:
-      http-proxy-agent: 7.0.2(supports-color@10.2.2)
-      https-proxy-agent: 7.0.6(supports-color@10.2.2)
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.6
       node-fetch: 3.3.2
       stream-events: 1.0.5
     transitivePeerDependencies:
       - supports-color
 
-  teeny-request@11.1.1(supports-color@10.2.2):
+  teeny-request@11.1.1:
     dependencies:
-      http-proxy-agent: 7.0.2(supports-color@10.2.2)
-      https-proxy-agent: 7.0.6(supports-color@10.2.2)
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.6
       node-fetch: 3.3.2
       stream-events: 1.0.5
     transitivePeerDependencies:

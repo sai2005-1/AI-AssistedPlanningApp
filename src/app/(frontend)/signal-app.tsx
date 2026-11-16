@@ -26,6 +26,13 @@ import {
 } from "./actions"
 
 import { logoutAction } from "./auth-actions"
+import { advisorChatAction } from "./advisor-actions"
+import {
+  classifyLocalCommand,
+  MAX_PROMPT_CHARS,
+  recentChatHistory,
+  type ChatTurn,
+} from "../../lib/advisor-chat"
 
 import TeamDeliverables from "./team-deliverables"
 
@@ -1194,7 +1201,7 @@ function QuickAdd({
   )
 }
 
-function AdvisorScreen({
+export function AdvisorScreen({
   onOpenTeam,
 
   onChanged,
@@ -1213,18 +1220,26 @@ function AdvisorScreen({
 
       role: "assistant",
 
-      text: "I can add a task, explain a score, parse a syllabus, build an exam plan, open Team Deliverables, or auto-reschedule conflicts.",
+      text: "Ask Gemini for planning advice using details you choose to share. Switch to Local commands to add tasks, explain scores, parse a syllabus, build an exam plan, open Team Deliverables, or replan. Review and approve local changes before saving.",
     },
   ])
 
   const [value, setValue] = useState("")
 
+  const [mode, setMode] = useState<"gemini" | "local">("gemini")
+  const messageId = useRef(1)
+  const [chatHistory, setChatHistory] = useState<ChatTurn[]>([])
+  const [proposal, setProposal] = useState<{
+    prompt: string
+    command: string
+  } | null>(null)
+
   const [pending, startTransition] = useTransition()
 
   function reply(text: string) {
     setMessages((current) => [
-      ...current,
-      { id: Date.now(), role: "assistant", text },
+      ...current.slice(-39),
+      { id: ++messageId.current, role: "assistant", text },
     ])
   }
 
@@ -1233,112 +1248,152 @@ function AdvisorScreen({
 
     const prompt = value.trim()
 
-    if (!prompt) return
+    if (!prompt || pending || proposal) return
 
     setMessages((current) => [
-      ...current,
-      { id: Date.now(), role: "user", text: prompt },
+      ...current.slice(-39),
+      { id: ++messageId.current, role: "user", text: prompt },
     ])
 
     setValue("")
 
+    if (mode === "gemini") {
+      const history = recentChatHistory(chatHistory, prompt)
+      startTransition(async () => {
+        try {
+          const result = await advisorChatAction({ prompt, history })
+          if (result.ok) {
+            reply(result.text)
+            setChatHistory([
+              ...history,
+              { role: "user", text: prompt },
+              { role: "assistant", text: result.text },
+            ])
+          } else {
+            reply(
+              `${result.error} You can switch to Local commands to explain a score or review a planning change. Nothing was saved.`,
+            )
+          }
+        } catch {
+          reply(
+            "The chat connection failed. Local commands are still available. Nothing was saved.",
+          )
+        }
+      })
+      return
+    }
+
+    const command = classifyLocalCommand(prompt)
+    if (["add", "exam", "syllabus", "replan"].includes(command)) {
+      setProposal({ prompt, command })
+      reply(
+        "Review the local command below. It will run only after you approve it.",
+      )
+      return
+    }
+    runLocalCommand(prompt)
+  }
+
+  function runLocalCommand(prompt: string) {
     const lower = prompt.toLowerCase()
+    const command = classifyLocalCommand(prompt)
 
     startTransition(async () => {
-      if (lower.includes("syllabus")) {
-        const result = await createWorkflowAction({
-          prompt,
-          workflow: "syllabus",
-        })
+      try {
+        if (command === "syllabus") {
+          const result = await createWorkflowAction({
+            prompt,
+            workflow: "syllabus",
+          })
 
-        const message = result.ok ? result.message : result.error
+          const message = result.ok ? result.message : result.error
 
-        reply(message)
+          reply(message)
 
-        if (result.ok) onChanged(message)
+          if (result.ok) onChanged(message)
 
-        return
-      }
+          return
+        }
 
-      if (
-        lower.includes("study plan") ||
-        lower.includes("spaced repetition") ||
-        lower.includes("midterm") ||
-        lower.includes("exam plan")
-      ) {
-        const result = await createWorkflowAction({ prompt, workflow: "exam" })
+        if (command === "exam") {
+          const result = await createWorkflowAction({
+            prompt,
+            workflow: "exam",
+          })
 
-        const message = result.ok ? result.message : result.error
+          const message = result.ok ? result.message : result.error
 
-        reply(message)
+          reply(message)
 
-        if (result.ok) onChanged(message)
+          if (result.ok) onChanged(message)
 
-        return
-      }
+          return
+        }
 
-      if (
-        lower.includes("members:") ||
-        lower.includes("sub-deliverable") ||
-        lower.includes("team proposal")
-      ) {
-        reply(
-          "Open Team Deliverables to create a project, choose registered teammates, and assign milestones.",
-        )
+        if (command === "team") {
+          reply(
+            "Open Team Deliverables to create a project, choose registered teammates, and assign milestones.",
+          )
 
-        onOpenTeam()
+          onOpenTeam()
 
-        return
-      }
+          return
+        }
 
-      if (lower.includes("replan") || lower.includes("reschedule")) {
-        const result = await replanTasksAction(
-          lower.includes("auto-reschedule") ? "week" : "fortnight",
-        )
+        if (command === "replan") {
+          const result = await replanTasksAction(
+            lower.includes("auto-reschedule") ? "week" : "fortnight",
+          )
 
-        const message = result.ok ? result.message : result.error
+          const message = result.ok ? result.message : result.error
 
-        reply(message)
+          reply(message)
 
-        if (result.ok) onChanged(message)
+          if (result.ok) onChanged(message)
 
-        return
-      }
+          return
+        }
 
-      if (lower.includes("explain") || lower.includes("why")) {
+        if (command === "explain") {
+          reply(
+            selectedTask
+              ? `${selectedTask.title} is ${selectedTask.score}/100. Urgency contributes ${selectedTask.urgency}, academic value ${selectedTask.academicValue}, and goal alignment ${selectedTask.goalAlignment}.`
+              : "Add or select a task first, then I can explain every score vector.",
+          )
+
+          return
+        }
+
+        if (command === "add") {
+          const result = await createTaskAction(
+            parseQuickTask(prompt.replace(/^add\s+/i, "")),
+          )
+
+          const message = result.ok ? result.message : result.error
+
+          reply(message)
+
+          if (result.ok) onChanged(message)
+
+          return
+        }
+
         reply(
           selectedTask
-            ? `${selectedTask.title} is ${selectedTask.score}/100. Urgency contributes ${selectedTask.urgency}, academic value ${selectedTask.academicValue}, and goal alignment ${selectedTask.goalAlignment}.`
-            : "Add or select a task first, then I can explain every score vector.",
+            ? `Start with ${selectedTask.title}. Its ${selectedTask.score} score makes it the strongest next move; protect ${selectedTask.estimatedMinutes} minutes.`
+            : "Your plan is empty. Try “add calculus problem set due tomorrow, 90 minutes.”",
         )
-
-        return
-      }
-
-      if (
-        lower.startsWith("add ") ||
-        lower.includes(" due ") ||
-        lower.includes(" hours")
-      ) {
-        const result = await createTaskAction(
-          parseQuickTask(prompt.replace(/^add\s+/i, "")),
+      } catch {
+        reply(
+          "The local command could not finish. Refresh your plan to check its current state before retrying.",
         )
-
-        const message = result.ok ? result.message : result.error
-
-        reply(message)
-
-        if (result.ok) onChanged(message)
-
-        return
       }
-
-      reply(
-        selectedTask
-          ? `Start with ${selectedTask.title}. Its ${selectedTask.score} score makes it the strongest next move; protect ${selectedTask.estimatedMinutes} minutes.`
-          : "Your plan is empty. Try “add calculus problem set due tomorrow, 90 minutes.”",
-      )
     })
+  }
+
+  function suggest(prompt: string) {
+    setMode("local")
+    setValue(prompt)
   }
 
   return (
@@ -1350,9 +1405,52 @@ function AdvisorScreen({
       </div>
       <Panel className="advisor-drawer">
         <div className="drawer-handle" />
-        <Kicker right={<Tag tone="green">PRIVATE ENGINE</Tag>}>
-          AI ADVISOR / LOCAL FALLBACK
+        <Kicker
+          right={
+            <Tag tone="green">
+              {mode === "gemini" ? "GOOGLE GEMINI" : "LOCAL COMMANDS"}
+            </Tag>
+          }
+        >
+          AI ADVISOR
         </Kicker>
+        <div className="flex flex-wrap gap-2 px-4 py-2">
+          <button
+            type="button"
+            aria-pressed={mode === "gemini"}
+            disabled={pending || Boolean(proposal)}
+            onClick={() => setMode("gemini")}
+            className="rounded border border-[var(--line)] px-3 py-2 text-xs aria-pressed:bg-[var(--blue)]"
+          >
+            Ask Gemini
+          </button>
+          <button
+            type="button"
+            aria-pressed={mode === "local"}
+            disabled={pending || Boolean(proposal)}
+            onClick={() => setMode("local")}
+            className="rounded border border-[var(--line)] px-3 py-2 text-xs aria-pressed:bg-[var(--blue)]"
+          >
+            Local commands
+          </button>
+          <button
+            type="button"
+            disabled={pending || Boolean(proposal)}
+            onClick={() => {
+              setChatHistory([])
+              setMessages([])
+            }}
+            className="ml-auto px-2 text-xs text-[var(--muted)]"
+          >
+            Clear chat
+          </button>
+        </div>
+        <p className="px-4 pb-2 text-xs leading-relaxed text-[var(--muted)]">
+          In Gemini mode, your submitted prompts and recent AI conversation are
+          processed by Google. Stored tasks and calendar records are not
+          attached. Share only details you choose. AI advice is not saved to
+          your plan.
+        </p>
         <div className="chat-log" aria-live="polite">
           {messages.map((message) => (
             <div
@@ -1363,22 +1461,74 @@ function AdvisorScreen({
               <p>{message.text}</p>
             </div>
           ))}
-          {pending && <div className="typing">SIGNAL IS REASONING…</div>}
+          {pending && (
+            <div className="typing">
+              {mode === "gemini" ? "ASKING GEMINI…" : "RUNNING LOCAL COMMAND…"}
+            </div>
+          )}
         </div>
+        {proposal && (
+          <div
+            role="region"
+            aria-label="Review local command"
+            className="mx-4 mb-3 rounded border border-[var(--line)] bg-[#151c29] p-3 text-xs"
+          >
+            <strong>
+              Approve{" "}
+              {proposal.command === "replan"
+                ? "replanning"
+                : "creating plan items"}
+              ?
+            </strong>
+            <p className="my-2 max-h-28 overflow-auto whitespace-pre-wrap">
+              {proposal.prompt}
+            </p>
+            <p className="mb-3 text-[var(--muted)]">
+              {proposal.command === "replan"
+                ? "This may move planned task start times using the existing scheduler."
+                : "This runs the existing local parser and saves its generated tasks/calendar items. Review the result in your plan."}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                disabled={pending}
+                tone="primary"
+                onClick={() => {
+                  const prompt = proposal.prompt
+                  setProposal(null)
+                  runLocalCommand(prompt)
+                }}
+              >
+                Approve and apply
+              </Button>
+              <Button
+                disabled={pending}
+                onClick={() => {
+                  setProposal(null)
+                  reply("Command cancelled. Nothing was saved.")
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
         <div className="suggestion-row">
-          <button onClick={() => setValue("Explain this score")}>
+          <button
+            disabled={pending || Boolean(proposal)}
+            onClick={() => suggest("Explain this score")}
+          >
             Explain score
           </button>
           <button
-            onClick={() =>
-              setValue("Auto-reschedule my focus blocks this week")
-            }
+            disabled={pending || Boolean(proposal)}
+            onClick={() => suggest("Auto-reschedule my focus blocks this week")}
           >
             Auto-reschedule
           </button>
           <button
+            disabled={pending || Boolean(proposal)}
             onClick={() =>
-              setValue(
+              suggest(
                 "Create a 10-day spaced repetition study plan for my midterm in two weeks",
               )
             }
@@ -1386,8 +1536,9 @@ function AdvisorScreen({
             Exam plan
           </button>
           <button
+            disabled={pending || Boolean(proposal)}
             onClick={() =>
-              setValue(
+              suggest(
                 "Parse this syllabus:\nAssignment 1 — September 12\nMidterm — October 8\nWeekly reading — October 15",
               )
             }
@@ -1395,6 +1546,7 @@ function AdvisorScreen({
             Syllabus
           </button>
           <button
+            disabled={pending || Boolean(proposal)}
             onClick={() => {
               setValue("Open Team Deliverables to assign project work.")
               onOpenTeam()
@@ -1410,9 +1562,11 @@ function AdvisorScreen({
             placeholder="Paste a syllabus, build an exam plan, assign team work, or auto-reschedule…"
             rows={3}
             value={value}
+            maxLength={mode === "gemini" ? MAX_PROMPT_CHARS : 20000}
+            disabled={pending || Boolean(proposal)}
           />
           <Button
-            disabled={pending || !value.trim()}
+            disabled={pending || Boolean(proposal) || !value.trim()}
             tone="primary"
             type="submit"
           >
@@ -1420,8 +1574,9 @@ function AdvisorScreen({
           </Button>
         </form>
         <p className="offline-note">
-          Fallback reasoning uses only your task and calendar context. No
-          external AI key is required.
+          Local commands work without Gemini and do not send prompts to Google.
+          Gemini replies are proposals, not completed changes. Use Local
+          commands and approve any changes you want to save.
         </p>
       </Panel>
     </div>
