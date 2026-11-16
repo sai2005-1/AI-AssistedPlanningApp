@@ -1,68 +1,91 @@
-# Firestore setup for team deliverables
+# Firebase setup
 
-## What is stored where
+## Runtime storage
 
-Payload remains the source of truth for app accounts, courses, personal tasks,
-calendar events, and CMS content. Cloud Firestore stores only the Sprint 2
-team-project feature: project documents, project-member subcollections,
-deliverable subcollections, and a name/username-only collaborator directory.
-The Firestore records refer to existing Payload users by their string ID; no
-email, password, or Payload auth token is copied to Firestore.
+Firebase Authentication owns app credentials. Cloud Firestore stores user
+profiles, username reservations, Firebase UID-to-profile mappings, courses,
+personal tasks, calendar events, team projects, and deliverables. User-owned
+records include `ownerId`; server actions require a verified Firebase session
+and repositories scope reads and writes to that ID.
 
-## Per-developer configuration
+The Firebase Admin SDK runs on the server. Firestore client rules and Storage
+rules deny direct client access; do not loosen these rules without adding and
+reviewing client authorization. Firebase Auth's web configuration is public
+and uses `NEXT_PUBLIC_FIREBASE_*`. Admin service-account values are private,
+server-only values and must never use a `NEXT_PUBLIC_` prefix.
 
-1. Use a separate Firebase project and Firestore database for each development
-   environment. Do not point local development at production.
-2. Enable Cloud Firestore and create a dedicated service account with only the
-   Firestore data permissions needed by the app.
-3. Add `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and
-   `FIREBASE_PRIVATE_KEY` to a local `.env.local`, using credentials for the
-   development project. `.env.local` is ignored by Git; `.env.example` contains
-   placeholders only.
-4. In Figma Make, configure these values using the environment-variable
-   settings flow. Never paste credentials into chat, source code, issues, or
-   documentation. Keep all three variables server-side; do not add a
-   `NEXT_PUBLIC_` prefix.
-5. Start the app through the normal Make development lifecycle. If the
-   Firestore variables are missing, the Team Deliverables screen shows a
-   configuration error; other Payload-backed screens remain separate.
+## Cloud development project
 
-The Firebase Admin SDK is initialized only in `src/lib/firebase-admin.ts`.
-`src/lib/team-deliverables.ts` contains Firestore access and invariants, while
-`src/app/(frontend)/team-actions.ts` authenticates and validates each
-user-facing operation. The browser never receives service-account credentials
-or calls Firestore directly. Admin SDK calls bypass Firestore Security Rules, so
-authorization must remain enforced in these server-side operations.
+1. Use a dedicated Firebase project for development. Do not point local or
+   shared development at production.
+2. Enable Firebase Authentication's email/password provider and Cloud
+   Firestore. Configure a Firebase Web App and copy its public configuration
+   into the `NEXT_PUBLIC_FIREBASE_*` variables in `.env.local`.
+3. Create a server service account with the minimum Firestore permissions
+   required by the app. Set `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and
+   `FIREBASE_PRIVATE_KEY` in `.env.local`. Set `FIREBASE_STORAGE_BUCKET` only
+   when using Firebase Storage.
+4. Deploy `firestore.rules`, `firestore.indexes.json`, and `storage.rules` to
+   the development Firebase project.
+5. Use the Figma Make environment-variable flow for deployed previews. Never
+   paste service credentials into chat, source code, issues, or documentation.
 
-## Firestore document layout
+## Local emulators
 
-- `teamProjects/{projectId}` stores project title, description, final deadline,
-  owner Payload user ID, and timestamps.
-- `teamProjects/{projectId}/members/{encodedUserId}` stores project membership
-  and display name/username. The document ID makes project/user membership
-  unique.
-- `teamProjects/{projectId}/deliverables/{deliverableId}` stores title,
-  description, due date, status, assignee, and optional parent deliverable.
-- `teamUserDirectory/{encodedUserId}` stores only Payload user ID, name,
-  username, normalized search fields, and update time. Its `projects` child
-  collection is a per-user index of the projects they can access.
+Run the local Firebase Emulator Suite with:
 
-The current app has no user-directory read access for other users. A signed-in
-user's directory entry is refreshed when they open or search the Team
-Deliverables screen, so a teammate becomes searchable after first opening that
-screen. Only names and usernames are searchable; email addresses are not
-stored or returned.
+```sh
+pnpm emulators
+```
 
-## Schema and environment consistency
+Set these local-only values in `.env.local` and restart the Next.js server:
 
-Firestore has no relational ORM or migration files in this integration. Keep
-document shapes in `src/lib/team-types.ts` and validate writes in the server
-actions and data-access layer. Make schema changes additively where possible;
-deploy compatible readers before depending on newly added fields. If future
-queries require composite indexes, commit the matching Firestore index
-configuration alongside the query change.
+```dotenv
+FIREBASE_PROJECT_ID=demo-signal
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
+FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-signal
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=demo-signal.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099
+NEXT_PUBLIC_FIREBASE_API_KEY=emulator-api-key
+NEXT_PUBLIC_FIREBASE_APP_ID=emulator-app-id
+```
 
-Each developer should use a separate Firebase development project and their
-own service-account credentials. Do not seed, migrate, or modify production
-Firestore as part of local development. No Firestore connection or document
-write is run by this implementation task.
+Emulator mode does not require service-account credentials. Do not set emulator
+hosts when using the cloud development project. Run the Firebase integration
+tests against isolated emulators with `pnpm test:firebase`; `pnpm test` runs
+unit tests and skips emulator-only cases when emulators are absent.
+
+## Firestore layout
+
+- `users/{profileId}` stores app profile data and role.
+- `usernames/{normalizedUsername}` reserves a username for one profile.
+- `authUserProfiles/{firebaseUid}` maps Firebase Auth identities to profile IDs.
+- `tasks/{taskId}` stores personal tasks and `ownerId`.
+- `calendarEvents/{eventId}` stores imported/planned events and `ownerId`.
+- `courses/{courseId}` stores course metadata referenced by tasks/events.
+- `teamProjects`, member subcollections, deliverable subcollections, and
+  `teamUserDirectory` keep the existing team-workspace model.
+
+The Admin SDK bypasses Firestore Rules. Authorization therefore lives in
+`src/lib/app-auth.ts`, `src/lib/app-data.ts`, and
+`src/lib/team-deliverables.ts`; rules remain deny-by-default for browser
+Firestore access. The committed indexes cover current owner-scoped queries.
+
+## Existing Payload data and cutover status
+
+New app signups, sessions, task writes, calendar imports, workflow plans,
+completion changes, and dashboard reads now use Firebase services. The existing
+Payload collections and generated admin/API routes remain available while
+their records await a verified export and reconciliation. The app does not
+dual-write between Payload and Firestore.
+
+Existing Payload users, tasks, calendar events, courses, CMS content, and media
+have **not** been imported by this change. Firebase Auth does not accept
+Payload password hashes as Firebase credentials; existing users need a
+verified account-link/reset flow that preserves profile IDs referenced by team
+projects. Do not switch production traffic or remove Payload collections until
+the team has exported the source data, migrated it to a development Firebase
+project, reconciled counts and ownership, and verified rollback. Payload content
+export/migration tooling was unavailable in this workspace, so no document
+mutation or ad hoc REST transfer was run.

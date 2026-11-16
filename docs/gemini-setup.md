@@ -33,10 +33,13 @@ does not establish model availability or quota for your Google project. An
 unavailable model or missing key produces a usable local-command fallback.
 
 The SDK is instantiated only in `src/lib/gemini.ts`, protected by `server-only`.
-The server action uses the existing `requireAppUser()` authentication helper;
-authentication and database schemas are unchanged. Neither the Gemini adapter
-nor the chat action queries task/calendar records or performs database writes.
-The existing authentication helper may access Payload to verify the session.
+The server action uses the existing `requireAppUser()` authentication helper.
+After main's Firebase migration, that helper verifies the Firebase session cookie
+with revocation checking and resolves the Firestore user profile. The Gemini
+adapter and chat action do not query task/calendar records or perform database
+writes; authentication remains owned by the existing Firebase implementation.
+See `docs/firestore-setup.md` for cloud/emulator configuration. Existing Payload
+CMS/admin configuration is preserved separately.
 
 ## Limits and approval
 
@@ -80,9 +83,15 @@ cancellation, local fallback, and separation of local/private data from Gemini
 history. No real credentials or paid/live API calls are used.
 Tests cover success, context mapping, authentication, missing keys, validation,
 quota/status errors, timeout/abort, invalid responses, and deterministic local
-command routing. A live Google response and authenticated browser interaction
-still require separate manual verification; test success alone does not prove
-production delivery or the full Sprint 2 persistence rubric.
+command routing. `advisor-firebase-auth.test.ts` exercises the actual migrated
+`requireAppUser()` and chat action with mocked Firebase I/O and Google calls.
+It covers session verification, profile resolution, missing/revoked sessions,
+missing/mismatched profiles, and sanitized profile-read failures.
+Authenticated browser interaction still requires separate manual verification;
+test success alone does not prove production delivery or the full Sprint 2
+persistence rubric. The user reported a separate successful live smoke test
+with `gemini-3.5-flash-lite` (HTTP 200, `SIGNAL_OK`); this merge verification
+made no live Gemini requests.
 
 Verification on November 15, 2026 (branch `feat/signal-gemini-integration`, based
 on `cca5042`; PRs #13/#14 remain separate):
@@ -101,6 +110,29 @@ on `cca5042`; PRs #13/#14 remain separate):
   server responded on localhost:3000 during inspection. Authenticated route,
   production route table, and real Google-response verification remain pending
   in the connected Make runtime. No production publication was attempted.
+
+Merge verification on November 15, 2026, incorporating `origin/main` at
+`2523c7b` into `feat/signal-gemini-integration`:
+
+- `TZ=UTC pnpm test`: 98 passed, two emulator-only tests skipped across eight
+  files, exit 0. Those two tests ran separately against local emulators.
+- `TZ=UTC CI=1 FIREBASE_PROJECT_ID=demo-signal pnpm test:firebase`: two tests
+  passed across two files on both subsequent runs, exit 0, including the final
+  pre-commit verification. The recovered initial invocation output shows that
+  `app-data.test.ts:34` exceeded Vitest's 5,000 ms test timeout; it did not report
+  an assertion failure. The final run completed that test in about 3.6 seconds.
+  Both successful runs emitted a metadata lookup warning
+  (`ETIMEDOUT, ENOTFOUND`). No production code or test timeout was changed.
+- `pnpm exec tsc --noEmit --incremental false`: passed, exit 0.
+- Working-tree and staged `git diff --check`: passed; no unmerged entries or
+  conflict markers remain.
+- `.env.local` remained byte-for-byte unchanged and ignored by Git. New cloud
+  Firebase browser configuration variables are documented in `.env.example`;
+  they have not been added to the local environment. Development uses Sai's
+  existing emulator defaults. No cloud configuration or browser sign-in was
+  verified during this merge.
+- The earlier build/production verification limitations above were not
+  re-evaluated in this merge session.
 
 Official references: [Google Gen AI JavaScript SDK](https://googleapis.github.io/js-genai/)
 and [Gemini API text generation](https://ai.google.dev/gemini-api/docs/text-generation).
