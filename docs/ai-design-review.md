@@ -1,167 +1,151 @@
-# Sprint 2 AI design review — draft awaiting human review
+# Sprint 2 AI-assisted design review — one human decision accepted
 
-Date: November 15, 2026. Tasks: T05, T06, T07, T29.
-Baseline: `8dd2e0f298b35932caa0c5f97cb3e83c0c5bb782` on `main`.
-Documentation branch: `docs/sprint2-uml-design-review`.
+Review date: November 15, 2026. Assigned documentation scope: T05 and T29;
+related diagram follow-up: T06 and T07.
+Current source baseline: `fe73e6783ece13b209b3ea42fe742673db21ac13` on `main`.
+Local `main` and freshly fetched `origin/main` matched that SHA before branching.
+Documentation branch: `docs/sprint2-accepted-directory-review`.
+Only this review document is changed in this follow-up.
 
 ## Status and provenance
 
-This draft records an assistant's source comparison and proposed documentation
-corrections. **Human review and approval have not occurred.** Julian authorized
-investigation, not approval of these findings. No task is claimed verified.
+The human reviewer has explicitly agreed to the directory multiplicity correction
+below. That single decision is **ACCEPTED**. Technical reasoning is AI-drafted
+from current source inspection and is labeled separately; agreement with the
+correction is not evidence that the reviewer authored or approved all reasoning.
+No Sprint 2 task or rubric item is marked verified by this update.
 
-The candidate assumption is that every app user must have a collaborator-directory
-document. The existing UML contains that assumption. **Its AI-generation
-provenance is unconfirmed.** Both diagrams first appear in Sai's commit
-`8dd2e0f`, but the Git history inspected does not identify their generating tool,
-original prompt, or human reviewer. The task context describes an AI-generated design, but that is
-not independent provenance evidence. Attach the actual generation
-record or author confirmation below before claiming the rubric's human-reviewed
-AI correction is satisfied. Do not attribute the assumption to Sai personally.
+**The original diagrams' AI-generation provenance remains unverified.** The
+previous review traced their first appearance to commit `8dd2e0f`, but that does
+not establish the generating tool, prompt, or human reviewer. The task's
+AI-generated-design description is context, not independent provenance evidence.
+Obtain a generation record or author confirmation before claiming that rubric
+requirement is satisfied. Do not attribute the original assumption to Sai personally.
 
-## Primary correction: directory membership is optional
+## Human decision — ACCEPTED
 
-Original UML:
+- Reviewer: human reviewer, agreement explicitly relayed in the task request;
+  individual reviewer identity was not separately supplied.
+- Recorded: November 15, 2026.
+- Evidence: the human instruction for this documentation update states:
+  “An application user does not need to have a team-directory entry. The relationship should permit zero or one directory entries per user (0..1), not require exactly one.”
+- Decision: **ACCEPTED**, limited to the optional directory relationship.
+- Approval scope: this does not approve the full class/sequence diagrams,
+  ownership/description findings, Figma parity, or runtime acceptance.
+
+Original relationship recorded in the earlier review:
 
 ```plantuml
 User "1" <-- "1" TeamUserDirectory : userId reference
 ```
 
-This says each user has exactly one directory document. The source permits an
-app account to exist before any Firestore directory document is created:
-
-1. [`createAppAuth().signup`](../src/lib/app-auth.ts) creates a Payload user and
-   logs in; it contains no Firestore directory write. The
-   [`Users` collection](../src/collections/Users.ts) has no directory-creation hook.
-2. [`directoryReference`](../src/lib/team-deliverables.ts) selects
-   `teamUserDirectory/{encodeURIComponent(userId)}`, giving a deterministic
-   document key for a user.
-3. In that repository, `loadTeamWorkspace` upserts the signed-in user's entry;
-   `searchDirectory` upserts only after its normalized query length reaches two;
-   `createTeamProject` also upserts the profile in its creation batch.
-4. `searchDirectory` queries Firestore directory fields, not all Payload users.
-   `addProjectMember` reports that no matching teammate is in the directory when
-   its username query is empty.
-
-Proposed corrected UML:
+Accepted relationship:
 
 ```plantuml
 User "1" <-- "0..1" TeamUserDirectory : userId reference
 ```
 
-Each directory entry references one user ID; a user can have zero or one entry.
-This describes the application's current write paths, not a foreign-key or
-cascade guarantee across databases. No runtime experiment was performed.
+The current [class diagram source](uml/sprint-2-data-model.puml) already contains
+the accepted `0..1` relationship. This follow-up records acceptance; it does not
+change or regenerate either diagram or claim full human approval of their SVGs.
 
-Rationale: avoid claiming signup synchronizes both stores or that every existing
-account is immediately selectable as a collaborator. Preserve the current lazy
-creation behavior; do not change authentication or the repository to fit the old
-diagram. A note now lists all three entry-creation paths.
+## AI-drafted technical rationale — current source evidence
 
-## Additional confirmed documentation corrections
+1. The signup branch in [AuthScreen](../src/app/(frontend)/auth-screen.tsx)
+   calls Firebase Auth `createUserWithEmailAndPassword`, then sends an ID token,
+   name, and username to [signupAction](../src/app/(frontend)/auth-actions.ts).
+2. [appAuth.signup](../src/lib/app-auth.ts) verifies the Firebase ID token and
+   writes `users/{uid}`, `usernames/{normalizedUsername}`, and
+   `authUserProfiles/{uid}` in a Firestore transaction. It then establishes the
+   application session. Neither signup nor its session/profile helpers writes
+   `teamUserDirectory` or calls the team repository. **Signup does not
+   automatically create a team-directory record.**
+3. In the [team repository](../src/lib/team-deliverables.ts),
+   `directoryReference` uses `teamUserDirectory/{encodeURIComponent(user.id)}`.
+   The deterministic key gives one directory-document location per application
+   user ID in these write paths. `loadTeamWorkspace` upserts that user's entry;
+   `searchDirectory` does so only after the normalized query reaches two
+   characters; `createTeamProject` upserts it in the project-creation batch.
+4. `searchDirectory` searches directory fields, rather than all Firestore user
+   profiles. `addProjectMember` queries `usernameNormalized` in that directory
+   and rejects an empty match with “No matching teammate is in the collaborator
+   directory yet.” For an existing match, it checks project ownership and writes
+   project membership plus the teammate's project index in a transaction.
 
-| Original statement | Source evidence | Proposed correction |
+An application profile can therefore exist with no directory entry until a later
+team operation succeeds. Subsequent UI activity may create one, but that does
+not make it a signup requirement. Each directory entry references one application
+user ID; each user has zero or one entry through the current repository paths.
+This is an application-level reference and keying convention, not a Firestore
+foreign-key, cascade, or global uniqueness guarantee for arbitrary external writes.
+No live signup, database write, or persistence experiment was performed here.
+
+## Outdated Payload references — corrections still needing implementation
+
+The earlier review used baseline `8dd2e0f298b35932caa0c5f97cb3e83c0c5bb782`.
+Its Payload-based reasoning is superseded by the current Firebase Auth/Firestore
+implementation. Payload remains configured for CMS administration; it is not
+current application-user authentication. The following documentation and diagram
+corrections remain **pending implementation and review** outside this one-file
+update:
+
+| Outdated statement/artifact | Current source evidence | Required follow-up |
 | --- | --- | --- |
-| Task/event ownership is always mandatory | `Tasks.ts` and `CalendarEvents.ts`: `owner` has no `required: true`; `assignOwner` assigns app-user creates and otherwise preserves the supplied/original owner. `app-access.ts` permits CMS-admin creates. | Show `owner: User?` and `0..1` at the User end; explain that normal app-user creation assigns an owner. This does not relax access rules. |
-| Firestore project/deliverable descriptions are optional stored fields | `team-actions.ts` defaults omitted descriptions to `""`; repository writes include `description`, and `projectFromData`/`deliverableFromData` use `requiredString`; `team-types.ts` requires strings. | Show `description: string [may be empty]` for those two entities. Calendar-event description remains optional. |
-| UI calls `createDeliverable`, and reload passes the whole user object to the repository | `submitDeliverable` calls `createProjectDeliverableAction`; `refreshBoard` calls `loadTeamProjectBoardAction`; that action calls `loadTeamProjectBoard(user.id, projectId)`. | Use the actual names and `user.id`; show authentication again on reload, with JWT verification conditional on an existing session cookie on each call. |
-| Parent-chain reads precede ownership/deadline checks | `createProjectDeliverable` checks project, requester membership, owner, assignee membership, and deadline before `assertParentChain`. | Reorder the transaction sequence; show parent-chain existence, cycle, and depth checks before the write. |
-| The flow omits invalid-field handling and implies every committed write refreshes successfully | `runAction` catches input errors; parsing occurs before the repository call. `refreshBoard` separately handles a failed reload with a saved-but-not-refreshed notice. | Add invalid-input, repository failure, and reload-failure branches. |
+| Earlier review: `createAppAuth().signup` creates a Payload user; a `Users` hook establishes the lifecycle | `app-auth.ts` exports `appAuth`; signup writes Firebase-backed profile/index documents. `src/collections/Users.ts` no longer exists. | This review's signup rationale and links are corrected above. Update the same claim in `docs/uml/README.md` and the class diagram note/SVG. |
+| Class legend, `PayloadID` attributes, README: users/tasks/calendar/courses use Payload; only teams use Firestore | [Firestore models](../src/lib/firestore-models.ts) and [app-data.ts](../src/lib/app-data.ts) define and persist personal records in Firestore. [Payload configuration](../src/payload.config.ts) registers `Admins`, not the former application collections. | Revise class entities, IDs, fields, relationships, persistence legend, README, and rendered SVG against current typed models. Preserve the managed Payload admin configuration. |
+| README/class note: team references are Payload user IDs and signup is Payload-based | `AppUser.id` is a string Firestore profile ID. `profileForAuthUid` resolves `authUserProfiles.profileId`, falling back to the Firebase Auth UID; signup uses that UID for the profile ID. Team repository uses `user.id`. | Describe application profile IDs and Auth UID mapping accurately; remove the Payload and cross-database descriptions. |
+| Sequence source/SVG: `JWTAuthentication()` against a Payload database | `currentUser` calls Firebase Admin `verifySessionCookie`, then reads the Firestore profile through `profileForAuthUid`. [Team actions](../src/app/(frontend)/team-actions.ts) call `requireAppUser` on creation and reload. | Replace Payload authentication messages with conditional Firebase session verification and Firestore profile resolution, including failure behavior; regenerate and review the SVG. |
+| Earlier ownership finding: `Tasks.ts`/`CalendarEvents.ts` and Payload hooks make ownership optional | Those collection files no longer exist. `FirestoreOwnedDocument` requires `ownerId: string`; current `app-data.ts` writes and checks `ownerId`. | Re-audit class ownership multiplicities and course/task/event fields against current models and repository behavior. The historical optional-owner finding is not a current accepted conclusion. |
+| `docs/sprint2/AGENT_INSTRUCTIONS.md` and `progress.json` describe the old hybrid boundary and source baseline | Current source uses Firebase Auth/Firestore for application accounts and personal/team data, while managed Payload CMS admin remains. | Reconcile architecture, task observations, and approval records in a separately scoped tracker/instructions update. Source migration alone does not prove team architecture approval. |
 
-The sequence also shows authentication exceptions using `runAction`'s generic
-fallback and `getTeamFirestore()` running before any transaction reads. A
-configuration failure therefore skips the transaction rather than implying that
-the database was accessed successfully.
+The [UML README](uml/README.md), [class source](uml/sprint-2-data-model.puml),
+[class SVG](uml/sprint-2-data-model.svg), [sequence source](uml/team-deliverable-sequence.puml),
+and [sequence SVG](uml/team-deliverable-sequence.svg) retain these stale statements.
+Their prior rendering checks do not establish accuracy against current main.
+The previous source review also proposed description-field and sequence-order/error
+corrections; those remain subject to human review and current-source reconciliation.
 
-Evidence paths: [`team-actions.ts`](../src/app/(frontend)/team-actions.ts),
-[`team-deliverables.tsx`](../src/app/(frontend)/team-deliverables.tsx),
-[`team-deliverables.ts`](../src/lib/team-deliverables.ts),
-[`team-types.ts`](../src/lib/team-types.ts),
-[`Tasks.ts`](../src/collections/Tasks.ts),
-[`CalendarEvents.ts`](../src/collections/CalendarEvents.ts),
-[`app-access.ts`](../src/lib/app-access.ts).
+## Issue #4 and remaining review requirements
 
-## Issue #4 acceptance comparison
+[Issue #4](https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/4) was read
+again on November 15, 2026. It remains open with unchecked acceptance criteria.
+Source inspection supports directory lookup, project/member operations, and
+assigned deliverables in the team repository; it does not demonstrate acceptance.
 
-The live [Issue #4](https://github.com/sai2005-1/AI-AssistedPlanningApp/issues/4)
-was read on November 15, 2026; it is open and its acceptance boxes are unchecked.
-These mappings identify source support, not acceptance sign-off:
+Still required:
 
-| Acceptance criterion | Existing source support | Remaining proof |
-| --- | --- | --- |
-| Add/select collaborators by name or username | UI `searchDirectory`/member controls; actions and repository `searchDirectory`/`addProjectMember`. | Demonstrate actual discovery and addition, including accounts without directory entries. |
-| Create, edit, decompose a master deliverable | Project/deliverable forms, edit actions, and `parentDeliverableId` with `assertParentChain`. | Exercise creation, editing, nested work, persistence, and access controls. |
-| Distinct assignee, description, target deadline | `submitDeliverable` and parsed `DeliverableInput`; membership and deadline checks in repository. | Demonstrate saved values and retrieval; a description can be empty in current source. |
-| Visual warning past the 72-hour freeze | UI `deadlineIsLate`, warning text, and submit guard; server `isDeadlineWithinReviewFreeze`. | Preview the warning and test both sides of the boundary. |
-| Board grouped by assignee | UI maps `board.members` and filters deliverables by `assigneeId`. | Verify an actual multi-assignee board against design intent. |
+- Identify the reviewer and attach a durable review/PR reference for this relayed
+  agreement; do not invent a named reviewer or independent sign-off.
+- Verify original AI-generation provenance with a tool/prompt record or author
+  confirmation before claiming the human-reviewed AI-correction rubric complete.
+- Implement and review the pending Firebase documentation/diagram corrections,
+  regenerate affected SVGs, and obtain human visual review and full diagram approval.
+- Obtain Figma MCP evidence for the Team Deliverables frame and compare it with
+  the implementation. No Figma MCP inspection or visual-parity approval occurred
+  in this follow-up. The issue's published prototype link is not such evidence.
+- Review the other ownership, description, sequence, and failure-path findings.
+- Resolve the issue's “precede” versus `<= final deadline minus 72 hours` wording;
+  the current [deadline helper](../src/lib/team-deliverable-rules.ts) permits equality.
+- Demonstrate collaborator discovery (including accounts without entries), project
+  creation/editing, assignment, hierarchy, deadline warnings, board grouping,
+  authorization, and persistence through real acceptance tests.
 
-The issue's prose says milestones must precede the freeze, while its development
-task explicitly uses `<= finalDeadline - 72 hours`. The current helper and its
-three unit tests permit equality. Keep `<=` in the diagrams; ask the human
-reviewer to acknowledge the wording ambiguity rather than changing code.
+This acceptance does not complete T05, T06, T07, T29, Figma review, architecture
+approval, or Issue #4 acceptance. The dated tracker remains unchanged.
 
-## Figma comparison limitation
+## Verification for this documentation update
 
-The issue supplies only the published
-[prototype](https://scroll-font-26457270.figma.site/). No Figma MCP inspection
-tool is available in this session, and opening the prototype through the web
-tool returned an inaccessible-page error. No frame geometry, modal behavior,
-component state, or visual parity is claimed reviewed. A reachable design file
-and Team Deliverables frame are still needed to complete that comparison.
+Checks on November 15, 2026:
 
-## Affected artifacts and verification limits
+- Fetched `origin/main`; confirmed local main and the new branch baseline matched
+  `fe73e6783ece13b209b3ea42fe742673db21ac13`; initial working tree was clean.
+- Checked this document's relative Markdown links and local heading fragments;
+  all targets exist. The linked GitHub Issue #4 was read through the connector.
+- `git diff --check`: passed.
+- Reviewed the diff and staged paths for the single-file documentation scope.
 
-- `docs/uml/sprint-2-data-model.puml`: corrected multiplicities, description
-  representation, lifecycle notes, and title reflecting implemented source.
-- `docs/uml/team-deliverable-sequence.puml`: corrected creation/reload sequence.
-- `docs/uml/sprint-2-data-model.svg` and
-  `docs/uml/team-deliverable-sequence.svg`: regenerated from the corrected sources.
-- `docs/uml/README.md`: explanations, review status, and rendering results.
-- `docs/ai-design-review.md`: this evidence and pending human decision.
-
-No Firebase configuration, repository implementation, Payload schema,
-authentication, or Sprint 2 tracker is changed. PR #11 is outside this branch's
-scope. No app/database tests, build, or Figma MCP review was performed.
-
-Initially no local PlantUML renderer was found. Julian then explicitly approved
-`brew install plantuml`; the installation succeeded, including Homebrew's
-required dependencies. The renderer reports PlantUML 1.2026.10 and Graphviz
-16.1.1. Both SVGs are now regenerated and synchronized with the sources.
-
-Checks performed on November 15, 2026:
-
-- `git diff --check`: passed for tracked changes; no whitespace errors.
-- Read-only Python assertions: passed for the exact six-file documentation
-  scope (including this untracked draft), expected branch and baseline HEAD,
-  relative Markdown link targets, one start/end delimiter pair per PlantUML
-  source, and balanced sequence groups.
-- `plantuml -tsvg docs/uml/sprint-2-data-model.puml docs/uml/team-deliverable-sequence.puml`:
-  exited 0; generated both SVGs from the updated sources.
-- Separate renders of the same sources to a temporary directory matched each
-  repository SVG byte-for-byte. XML parsing passed; dimensions are 1521 × 1431
-  for the class diagram and 1838 × 2066 for the sequence diagram.
-- Assistant visual inspection of rasterized copies of both generated SVGs:
-  checked corrected labels, multiplicities, and sequence branches. This is not
-  Julian's human review or approval.
-
-Rendering checks establish source/output consistency, not application behavior
-or rubric completion. No application test was run. The earlier branch creation
-succeeded, although its post-checkout hook reported that the
-configured Git LFS executable is missing. No hook or LFS configuration was changed.
-
-## Human review — to be completed by Julian
-
-- Reviewer: **pending**
-- Review date: **pending**
-- AI-generation provenance (tool/prompt record or author confirmation): **pending**
-- Directory multiplicity correction accepted/rejected and rationale: **pending**
-- Ownership/description corrections accepted/rejected and rationale: **pending**
-- Sequence corrections accepted/rejected and rationale: **pending**
-- Issue #4 boundary wording and collaborator-discovery limitation reviewed: **pending**
-- Figma frame/tool evidence and remaining discrepancies: **pending**
-- Regenerated SVGs visually reviewed: **pending**
-- Final approval and review/PR reference: **pending**
-
-Until those decisions are actually recorded, this artifact is a proposed
-correction supported by source inspection, not a completed human-reviewed
-AI-design correction or evidence of runtime acceptance.
+No runtime code, authentication, database schema, environment configuration,
+tracker, or diagram artifact was changed. No application tests, production build,
+Figma MCP review, or new diagram render was performed for this documentation-only
+update. Historical rendering evidence from the earlier review is not claimed as
+new verification of the migrated implementation.
