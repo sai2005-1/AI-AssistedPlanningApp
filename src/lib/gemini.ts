@@ -34,7 +34,7 @@ export async function generateAdvisorReply(
   request: ChatRequest,
 ): Promise<ChatResult> {
   const apiKey = process.env.GEMINI_API_KEY?.trim()
-  const model = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash"
+  const model = process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite"
   if (!apiKey || !/^gemini-[a-zA-Z0-9._-]{1,80}$/.test(model)) {
     return {
       ok: false,

@@ -23,12 +23,12 @@ never paste them into chat, source, commits, screenshots, or test reports.
 ```dotenv
 # Placeholder only; replace privately in the server environment.
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
 Restart the local runtime after setting environment variables. The key must not
 use a `NEXT_PUBLIC_` prefix or appear in `next.config.ts`'s `env` section.
-`GEMINI_MODEL` is optional and defaults to `gemini-2.5-flash`. A valid model name
+`GEMINI_MODEL` is optional and defaults to `gemini-3.5-flash-lite`. A valid model name
 does not establish model availability or quota for your Google project. An
 unavailable model or missing key produces a usable local-command fallback.
 

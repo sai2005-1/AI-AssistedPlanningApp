@@ -48,7 +48,7 @@ describe("Gemini server adapter (SDK fully mocked; no live requests)", () => {
       vertexai: false,
     })
     const sent = sdk.generate.mock.calls[0][0]
-    expect(sent.model).toBe("gemini-2.5-flash")
+    expect(sent.model).toBe("gemini-3.5-flash-lite")
     expect(sent.contents).toEqual([
       { role: "user", parts: [{ text: request.prompt }] },
     ])
