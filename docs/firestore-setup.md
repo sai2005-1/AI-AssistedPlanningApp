@@ -1,5 +1,23 @@
 # Firebase setup
 
+## Database decision
+
+Firebase Authentication and Cloud Firestore are the selected application data
+stack for Issue #15. Firestore is a natural fit for the current domain because
+tasks, calendar events, courses, team projects, and deliverables are owner-scoped
+documents queried by account and date. The project already depended on Firebase
+Admin for team data, so extending that SDK avoids a second database, an ORM
+runtime, and cross-store ownership rules. Authentication is provided by Firebase
+Auth; passwords are never stored in Firestore.
+
+The relational-ORM step is not applicable: Firestore is a document database.
+The equivalent is the Firebase Admin SDK plus typed contracts in
+`src/lib/firestore-models.ts` and `src/lib/team-types.ts`. Firestore has no
+relational migration mechanism; version-controlled security rules and composite
+indexes in `firestore.rules`, `storage.rules`, and `firestore.indexes.json` are
+the required database setup. Additive document changes should be deployed
+reader-first and recorded with the corresponding model/index changes.
+
 ## Runtime storage
 
 Firebase Authentication owns app credentials. Cloud Firestore stores user
@@ -55,6 +73,22 @@ Emulator mode does not require service-account credentials. Do not set emulator
 hosts when using the cloud development project. Run the Firebase integration
 tests against isolated emulators with `pnpm test:firebase`; `pnpm test` runs
 unit tests and skips emulator-only cases when emulators are absent.
+
+To seed development data, first sign up through the app while the Auth and
+Firestore emulators are running. Then run the seed script with that emulator
+account's email:
+
+```sh
+FIREBASE_PROJECT_ID=demo-signal \
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 \
+FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 \
+FIREBASE_SEED_USER_EMAIL=you@example.test \
+pnpm seed:emulator
+```
+
+The script requires the exact demo project and loopback emulator endpoints,
+verifies that the Auth account has an app profile, and idempotently creates one
+course and one task. It refuses to run against cloud Firebase.
 
 ## Firestore layout
 

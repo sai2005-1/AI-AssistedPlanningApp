@@ -2,6 +2,7 @@ import 'server-only'
 
 import { cookies } from 'next/headers'
 import { getFirebaseAdminAuth, getTeamFirestore } from '@/lib/firebase-admin'
+import type { FirestoreUserProfileDocument } from './firestore-models'
 
 const APP_SESSION_COOKIE = 'app-session'
 const SESSION_MAX_AGE = 12 * 60 * 60 * 1000
@@ -114,19 +115,18 @@ async function signup(
     }
 
     const now = new Date().toISOString()
-    transaction.set(
-      userRef,
-      {
-        authUid: decoded.uid,
-        email,
-        name: input.name,
-        role: 'student',
-        updatedAt: now,
-        username: input.username,
-        ...(existingUser.exists ? {} : { createdAt: now }),
-      },
-      { merge: true },
-    )
+    const profile: FirestoreUserProfileDocument = {
+      authUid: decoded.uid,
+      email,
+      name: input.name,
+      role: 'student',
+      username: input.username,
+      createdAt: typeof existingUser.data()?.createdAt === 'string'
+        ? existingUser.data()!.createdAt
+        : now,
+      updatedAt: now,
+    }
+    transaction.set(userRef, profile, { merge: true })
     transaction.set(usernameRef, { profileId: decoded.uid })
     transaction.set(authProfileRef, { profileId: decoded.uid })
   })
