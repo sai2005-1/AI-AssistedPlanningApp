@@ -57,7 +57,10 @@ function deterministicId(scope: string, value: string) {
   return createHash('sha256').update(`${scope}\0${value}`).digest('hex')
 }
 
-function eventFromSnapshot(id: string, data: FirebaseFirestore.DocumentData): AppCalendarEvent {
+function eventFromSnapshot(
+  id: string,
+  data: FirebaseFirestore.DocumentData,
+): AppCalendarEvent {
   return {
     allDay: Boolean(data.allDay),
     completed: Boolean(data.completed),
@@ -78,7 +81,8 @@ function taskFromSnapshot(id: string, data: FirebaseFirestore.DocumentData): App
   return {
     academicValue: Number(data.academicValue ?? 0),
     assignmentType: data.assignmentType,
-    calendarEventId: typeof data.calendarEventId === 'string' ? data.calendarEventId : undefined,
+    calendarEventId:
+      typeof data.calendarEventId === 'string' ? data.calendarEventId : undefined,
     careerAlignment: Number(data.careerAlignment ?? 35),
     careerValue: Number(data.careerValue ?? 0),
     classLevel: data.classLevel,
@@ -141,9 +145,10 @@ export async function listUserCourses(userId: string): Promise<AppCourse[]> {
     .get()
   return result.docs.map((snapshot) => ({
     code: String(snapshot.data().code ?? ''),
-    color: snapshot.data().color === 'green' || snapshot.data().color === 'gray'
-      ? snapshot.data().color
-      : 'blue',
+    color:
+      snapshot.data().color === 'green' || snapshot.data().color === 'gray'
+        ? snapshot.data().color
+        : 'blue',
     id: snapshot.id,
     level: snapshot.data().level,
     name: String(snapshot.data().name ?? ''),
@@ -200,8 +205,14 @@ export async function updateUserCourse(
 export async function deleteUserCourse(userId: string, courseId: string) {
   const db = getTeamFirestore()
   const reference = db.collection(COURSES).doc(courseId)
-  const tasks = db.collection(TASKS).where('ownerId', '==', userId).where('courseId', '==', courseId)
-  const events = db.collection(EVENTS).where('ownerId', '==', userId).where('courseId', '==', courseId)
+  const tasks = db
+    .collection(TASKS)
+    .where('ownerId', '==', userId)
+    .where('courseId', '==', courseId)
+  const events = db
+    .collection(EVENTS)
+    .where('ownerId', '==', userId)
+    .where('courseId', '==', courseId)
   await db.runTransaction(async (transaction) => {
     const [course, linkedTasks, linkedEvents] = await Promise.all([
       transaction.get(reference),
@@ -212,7 +223,9 @@ export async function deleteUserCourse(userId: string, courseId: string) {
       throw new Error('Course not found.')
     }
     if (!linkedTasks.empty || !linkedEvents.empty) {
-      throw new Error('Remove this course from linked tasks and events before deleting it.')
+      throw new Error(
+        'Remove this course from linked tasks and events before deleting it.',
+      )
     }
     transaction.delete(reference)
   })
@@ -234,7 +247,9 @@ export async function createUserTask(userId: string, input: AppTaskInput) {
     classLevel: input.classLevel,
     estimatedMinutes: input.estimatedMinutes,
     title: input.title,
-    ...(input.careerAlignment !== undefined ? { careerAlignment: input.careerAlignment } : {}),
+    ...(input.careerAlignment !== undefined
+      ? { careerAlignment: input.careerAlignment }
+      : {}),
     ...(input.consequence !== undefined ? { consequence: input.consequence } : {}),
     ...(input.courseId ? { courseId: input.courseId } : {}),
     ...(input.dueDate ? { dueDate: input.dueDate } : {}),
@@ -254,7 +269,10 @@ export async function createWorkflow(userId: string, plan: WorkflowPlan) {
   const eventRefs = plan.events.map(() => db.collection(EVENTS).doc())
   const taskRefs = plan.tasks.map(() => db.collection(TASKS).doc())
   const now = new Date().toISOString()
-  const eventWrites = plan.events.map((event, index) => ({ event, reference: eventRefs[index] }))
+  const eventWrites = plan.events.map((event, index) => ({
+    event,
+    reference: eventRefs[index],
+  }))
   await commitInBatches(eventWrites, (batch, { event, reference }) => {
     const document: FirestoreCalendarEventDocument = {
       ...event,
@@ -272,7 +290,8 @@ export async function createWorkflow(userId: string, plan: WorkflowPlan) {
   const taskWrites = plan.tasks.map((task, index) => ({
     reference: taskRefs[index],
     task,
-    calendarEventId: eventRefs.length === taskRefs.length ? eventRefs[index].id : undefined,
+    calendarEventId:
+      eventRefs.length === taskRefs.length ? eventRefs[index].id : undefined,
   }))
   await commitInBatches(taskWrites, (batch, { reference, task, calendarEventId }) => {
     const document: FirestoreTaskDocument = {
@@ -302,14 +321,17 @@ async function syncAssignmentTasks(userId: string, events: AppCalendarEvent[]) {
       .where('calendarEventId', 'in', ids)
       .get()
     for (const task of result.docs) {
-      if (typeof task.data().calendarEventId === 'string') existing.add(task.data().calendarEventId)
+      if (typeof task.data().calendarEventId === 'string')
+        existing.add(task.data().calendarEventId)
     }
   }
 
   const writes = assignments
     .filter((event) => !existing.has(event.id))
     .map((event) => {
-      const reference = db.collection(TASKS).doc(`calendar_${deterministicId(userId, event.id)}`)
+      const reference = db
+        .collection(TASKS)
+        .doc(`calendar_${deterministicId(userId, event.id)}`)
       const task = taskDataFromCalendarAssignment(event)
       return { event, reference, taskData: task }
     })
@@ -335,7 +357,10 @@ export async function importUserCalendar(
   const uniqueEvents = new Map(
     events.map((event) => [`${event.uid}:${event.start}`, event] as const),
   )
-  const keyedEvents = [...uniqueEvents].map(([sourceKey, event]) => ({ event, sourceKey }))
+  const keyedEvents = [...uniqueEvents].map(([sourceKey, event]) => ({
+    event,
+    sourceKey,
+  }))
   const existingKeys = new Set<string>()
   const existingEvents = new Map<string, AppCalendarEvent>()
 
@@ -385,12 +410,17 @@ export async function importUserCalendar(
   }
 }
 
-export async function setUserTaskCompleted(userId: string, taskId: string, completed: boolean) {
+export async function setUserTaskCompleted(
+  userId: string,
+  taskId: string,
+  completed: boolean,
+) {
   const db = getTeamFirestore()
   const taskRef = db.collection(TASKS).doc(taskId)
   await db.runTransaction(async (transaction) => {
     const task = await transaction.get(taskRef)
-    if (!task.exists || task.data()?.ownerId !== userId) throw new Error('Task not found.')
+    if (!task.exists || task.data()?.ownerId !== userId)
+      throw new Error('Task not found.')
     const calendarEventId = task.data()?.calendarEventId
     let eventRef
     let event
@@ -409,7 +439,11 @@ export async function setUserTaskCompleted(userId: string, taskId: string, compl
   return { completed, id: taskId }
 }
 
-export async function setUserEventCompleted(userId: string, eventId: string, completed: boolean) {
+export async function setUserEventCompleted(
+  userId: string,
+  eventId: string,
+  completed: boolean,
+) {
   const db = getTeamFirestore()
   const eventRef = db.collection(EVENTS).doc(eventId)
   const linkedTasksQuery = db
@@ -422,7 +456,8 @@ export async function setUserEventCompleted(userId: string, eventId: string, com
       transaction.get(eventRef),
       transaction.get(linkedTasksQuery),
     ])
-    if (!event.exists || event.data()?.ownerId !== userId) throw new Error('Event not found.')
+    if (!event.exists || event.data()?.ownerId !== userId)
+      throw new Error('Event not found.')
     transaction.update(eventRef, { completed, updatedAt: new Date().toISOString() })
     for (const task of linkedTasks.docs) {
       transaction.update(task.ref, {
@@ -434,7 +469,10 @@ export async function setUserEventCompleted(userId: string, eventId: string, com
   return { completed, id: eventId }
 }
 
-export async function replanUserTasks(userId: string, window: 'fortnight' | 'week' = 'fortnight') {
+export async function replanUserTasks(
+  userId: string,
+  window: 'fortnight' | 'week' = 'fortnight',
+) {
   const db = getTeamFirestore()
   const now = new Date()
   const horizon = new Date(now)
@@ -450,7 +488,9 @@ export async function replanUserTasks(userId: string, window: 'fortnight' | 'wee
       .get(),
     db.collection(TASKS).where('ownerId', '==', userId).limit(500).get(),
   ])
-  const events = eventResult.docs.map((snapshot) => eventFromSnapshot(snapshot.id, snapshot.data()))
+  const events = eventResult.docs.map((snapshot) =>
+    eventFromSnapshot(snapshot.id, snapshot.data()),
+  )
   const tasks = taskResult.docs
     .map((snapshot) => taskFromSnapshot(snapshot.id, snapshot.data()))
     .filter((task) => task.status !== 'done')
@@ -462,7 +502,9 @@ export async function replanUserTasks(userId: string, window: 'fortnight' | 'wee
   const busy = events
     .filter((event) => event.kind !== 'deadline' && !event.completed)
     .map((event) => [Date.parse(event.start), Date.parse(event.end)] as [number, number])
-    .filter(([start, end]) => Number.isFinite(start) && Number.isFinite(end) && end > start)
+    .filter(
+      ([start, end]) => Number.isFinite(start) && Number.isFinite(end) && end > start,
+    )
   const allocations: Array<[number, number]> = []
   const starts: Array<{ id: string; plannedStart: string }> = []
 

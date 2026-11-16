@@ -1,4 +1,4 @@
-import "server-only"
+import 'server-only'
 
 import {
   FieldValue,
@@ -7,13 +7,13 @@ import {
   type DocumentReference,
   type Firestore,
   type Transaction,
-} from "firebase-admin/firestore"
+} from 'firebase-admin/firestore'
 
-import type { AppUser } from "./app-auth"
+import type { AppUser } from './app-auth'
 
-import { getTeamFirestore } from "./firebase-admin"
+import { getTeamFirestore } from './firebase-admin'
 
-import { isDeadlineWithinReviewFreeze } from "./team-deliverable-rules"
+import { isDeadlineWithinReviewFreeze } from './team-deliverable-rules'
 
 import type {
   DeliverableInput,
@@ -24,33 +24,32 @@ import type {
   TeamProjectBoard,
   TeamProjectSummary,
   ProjectInput,
-} from "./team-types"
+} from './team-types'
 
 export class TeamDataError extends Error {
   constructor(message: string) {
     super(message)
 
-    this.name = "TeamDataError"
+    this.name = 'TeamDataError'
   }
 }
 
-const directoryCollection = "teamUserDirectory"
+const directoryCollection = 'teamUserDirectory'
 
-const projectCollection = "teamProjects"
+const projectCollection = 'teamProjects'
 
 function documentId(id: string) {
   return encodeURIComponent(id)
 }
 
 function normalized(value: string) {
-  return value.trim().toLocaleLowerCase("en-US")
+  return value.trim().toLocaleLowerCase('en-US')
 }
 
 function requiredString(data: DocumentData, key: string) {
   const value = data[key]
 
-  if (typeof value !== "string")
-    throw new TeamDataError(`Stored ${key} is invalid.`)
+  if (typeof value !== 'string') throw new TeamDataError(`Stored ${key} is invalid.`)
 
   return value
 }
@@ -58,10 +57,9 @@ function requiredString(data: DocumentData, key: string) {
 function optionalString(data: DocumentData, key: string) {
   const value = data[key]
 
-  if (value === undefined || value === null || value === "") return undefined
+  if (value === undefined || value === null || value === '') return undefined
 
-  if (typeof value !== "string")
-    throw new TeamDataError(`Stored ${key} is invalid.`)
+  if (typeof value !== 'string') throw new TeamDataError(`Stored ${key} is invalid.`)
 
   return value
 }
@@ -69,8 +67,7 @@ function optionalString(data: DocumentData, key: string) {
 function requiredIsoDate(data: DocumentData, key: string) {
   const value = data[key]
 
-  if (!(value instanceof Timestamp))
-    throw new TeamDataError(`Stored ${key} is invalid.`)
+  if (!(value instanceof Timestamp)) throw new TeamDataError(`Stored ${key} is invalid.`)
 
   return value.toDate().toISOString()
 }
@@ -80,7 +77,7 @@ function projectReference(db: Firestore, projectId: string) {
 }
 
 function memberReference(projectRef: DocumentReference, userId: string) {
-  return projectRef.collection("members").doc(documentId(userId))
+  return projectRef.collection('members').doc(documentId(userId))
 }
 
 function directoryReference(db: Firestore, userId: string) {
@@ -91,23 +88,23 @@ function projectFromData(id: string, data: DocumentData): TeamProjectSummary {
   return {
     id,
 
-    title: requiredString(data, "title"),
+    title: requiredString(data, 'title'),
 
-    description: requiredString(data, "description"),
+    description: requiredString(data, 'description'),
 
-    finalDeadline: requiredIsoDate(data, "finalDeadline"),
+    finalDeadline: requiredIsoDate(data, 'finalDeadline'),
 
-    ownerId: requiredString(data, "ownerId"),
+    ownerId: requiredString(data, 'ownerId'),
   }
 }
 
 function directoryFromData(id: string, data: DocumentData): DirectoryEntry {
   return {
-    id: requiredString(data, "userId") || id,
+    id: requiredString(data, 'userId') || id,
 
-    name: requiredString(data, "name"),
+    name: requiredString(data, 'name'),
 
-    username: requiredString(data, "username"),
+    username: requiredString(data, 'username'),
   }
 }
 
@@ -117,65 +114,65 @@ function directoryProfile(user: AppUser) {
 
     name: user.name,
 
-    username: user.username ?? "",
+    username: user.username ?? '',
 
     nameNormalized: normalized(user.name),
 
-    usernameNormalized: normalized(user.username ?? ""),
+    usernameNormalized: normalized(user.username ?? ''),
 
     updatedAt: Timestamp.now(),
   }
 }
 
 function memberFromData(id: string, data: DocumentData): TeamMember {
-  const role = requiredString(data, "role")
+  const role = requiredString(data, 'role')
 
-  if (role !== "owner" && role !== "member")
-    throw new TeamDataError("Stored member role is invalid.")
+  if (role !== 'owner' && role !== 'member')
+    throw new TeamDataError('Stored member role is invalid.')
 
   return {
-    id: requiredString(data, "userId") || id,
+    id: requiredString(data, 'userId') || id,
 
-    name: requiredString(data, "name"),
+    name: requiredString(data, 'name'),
 
-    username: requiredString(data, "username"),
+    username: requiredString(data, 'username'),
 
     role,
   }
 }
 
 function deliverableFromData(id: string, data: DocumentData): TeamDeliverable {
-  const status = requiredString(data, "status")
+  const status = requiredString(data, 'status')
 
-  if (status !== "open" && status !== "in-progress" && status !== "done") {
-    throw new TeamDataError("Stored deliverable status is invalid.")
+  if (status !== 'open' && status !== 'in-progress' && status !== 'done') {
+    throw new TeamDataError('Stored deliverable status is invalid.')
   }
 
   return {
     id,
 
-    title: requiredString(data, "title"),
+    title: requiredString(data, 'title'),
 
-    description: requiredString(data, "description"),
+    description: requiredString(data, 'description'),
 
-    dueAt: requiredIsoDate(data, "dueAt"),
+    dueAt: requiredIsoDate(data, 'dueAt'),
 
     status,
 
-    assigneeId: requiredString(data, "assigneeId"),
+    assigneeId: requiredString(data, 'assigneeId'),
 
-    assigneeName: requiredString(data, "assigneeName"),
+    assigneeName: requiredString(data, 'assigneeName'),
 
-    assigneeUsername: requiredString(data, "assigneeUsername"),
+    assigneeUsername: requiredString(data, 'assigneeUsername'),
 
-    parentDeliverableId: optionalString(data, "parentDeliverableId"),
+    parentDeliverableId: optionalString(data, 'parentDeliverableId'),
   }
 }
 
 function assertDeadline(dueAt: string, finalDeadline: string) {
   if (!isDeadlineWithinReviewFreeze(dueAt, finalDeadline)) {
     throw new TeamDataError(
-      "Set the milestone deadline at least 72 hours before final submission.",
+      'Set the milestone deadline at least 72 hours before final submission.',
     )
   }
 }
@@ -197,22 +194,21 @@ async function assertParentChain(
 
   while (nextId) {
     if (nextId === currentDeliverableId || visited.has(nextId)) {
-      throw new TeamDataError("A deliverable cannot be its own ancestor.")
+      throw new TeamDataError('A deliverable cannot be its own ancestor.')
     }
 
-    if (++depth > 50)
-      throw new TeamDataError("Deliverable nesting is too deep.")
+    if (++depth > 50) throw new TeamDataError('Deliverable nesting is too deep.')
 
     visited.add(nextId)
 
     const snapshot = await transaction.get(
-      projectRef.collection("deliverables").doc(nextId),
+      projectRef.collection('deliverables').doc(nextId),
     )
 
     if (!snapshot.exists)
-      throw new TeamDataError("Choose a parent deliverable in this project.")
+      throw new TeamDataError('Choose a parent deliverable in this project.')
 
-    nextId = optionalString(snapshot.data() ?? {}, "parentDeliverableId")
+    nextId = optionalString(snapshot.data() ?? {}, 'parentDeliverableId')
   }
 }
 
@@ -232,11 +228,11 @@ export async function searchDirectory(
 
       name: user.name,
 
-      username: user.username ?? "",
+      username: user.username ?? '',
 
       nameNormalized: normalized(user.name),
 
-      usernameNormalized: normalized(user.username ?? ""),
+      usernameNormalized: normalized(user.username ?? ''),
 
       updatedAt: FieldValue.serverTimestamp(),
     },
@@ -249,7 +245,7 @@ export async function searchDirectory(
   const [byName, byUsername] = await Promise.all([
     directory
 
-      .orderBy("nameNormalized")
+      .orderBy('nameNormalized')
 
       .startAt(query)
 
@@ -261,7 +257,7 @@ export async function searchDirectory(
 
     directory
 
-      .orderBy("usernameNormalized")
+      .orderBy('usernameNormalized')
 
       .startAt(query)
 
@@ -283,9 +279,7 @@ export async function searchDirectory(
   return [...matches.values()]
 }
 
-export async function loadTeamWorkspace(
-  user: AppUser,
-): Promise<TeamProjectSummary[]> {
+export async function loadTeamWorkspace(user: AppUser): Promise<TeamProjectSummary[]> {
   const db = getTeamFirestore()
 
   await directoryReference(db, user.id).set(
@@ -294,11 +288,11 @@ export async function loadTeamWorkspace(
 
       name: user.name,
 
-      username: user.username ?? "",
+      username: user.username ?? '',
 
       nameNormalized: normalized(user.name),
 
-      usernameNormalized: normalized(user.username ?? ""),
+      usernameNormalized: normalized(user.username ?? ''),
 
       updatedAt: FieldValue.serverTimestamp(),
     },
@@ -307,10 +301,9 @@ export async function loadTeamWorkspace(
   )
 
   const memberships = await directoryReference(db, user.id)
+    .collection('projects')
 
-    .collection("projects")
-
-    .orderBy("createdAt", "desc")
+    .orderBy('createdAt', 'desc')
 
     .limit(50)
 
@@ -318,14 +311,12 @@ export async function loadTeamWorkspace(
 
   const projects = await Promise.all(
     memberships.docs.map(async (membership) => {
-      const projectId = requiredString(membership.data(), "projectId")
+      const projectId = requiredString(membership.data(), 'projectId')
 
       const snapshot = await projectReference(db, projectId).get()
 
       if (!snapshot.exists)
-        throw new TeamDataError(
-          "A project membership points to a missing project.",
-        )
+        throw new TeamDataError('A project membership points to a missing project.')
 
       return projectFromData(snapshot.id, snapshot.data() ?? {})
     }),
@@ -350,19 +341,15 @@ export async function loadTeamProjectBoard(
   ])
 
   if (!projectSnapshot.exists)
-    throw new TeamDataError("That team project could not be found.")
+    throw new TeamDataError('That team project could not be found.')
 
   if (!requesterMembership.exists)
-    throw new TeamDataError("You are not a member of this project.")
+    throw new TeamDataError('You are not a member of this project.')
 
   const [memberSnapshot, deliverableSnapshot] = await Promise.all([
-    projectRef.collection("members").orderBy("username").limit(100).get(),
+    projectRef.collection('members').orderBy('username').limit(100).get(),
 
-    projectRef
-      .collection("deliverables")
-      .orderBy("updatedAt", "desc")
-      .limit(200)
-      .get(),
+    projectRef.collection('deliverables').orderBy('updatedAt', 'desc').limit(200).get(),
   ])
 
   const members = memberSnapshot.docs.map((snapshot) =>
@@ -384,7 +371,7 @@ export async function loadTeamProjectBoard(
       ...item,
 
       parentTitle: item.parentDeliverableId
-        ? (titleById.get(item.parentDeliverableId) ?? "Parent deliverable")
+        ? (titleById.get(item.parentDeliverableId) ?? 'Parent deliverable')
         : undefined,
     })),
   }
@@ -399,7 +386,7 @@ export async function createTeamProject(user: AppUser, input: ProjectInput) {
 
   const profileRef = directoryReference(db, user.id)
 
-  const membershipRef = profileRef.collection("projects").doc(projectRef.id)
+  const membershipRef = profileRef.collection('projects').doc(projectRef.id)
 
   const now = Timestamp.now()
 
@@ -438,9 +425,9 @@ export async function createTeamProject(user: AppUser, input: ProjectInput) {
 
     name: user.name,
 
-    username: user.username ?? "",
+    username: user.username ?? '',
 
-    role: "owner",
+    role: 'owner',
 
     createdAt: now,
   })
@@ -448,7 +435,7 @@ export async function createTeamProject(user: AppUser, input: ProjectInput) {
   batch.set(membershipRef, {
     projectId: projectRef.id,
 
-    role: "owner",
+    role: 'owner',
 
     createdAt: now,
   })
@@ -473,22 +460,18 @@ export async function updateTeamProject(
     const projectSnapshot = await transaction.get(projectRef)
 
     if (!projectSnapshot.exists)
-      throw new TeamDataError("That team project could not be found.")
+      throw new TeamDataError('That team project could not be found.')
 
     const projectData = projectSnapshot.data() ?? {}
 
-    if (requiredString(projectData, "ownerId") !== user.id) {
-      throw new TeamDataError(
-        "Only the project owner can edit project details.",
-      )
+    if (requiredString(projectData, 'ownerId') !== user.id) {
+      throw new TeamDataError('Only the project owner can edit project details.')
     }
 
-    const deliverables = await transaction.get(
-      projectRef.collection("deliverables"),
-    )
+    const deliverables = await transaction.get(projectRef.collection('deliverables'))
 
     for (const deliverable of deliverables.docs) {
-      const dueAt = requiredIsoDate(deliverable.data(), "dueAt")
+      const dueAt = requiredIsoDate(deliverable.data(), 'dueAt')
 
       assertDeadline(dueAt, input.finalDeadline)
     }
@@ -530,34 +513,30 @@ export async function addProjectMember(
 
     .collection(directoryCollection)
 
-    .where("usernameNormalized", "==", normalized(username))
+    .where('usernameNormalized', '==', normalized(username))
 
     .limit(2)
 
     .get()
 
   if (matches.empty) {
-    throw new TeamDataError(
-      "No matching teammate is in the collaborator directory yet.",
-    )
+    throw new TeamDataError('No matching teammate is in the collaborator directory yet.')
   }
 
   if (matches.size > 1)
-    throw new TeamDataError(
-      "That username is ambiguous; contact an administrator.",
-    )
+    throw new TeamDataError('That username is ambiguous; contact an administrator.')
 
   const teammate = directoryFromData(matches.docs[0].id, matches.docs[0].data())
 
   if (teammate.id === user.id)
-    throw new TeamDataError("You are already the project owner.")
+    throw new TeamDataError('You are already the project owner.')
 
   const projectRef = projectReference(db, projectId)
 
   const teammateRef = memberReference(projectRef, teammate.id)
 
   const membershipRef = directoryReference(db, teammate.id)
-    .collection("projects")
+    .collection('projects')
     .doc(projectId)
 
   const now = Timestamp.now()
@@ -570,14 +549,14 @@ export async function addProjectMember(
     ])
 
     if (!projectSnapshot.exists)
-      throw new TeamDataError("That team project could not be found.")
+      throw new TeamDataError('That team project could not be found.')
 
-    if (requiredString(projectSnapshot.data() ?? {}, "ownerId") !== user.id) {
-      throw new TeamDataError("Only the project owner can add collaborators.")
+    if (requiredString(projectSnapshot.data() ?? {}, 'ownerId') !== user.id) {
+      throw new TeamDataError('Only the project owner can add collaborators.')
     }
 
     if (existingMembership.exists)
-      throw new TeamDataError("That teammate is already on this project.")
+      throw new TeamDataError('That teammate is already on this project.')
 
     transaction.set(teammateRef, {
       userId: teammate.id,
@@ -586,19 +565,19 @@ export async function addProjectMember(
 
       username: teammate.username,
 
-      role: "member",
+      role: 'member',
 
       createdAt: now,
     })
 
     transaction.set(membershipRef, {
       projectId,
-      role: "member",
+      role: 'member',
       createdAt: now,
     })
   })
 
-  return { ...teammate, role: "member" as const }
+  return { ...teammate, role: 'member' as const }
 }
 
 export async function createProjectDeliverable(
@@ -616,7 +595,7 @@ export async function createProjectDeliverable(
 
   const assigneeRef = memberReference(projectRef, input.assigneeId)
 
-  const deliverableRef = projectRef.collection("deliverables").doc()
+  const deliverableRef = projectRef.collection('deliverables').doc()
 
   const now = Timestamp.now()
 
@@ -630,22 +609,19 @@ export async function createProjectDeliverable(
     ])
 
     if (!projectSnapshot.exists)
-      throw new TeamDataError("That team project could not be found.")
+      throw new TeamDataError('That team project could not be found.')
 
     if (!requester.exists)
-      throw new TeamDataError("You are not a member of this project.")
+      throw new TeamDataError('You are not a member of this project.')
 
-    if (requiredString(projectSnapshot.data() ?? {}, "ownerId") !== user.id) {
-      throw new TeamDataError("Only the project owner can create deliverables.")
+    if (requiredString(projectSnapshot.data() ?? {}, 'ownerId') !== user.id) {
+      throw new TeamDataError('Only the project owner can create deliverables.')
     }
 
     if (!assignee.exists)
-      throw new TeamDataError("Choose a current project collaborator.")
+      throw new TeamDataError('Choose a current project collaborator.')
 
-    const project = projectFromData(
-      projectSnapshot.id,
-      projectSnapshot.data() ?? {},
-    )
+    const project = projectFromData(projectSnapshot.id, projectSnapshot.data() ?? {})
 
     assertDeadline(input.dueAt, project.finalDeadline)
 
@@ -662,13 +638,13 @@ export async function createProjectDeliverable(
 
       dueAt: Timestamp.fromDate(new Date(input.dueAt)),
 
-      status: "open",
+      status: 'open',
 
       assigneeId: input.assigneeId,
 
-      assigneeName: requiredString(assigneeData, "name"),
+      assigneeName: requiredString(assigneeData, 'name'),
 
-      assigneeUsername: requiredString(assigneeData, "username"),
+      assigneeUsername: requiredString(assigneeData, 'username'),
 
       ...(input.parentDeliverableId
         ? { parentDeliverableId: input.parentDeliverableId }
@@ -696,41 +672,33 @@ export async function updateProjectDeliverable(
 
   const projectRef = projectReference(db, projectId)
 
-  const deliverableRef = projectRef
-    .collection("deliverables")
-    .doc(deliverableId)
+  const deliverableRef = projectRef.collection('deliverables').doc(deliverableId)
 
   const assigneeRef = memberReference(projectRef, input.assigneeId)
 
   await db.runTransaction(async (transaction) => {
-    const [projectSnapshot, deliverableSnapshot, assigneeSnapshot] =
-      await Promise.all([
-        transaction.get(projectRef),
+    const [projectSnapshot, deliverableSnapshot, assigneeSnapshot] = await Promise.all([
+      transaction.get(projectRef),
 
-        transaction.get(deliverableRef),
+      transaction.get(deliverableRef),
 
-        transaction.get(assigneeRef),
-      ])
+      transaction.get(assigneeRef),
+    ])
 
     if (!projectSnapshot.exists)
-      throw new TeamDataError("That team project could not be found.")
+      throw new TeamDataError('That team project could not be found.')
 
-    if (requiredString(projectSnapshot.data() ?? {}, "ownerId") !== user.id) {
-      throw new TeamDataError(
-        "Only the project owner can edit deliverable details.",
-      )
+    if (requiredString(projectSnapshot.data() ?? {}, 'ownerId') !== user.id) {
+      throw new TeamDataError('Only the project owner can edit deliverable details.')
     }
 
     if (!deliverableSnapshot.exists)
-      throw new TeamDataError("That deliverable could not be found.")
+      throw new TeamDataError('That deliverable could not be found.')
 
     if (!assigneeSnapshot.exists)
-      throw new TeamDataError("Choose a current project collaborator.")
+      throw new TeamDataError('Choose a current project collaborator.')
 
-    const project = projectFromData(
-      projectSnapshot.id,
-      projectSnapshot.data() ?? {},
-    )
+    const project = projectFromData(projectSnapshot.id, projectSnapshot.data() ?? {})
 
     assertDeadline(input.dueAt, project.finalDeadline)
 
@@ -752,9 +720,9 @@ export async function updateProjectDeliverable(
 
       assigneeId: input.assigneeId,
 
-      assigneeName: requiredString(assignee, "name"),
+      assigneeName: requiredString(assignee, 'name'),
 
-      assigneeUsername: requiredString(assignee, "username"),
+      assigneeUsername: requiredString(assignee, 'username'),
 
       parentDeliverableId: input.parentDeliverableId ?? FieldValue.delete(),
 
@@ -778,34 +746,27 @@ export async function setProjectDeliverableStatus(
 
   const projectRef = projectReference(db, projectId)
 
-  const deliverableRef = projectRef
-    .collection("deliverables")
-    .doc(deliverableId)
+  const deliverableRef = projectRef.collection('deliverables').doc(deliverableId)
 
   await db.runTransaction(async (transaction) => {
-    const [projectSnapshot, requester, deliverableSnapshot] = await Promise.all(
-      [
-        transaction.get(projectRef),
+    const [projectSnapshot, requester, deliverableSnapshot] = await Promise.all([
+      transaction.get(projectRef),
 
-        transaction.get(memberReference(projectRef, user.id)),
+      transaction.get(memberReference(projectRef, user.id)),
 
-        transaction.get(deliverableRef),
-      ],
-    )
+      transaction.get(deliverableRef),
+    ])
 
     if (!projectSnapshot.exists)
-      throw new TeamDataError("That team project could not be found.")
+      throw new TeamDataError('That team project could not be found.')
 
     if (!requester.exists)
-      throw new TeamDataError("You are not a member of this project.")
+      throw new TeamDataError('You are not a member of this project.')
 
     if (!deliverableSnapshot.exists)
-      throw new TeamDataError("That deliverable could not be found.")
+      throw new TeamDataError('That deliverable could not be found.')
 
-    const project = projectFromData(
-      projectSnapshot.id,
-      projectSnapshot.data() ?? {},
-    )
+    const project = projectFromData(projectSnapshot.id, projectSnapshot.data() ?? {})
 
     const deliverable = deliverableFromData(
       deliverableSnapshot.id,
@@ -814,7 +775,7 @@ export async function setProjectDeliverableStatus(
 
     if (project.ownerId !== user.id && deliverable.assigneeId !== user.id) {
       throw new TeamDataError(
-        "Only the project owner or assigned teammate can change this status.",
+        'Only the project owner or assigned teammate can change this status.',
       )
     }
 

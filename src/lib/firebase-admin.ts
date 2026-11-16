@@ -1,12 +1,12 @@
-import "server-only"
+import 'server-only'
 
-import { cert, getApps, initializeApp, type App } from "firebase-admin/app"
+import { cert, getApps, initializeApp, type App } from 'firebase-admin/app'
 
-import { getAuth } from "firebase-admin/auth"
-import { getFirestore } from "firebase-admin/firestore"
-import { getStorage } from "firebase-admin/storage"
+import { getAuth } from 'firebase-admin/auth'
+import { getFirestore } from 'firebase-admin/firestore'
+import { getStorage } from 'firebase-admin/storage'
 
-const appName = "signal-team-workspace"
+const appName = 'signal-team-workspace'
 
 export class FirestoreConfigurationError extends Error {
   constructor() {
@@ -14,17 +14,17 @@ export class FirestoreConfigurationError extends Error {
       'Firebase Admin cloud mode requires FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY.',
     )
 
-    this.name = "FirestoreConfigurationError"
+    this.name = 'FirestoreConfigurationError'
   }
 }
 
 export function getFirebaseAdminApp(): App {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim()
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n")
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
   const emulatorHostsConfigured = Boolean(
     process.env.FIRESTORE_EMULATOR_HOST ||
-      process.env.FIREBASE_AUTH_EMULATOR_HOST ||
-      process.env.STORAGE_EMULATOR_HOST,
+    process.env.FIREBASE_AUTH_EMULATOR_HOST ||
+    process.env.STORAGE_EMULATOR_HOST,
   )
   const defaultMode =
     process.env.NODE_ENV === 'development' && !clientEmail && !privateKey

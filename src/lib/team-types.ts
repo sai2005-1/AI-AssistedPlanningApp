@@ -1,4 +1,4 @@
-export type DeliverableStatus = "open" | "in-progress" | "done"
+export type DeliverableStatus = 'open' | 'in-progress' | 'done'
 
 export type TeamProjectSummary = {
   id: string
@@ -19,7 +19,7 @@ export type TeamMember = {
 
   username: string
 
-  role: "owner" | "member"
+  role: 'owner' | 'member'
 }
 
 export type TeamDeliverable = {

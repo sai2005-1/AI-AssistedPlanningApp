@@ -1,9 +1,6 @@
 export const REVIEW_FREEZE_HOURS = 72
 
-export function isDeadlineWithinReviewFreeze(
-  dueAt: string,
-  finalDeadline: string,
-) {
+export function isDeadlineWithinReviewFreeze(dueAt: string, finalDeadline: string) {
   const dueAtMs = Date.parse(dueAt)
 
   const finalDeadlineMs = Date.parse(finalDeadline)

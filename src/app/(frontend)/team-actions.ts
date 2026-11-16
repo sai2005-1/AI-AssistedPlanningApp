@@ -1,14 +1,10 @@
-"use server"
+'use server'
 
-import { FirestoreConfigurationError } from "@/lib/firebase-admin"
+import { FirestoreConfigurationError } from '@/lib/firebase-admin'
 
-import { requireAppUser, type AppUser } from "@/lib/app-auth"
+import { requireAppUser, type AppUser } from '@/lib/app-auth'
 
-import type {
-  DeliverableInput,
-  DeliverableStatus,
-  ProjectInput,
-} from "@/lib/team-types"
+import type { DeliverableInput, DeliverableStatus, ProjectInput } from '@/lib/team-types'
 
 import {
   addProjectMember,
@@ -21,20 +17,20 @@ import {
   TeamDataError,
   updateProjectDeliverable,
   updateTeamProject,
-} from "@/lib/team-deliverables"
+} from '@/lib/team-deliverables'
 
 type ActionResult<T> =
   | { ok: true; data: T; message: string }
   | {
-  ok: false
-  error: string
-}
+      ok: false
+      error: string
+    }
 
 class InputError extends Error {}
 
 function record(value: unknown): Record<string, unknown> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new InputError("The submitted data is invalid.")
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new InputError('The submitted data is invalid.')
   }
 
   return value as Record<string, unknown>
@@ -42,12 +38,12 @@ function record(value: unknown): Record<string, unknown> {
 
 function allowKeys(value: Record<string, unknown>, allowed: string[]) {
   if (Object.keys(value).some((key) => !allowed.includes(key))) {
-    throw new InputError("The submitted data contains unsupported fields.")
+    throw new InputError('The submitted data contains unsupported fields.')
   }
 }
 
 function text(value: unknown, label: string, maximum: number, required = true) {
-  if (typeof value !== "string") throw new InputError(`Enter a valid ${label}.`)
+  if (typeof value !== 'string') throw new InputError(`Enter a valid ${label}.`)
 
   const result = value.trim()
 
@@ -62,8 +58,7 @@ function text(value: unknown, label: string, maximum: number, required = true) {
 function documentId(value: unknown, label: string) {
   const id = text(value, label, 128)
 
-  if (!/^[A-Za-z0-9_-]+$/.test(id))
-    throw new InputError(`The ${label} is invalid.`)
+  if (!/^[A-Za-z0-9_-]+$/.test(id)) throw new InputError(`The ${label} is invalid.`)
 
   return id
 }
@@ -72,17 +67,14 @@ function isoDate(value: unknown, label: string) {
   const date = text(value, label, 40)
 
   if (
-    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(
-      date,
-    )
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(date)
   ) {
     throw new InputError(`Enter a valid ${label}.`)
   }
 
   const parsed = new Date(date)
 
-  if (Number.isNaN(parsed.getTime()))
-    throw new InputError(`Enter a valid ${label}.`)
+  if (Number.isNaN(parsed.getTime())) throw new InputError(`Enter a valid ${label}.`)
 
   return parsed.toISOString()
 }
@@ -90,41 +82,35 @@ function isoDate(value: unknown, label: string) {
 function parseProjectInput(value: unknown): ProjectInput {
   const input = record(value)
 
-  allowKeys(input, ["title", "description", "finalDeadline"])
+  allowKeys(input, ['title', 'description', 'finalDeadline'])
 
   return {
-    title: text(input.title, "project title", 160),
+    title: text(input.title, 'project title', 160),
 
-    description: text(input.description ?? "", "description", 2000, false),
+    description: text(input.description ?? '', 'description', 2000, false),
 
-    finalDeadline: isoDate(input.finalDeadline, "final submission date"),
+    finalDeadline: isoDate(input.finalDeadline, 'final submission date'),
   }
 }
 
 function parseDeliverableInput(value: unknown): DeliverableInput {
   const input = record(value)
 
-  allowKeys(input, [
-    "title",
-    "description",
-    "dueAt",
-    "assigneeId",
-    "parentDeliverableId",
-  ])
+  allowKeys(input, ['title', 'description', 'dueAt', 'assigneeId', 'parentDeliverableId'])
 
   const parentDeliverableId =
-    input.parentDeliverableId === undefined || input.parentDeliverableId === ""
+    input.parentDeliverableId === undefined || input.parentDeliverableId === ''
       ? undefined
-      : documentId(input.parentDeliverableId, "parent deliverable")
+      : documentId(input.parentDeliverableId, 'parent deliverable')
 
   return {
-    title: text(input.title, "deliverable title", 160),
+    title: text(input.title, 'deliverable title', 160),
 
-    description: text(input.description ?? "", "description", 2000, false),
+    description: text(input.description ?? '', 'description', 2000, false),
 
-    dueAt: isoDate(input.dueAt, "milestone deadline"),
+    dueAt: isoDate(input.dueAt, 'milestone deadline'),
 
-    assigneeId: documentId(input.assigneeId, "assignee"),
+    assigneeId: documentId(input.assigneeId, 'assignee'),
 
     parentDeliverableId,
   }
@@ -140,8 +126,8 @@ function publicError(error: unknown, fallback: string) {
   }
 
   console.error(
-    "Team deliverables action failed",
-    error instanceof Error ? error.name : "Unknown error",
+    'Team deliverables action failed',
+    error instanceof Error ? error.name : 'Unknown error',
   )
 
   return fallback
@@ -155,7 +141,7 @@ async function runAction<T>(
   try {
     const user = await requireAppUser()
 
-    if (!user) return { ok: false, error: "Sign in to use team deliverables." }
+    if (!user) return { ok: false, error: 'Sign in to use team deliverables.' }
 
     const result = await operation(user)
 
@@ -165,69 +151,71 @@ async function runAction<T>(
   }
 }
 
-export async function loadTeamWorkspaceAction(): Promise<ActionResult<{
-  projects: Awaited<ReturnType<typeof loadTeamWorkspace>>
-}>> {
+export async function loadTeamWorkspaceAction(): Promise<
+  ActionResult<{
+    projects: Awaited<ReturnType<typeof loadTeamWorkspace>>
+  }>
+> {
   return runAction(
-    "Could not load team projects. Check the Firestore setup and try again.",
+    'Could not load team projects. Check the Firestore setup and try again.',
     async (user) => ({
       data: { projects: await loadTeamWorkspace(user) },
 
-      message: "Team projects loaded.",
+      message: 'Team projects loaded.',
     }),
   )
 }
 
-export async function loadTeamProjectBoardAction(
-  projectIdValue: unknown,
-): Promise<ActionResult<{
-  board: Awaited<ReturnType<typeof loadTeamProjectBoard>>
-}>> {
+export async function loadTeamProjectBoardAction(projectIdValue: unknown): Promise<
+  ActionResult<{
+    board: Awaited<ReturnType<typeof loadTeamProjectBoard>>
+  }>
+> {
   return runAction(
-    "Could not load this project. Check the Firestore setup and try again.",
+    'Could not load this project. Check the Firestore setup and try again.',
     async (user) => {
-      const projectId = documentId(projectIdValue, "project")
+      const projectId = documentId(projectIdValue, 'project')
 
       return {
         data: { board: await loadTeamProjectBoard(user.id, projectId) },
 
-        message: "Project loaded.",
+        message: 'Project loaded.',
       }
     },
   )
 }
 
-export async function searchTeammatesAction(
-  queryValue: unknown,
-): Promise<ActionResult<{
-  matches: Awaited<ReturnType<typeof searchDirectory>>
-}>> {
+export async function searchTeammatesAction(queryValue: unknown): Promise<
+  ActionResult<{
+    matches: Awaited<ReturnType<typeof searchDirectory>>
+  }>
+> {
   return runAction(
-    "Could not search the collaborator directory. Try again.",
+    'Could not search the collaborator directory. Try again.',
     async (user) => {
-      const query = text(queryValue, "search", 80, false)
+      const query = text(queryValue, 'search', 80, false)
 
       return {
         data: { matches: await searchDirectory(user, query) },
-        message: "Search complete.",
+        message: 'Search complete.',
       }
     },
   )
 }
 
-export async function createTeamProjectAction(
-  inputValue: unknown,
-): Promise<ActionResult<{
-  project: Awaited<ReturnType<typeof createTeamProject>>
-}>> {
+export async function createTeamProjectAction(inputValue: unknown): Promise<
+  ActionResult<{
+    project: Awaited<ReturnType<typeof createTeamProject>>
+  }>
+> {
   return runAction(
-    "Could not create the project. Check the Firestore setup and try again.",
+    'Could not create the project. Check the Firestore setup and try again.',
     async (user) => ({
       data: {
         project: await createTeamProject(user, parseProjectInput(inputValue)),
       },
 
-      message: "Team project created.",
+      message: 'Team project created.',
     }),
   )
 }
@@ -236,22 +224,20 @@ export async function updateTeamProjectAction(
   projectIdValue: unknown,
 
   inputValue: unknown,
-): Promise<ActionResult<{
-  project: Awaited<ReturnType<typeof updateTeamProject>>
-}>> {
-  return runAction("Could not update the project. Try again.", async (user) => {
-    const projectId = documentId(projectIdValue, "project")
+): Promise<
+  ActionResult<{
+    project: Awaited<ReturnType<typeof updateTeamProject>>
+  }>
+> {
+  return runAction('Could not update the project. Try again.', async (user) => {
+    const projectId = documentId(projectIdValue, 'project')
 
     return {
       data: {
-        project: await updateTeamProject(
-          user,
-          projectId,
-          parseProjectInput(inputValue),
-        ),
+        project: await updateTeamProject(user, projectId, parseProjectInput(inputValue)),
       },
 
-      message: "Project details updated.",
+      message: 'Project details updated.',
     }
   })
 }
@@ -260,27 +246,26 @@ export async function addProjectMemberAction(
   projectIdValue: unknown,
 
   usernameValue: unknown,
-): Promise<ActionResult<{
-  member: Awaited<ReturnType<typeof addProjectMember>>
-}>> {
-  return runAction(
-    "Could not add that collaborator. Try again.",
-    async (user) => {
-      const projectId = documentId(projectIdValue, "project")
+): Promise<
+  ActionResult<{
+    member: Awaited<ReturnType<typeof addProjectMember>>
+  }>
+> {
+  return runAction('Could not add that collaborator. Try again.', async (user) => {
+    const projectId = documentId(projectIdValue, 'project')
 
-      const username = text(usernameValue, "username", 32)
+    const username = text(usernameValue, 'username', 32)
 
-      if (!/^[a-zA-Z0-9_-]{3,32}$/.test(username)) {
-        throw new InputError("Enter a valid teammate username.")
-      }
+    if (!/^[a-zA-Z0-9_-]{3,32}$/.test(username)) {
+      throw new InputError('Enter a valid teammate username.')
+    }
 
-      return {
-        data: { member: await addProjectMember(user, projectId, username) },
+    return {
+      data: { member: await addProjectMember(user, projectId, username) },
 
-        message: "Collaborator added.",
-      }
-    },
-  )
+      message: 'Collaborator added.',
+    }
+  })
 }
 
 export async function createProjectDeliverableAction(
@@ -288,20 +273,17 @@ export async function createProjectDeliverableAction(
 
   inputValue: unknown,
 ): Promise<ActionResult<{ id: string }>> {
-  return runAction(
-    "Could not create the deliverable. Try again.",
-    async (user) => {
-      const projectId = documentId(projectIdValue, "project")
+  return runAction('Could not create the deliverable. Try again.', async (user) => {
+    const projectId = documentId(projectIdValue, 'project')
 
-      const result = await createProjectDeliverable(
-        user,
-        projectId,
-        parseDeliverableInput(inputValue),
-      )
+    const result = await createProjectDeliverable(
+      user,
+      projectId,
+      parseDeliverableInput(inputValue),
+    )
 
-      return { data: result, message: "Deliverable created." }
-    },
-  )
+    return { data: result, message: 'Deliverable created.' }
+  })
 }
 
 export async function updateProjectDeliverableAction(
@@ -311,26 +293,23 @@ export async function updateProjectDeliverableAction(
 
   inputValue: unknown,
 ): Promise<ActionResult<{ id: string }>> {
-  return runAction(
-    "Could not update the deliverable. Try again.",
-    async (user) => {
-      const projectId = documentId(projectIdValue, "project")
+  return runAction('Could not update the deliverable. Try again.', async (user) => {
+    const projectId = documentId(projectIdValue, 'project')
 
-      const deliverableId = documentId(deliverableIdValue, "deliverable")
+    const deliverableId = documentId(deliverableIdValue, 'deliverable')
 
-      const result = await updateProjectDeliverable(
-        user,
+    const result = await updateProjectDeliverable(
+      user,
 
-        projectId,
+      projectId,
 
-        deliverableId,
+      deliverableId,
 
-        parseDeliverableInput(inputValue),
-      )
+      parseDeliverableInput(inputValue),
+    )
 
-      return { data: result, message: "Deliverable updated." }
-    },
-  )
+    return { data: result, message: 'Deliverable updated.' }
+  })
 }
 
 export async function setProjectDeliverableStatusAction(
@@ -341,18 +320,18 @@ export async function setProjectDeliverableStatusAction(
   statusValue: unknown,
 ): Promise<ActionResult<{ id: string; status: DeliverableStatus }>> {
   return runAction(
-    "Could not update the deliverable status. Try again.",
+    'Could not update the deliverable status. Try again.',
     async (user) => {
-      const projectId = documentId(projectIdValue, "project")
+      const projectId = documentId(projectIdValue, 'project')
 
-      const deliverableId = documentId(deliverableIdValue, "deliverable")
+      const deliverableId = documentId(deliverableIdValue, 'deliverable')
 
       if (
-        statusValue !== "open" &&
-        statusValue !== "in-progress" &&
-        statusValue !== "done"
+        statusValue !== 'open' &&
+        statusValue !== 'in-progress' &&
+        statusValue !== 'done'
       ) {
-        throw new InputError("Choose a valid deliverable status.")
+        throw new InputError('Choose a valid deliverable status.')
       }
 
       return {
@@ -365,7 +344,7 @@ export async function setProjectDeliverableStatusAction(
           )),
         },
 
-        message: "Deliverable status updated.",
+        message: 'Deliverable status updated.',
       }
     },
   )

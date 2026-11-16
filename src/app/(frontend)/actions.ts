@@ -1,7 +1,6 @@
 'use server'
 
 import { lookup } from 'node:dns/promises'
-import { taskDataFromCalendarAssignment } from '@/lib/calendar-task'
 import { parseICS } from '@/lib/ics'
 import type { AssignmentType, ClassLevel } from '@/lib/scoring'
 import { requireAppUser } from '@/lib/app-auth'
@@ -58,13 +57,17 @@ function asNumber(value: unknown, fallback: number, min = 0, max = 100) {
   return Number.isFinite(number) ? Math.max(min, Math.min(max, number)) : fallback
 }
 
-export async function createTaskAction(input: NewTask): Promise<ActionResult<{ id: string }>> {
+export async function createTaskAction(
+  input: NewTask,
+): Promise<ActionResult<{ id: string }>> {
   const appUser = await requireAppUser()
   if (!appUser) return { ok: false, error: 'Sign in to add tasks.' }
   const title = typeof input.title === 'string' ? input.title.trim().slice(0, 160) : ''
   if (!title) return { ok: false, error: 'Give the task a title.' }
-  if (!taskTypes.has(input.assignmentType)) return { ok: false, error: 'Unknown assignment type.' }
-  if (!classLevels.has(input.classLevel)) return { ok: false, error: 'Unknown class level.' }
+  if (!taskTypes.has(input.assignmentType))
+    return { ok: false, error: 'Unknown assignment type.' }
+  if (!classLevels.has(input.classLevel))
+    return { ok: false, error: 'Unknown class level.' }
   const dueDate = input.dueDate ? new Date(input.dueDate) : null
   if (dueDate && Number.isNaN(dueDate.getTime())) {
     return { ok: false, error: 'The deadline could not be read.' }
@@ -97,7 +100,9 @@ export async function createCourseAction(
     return { ok: false, error: 'The course details are invalid.' }
   }
   const values = input as Record<string, unknown>
-  if (Object.keys(values).some((key) => !['code', 'name', 'level', 'color'].includes(key))) {
+  if (
+    Object.keys(values).some((key) => !['code', 'name', 'level', 'color'].includes(key))
+  ) {
     return { ok: false, error: 'The course details contain unsupported fields.' }
   }
   const code = typeof values.code === 'string' ? values.code.trim().toUpperCase() : ''
@@ -107,9 +112,11 @@ export async function createCourseAction(
   if (!/^[A-Z0-9][A-Z0-9 -]{1,19}$/.test(code)) {
     return { ok: false, error: 'Use a course code between 2 and 20 letters or numbers.' }
   }
-  if (!name || name.length > 120) return { ok: false, error: 'Enter a course name up to 120 characters.' }
+  if (!name || name.length > 120)
+    return { ok: false, error: 'Enter a course name up to 120 characters.' }
   if (!classLevels.has(level)) return { ok: false, error: 'Choose a valid course level.' }
-  if (!courseColors.has(color)) return { ok: false, error: 'Choose a valid course color.' }
+  if (!courseColors.has(color))
+    return { ok: false, error: 'Choose a valid course color.' }
 
   try {
     const course = await createUserCourse(appUser.id, {
@@ -118,11 +125,16 @@ export async function createCourseAction(
       level: level as AppCourse['level'],
       name,
     })
-    return { ok: true, data: course, message: `${course.code} was added to your courses.` }
+    return {
+      ok: true,
+      data: course,
+      message: `${course.code} was added to your courses.`,
+    }
   } catch (error) {
     return {
       ok: false,
-      error: error instanceof Error ? error.message : 'Signal could not save that course.',
+      error:
+        error instanceof Error ? error.message : 'Signal could not save that course.',
     }
   }
 }
@@ -133,7 +145,10 @@ export async function updateCourseAction(
 ): Promise<ActionResult<AppCourse>> {
   const appUser = await requireAppUser()
   if (!appUser) return { ok: false, error: 'Sign in to update courses.' }
-  if (typeof courseIdValue !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(courseIdValue)) {
+  if (
+    typeof courseIdValue !== 'string' ||
+    !/^[A-Za-z0-9_-]{1,128}$/.test(courseIdValue)
+  ) {
     return { ok: false, error: 'That course is invalid.' }
   }
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
@@ -146,9 +161,11 @@ export async function updateCourseAction(
   const name = typeof values.name === 'string' ? values.name.trim() : ''
   const level = typeof values.level === 'string' ? values.level : ''
   const color = typeof values.color === 'string' ? values.color : ''
-  if (!name || name.length > 120) return { ok: false, error: 'Enter a course name up to 120 characters.' }
+  if (!name || name.length > 120)
+    return { ok: false, error: 'Enter a course name up to 120 characters.' }
   if (!classLevels.has(level)) return { ok: false, error: 'Choose a valid course level.' }
-  if (!courseColors.has(color)) return { ok: false, error: 'Choose a valid course color.' }
+  if (!courseColors.has(color))
+    return { ok: false, error: 'Choose a valid course color.' }
 
   try {
     const course = await updateUserCourse(appUser.id, courseIdValue, {
@@ -160,15 +177,21 @@ export async function updateCourseAction(
   } catch (error) {
     return {
       ok: false,
-      error: error instanceof Error ? error.message : 'Signal could not update that course.',
+      error:
+        error instanceof Error ? error.message : 'Signal could not update that course.',
     }
   }
 }
 
-export async function deleteCourseAction(courseIdValue: unknown): Promise<ActionResult<{ id: string }>> {
+export async function deleteCourseAction(
+  courseIdValue: unknown,
+): Promise<ActionResult<{ id: string }>> {
   const appUser = await requireAppUser()
   if (!appUser) return { ok: false, error: 'Sign in to remove courses.' }
-  if (typeof courseIdValue !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(courseIdValue)) {
+  if (
+    typeof courseIdValue !== 'string' ||
+    !/^[A-Za-z0-9_-]{1,128}$/.test(courseIdValue)
+  ) {
     return { ok: false, error: 'That course is invalid.' }
   }
   try {
@@ -177,30 +200,39 @@ export async function deleteCourseAction(courseIdValue: unknown): Promise<Action
   } catch (error) {
     return {
       ok: false,
-      error: error instanceof Error ? error.message : 'Signal could not remove that course.',
+      error:
+        error instanceof Error ? error.message : 'Signal could not remove that course.',
     }
   }
 }
 
-export async function createWorkflowAction(
-  input: { prompt: string; workflow: 'exam' | 'syllabus' | 'team' },
-): Promise<ActionResult<{ eventsCreated: number; tasksCreated: number }>> {
+export async function createWorkflowAction(input: {
+  prompt: string
+  workflow: 'exam' | 'syllabus' | 'team'
+}): Promise<ActionResult<{ eventsCreated: number; tasksCreated: number }>> {
   const appUser = await requireAppUser()
   if (!appUser) return { ok: false, error: 'Sign in to build a plan.' }
   if (!input || !['exam', 'syllabus', 'team'].includes(input.workflow)) {
     return { ok: false, error: 'Choose a valid planning workflow.' }
   }
-  const prompt = String(input.prompt ?? '').trim().slice(0, 20_000)
-  if (!prompt) return { ok: false, error: 'Paste or describe the planning details first.' }
+  const prompt = String(input.prompt ?? '')
+    .trim()
+    .slice(0, 20_000)
+  if (!prompt)
+    return { ok: false, error: 'Paste or describe the planning details first.' }
 
-  const builders: Record<'exam' | 'syllabus' | 'team', (value: string) => WorkflowPlan> = {
-    exam: buildExamPlan,
-    syllabus: buildSyllabusPlan,
-    team: buildTeamPlan,
-  }
+  const builders: Record<'exam' | 'syllabus' | 'team', (value: string) => WorkflowPlan> =
+    {
+      exam: buildExamPlan,
+      syllabus: buildSyllabusPlan,
+      team: buildTeamPlan,
+    }
   const plan = builders[input.workflow](prompt)
   if (!plan.tasks.length) {
-    return { ok: false, error: 'No dated items were found. Put each item and date on its own line.' }
+    return {
+      ok: false,
+      error: 'No dated items were found. Put each item and date on its own line.',
+    }
   }
 
   try {
@@ -225,12 +257,15 @@ export async function setTaskCompletedAction(
   try {
     const appUser = await requireAppUser()
     if (!appUser) return { ok: false, error: 'Sign in to update tasks.' }
-    if (typeof completed !== 'boolean') return { ok: false, error: 'That task state is invalid.' }
+    if (typeof completed !== 'boolean')
+      return { ok: false, error: 'That task state is invalid.' }
     const task = await setUserTaskCompleted(appUser.id, id, completed)
     return {
       ok: true,
       data: task,
-      message: completed ? 'Task moved to Completed.' : 'Task restored to the upcoming plan.',
+      message: completed
+        ? 'Task moved to Completed.'
+        : 'Task restored to the upcoming plan.',
     }
   } catch {
     return { ok: false, error: 'Signal could not update that task.' }
@@ -256,7 +291,8 @@ async function readCalendarSource(formData: FormData) {
   const urlValue = String(formData.get('url') ?? '').trim()
 
   if (file instanceof File && file.size > 0) {
-    if (file.size > MAX_CALENDAR_BYTES) throw new Error('Choose an .ics file smaller than 5 MB.')
+    if (file.size > MAX_CALENDAR_BYTES)
+      throw new Error('Choose an .ics file smaller than 5 MB.')
     const text = await file.text()
     return {
       isCanvas: /canvas|instructure/i.test(`${file.name}\n${text.slice(0, 2000)}`),
@@ -267,8 +303,10 @@ async function readCalendarSource(formData: FormData) {
   if (!urlValue) throw new Error('Choose an .ics file or enter a calendar URL.')
 
   let url = new URL(urlValue.replace(/^webcal:\/\//i, 'https://'))
-  const isCanvas = /(^|\.)instructure\.com$/i.test(url.hostname) || /canvas/i.test(url.hostname)
-  if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Use an HTTP or HTTPS calendar URL.')
+  const isCanvas =
+    /(^|\.)instructure\.com$/i.test(url.hostname) || /canvas/i.test(url.hostname)
+  if (!['http:', 'https:'].includes(url.protocol))
+    throw new Error('Use an HTTP or HTTPS calendar URL.')
 
   let response: Response | undefined
   for (let redirect = 0; redirect < 4; redirect += 1) {
@@ -298,9 +336,11 @@ async function readCalendarSource(formData: FormData) {
   }
   if (!response.ok) throw new Error(`Calendar server returned ${response.status}.`)
   const length = Number(response.headers.get('content-length') ?? 0)
-  if (length > MAX_CALENDAR_BYTES) throw new Error('Calendar response is larger than 5 MB.')
+  if (length > MAX_CALENDAR_BYTES)
+    throw new Error('Calendar response is larger than 5 MB.')
   const text = await response.text()
-  if (text.length > MAX_CALENDAR_BYTES) throw new Error('Calendar response is larger than 5 MB.')
+  if (text.length > MAX_CALENDAR_BYTES)
+    throw new Error('Calendar response is larger than 5 MB.')
   if (/<(?:!doctype\s+)?html/i.test(text)) {
     throw new Error(
       isCanvas
@@ -311,9 +351,14 @@ async function readCalendarSource(formData: FormData) {
   return { isCanvas, source: 'ics-url' as const, text }
 }
 
-export async function importCalendarAction(
-  formData: FormData,
-): Promise<ActionResult<{ created: number; duplicates: number; parsed: number; tasksCreated: number }>> {
+export async function importCalendarAction(formData: FormData): Promise<
+  ActionResult<{
+    created: number
+    duplicates: number
+    parsed: number
+    tasksCreated: number
+  }>
+> {
   try {
     const appUser = await requireAppUser()
     if (!appUser) return { ok: false, error: 'Sign in to import a calendar.' }
@@ -340,7 +385,10 @@ export async function importCalendarAction(
       message: `${calendar.isCanvas ? 'Canvas: ' : ''}imported ${result.created} event${result.created === 1 ? '' : 's'}, synced ${result.tasksCreated} priority task${result.tasksCreated === 1 ? '' : 's'}; ${result.duplicates} duplicate${result.duplicates === 1 ? '' : 's'} skipped.`,
     }
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : 'Calendar import failed.' }
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Calendar import failed.',
+    }
   }
 }
 
@@ -348,16 +396,20 @@ export async function setCalendarEventCompletedAction(
   id: string,
   completed: boolean,
 ): Promise<ActionResult<{ completed: boolean; id: string }>> {
-  if (!id || id.length > 100) return { ok: false, error: 'That calendar event is invalid.' }
+  if (!id || id.length > 100)
+    return { ok: false, error: 'That calendar event is invalid.' }
   try {
     const appUser = await requireAppUser()
     if (!appUser) return { ok: false, error: 'Sign in to update assignments.' }
-    if (typeof completed !== 'boolean') return { ok: false, error: 'That event state is invalid.' }
+    if (typeof completed !== 'boolean')
+      return { ok: false, error: 'That event state is invalid.' }
     const event = await setUserEventCompleted(appUser.id, id, completed)
     return {
       ok: true,
       data: event,
-      message: completed ? 'Assignment marked completed.' : 'Assignment restored to the plan.',
+      message: completed
+        ? 'Assignment marked completed.'
+        : 'Assignment restored to the plan.',
     }
   } catch {
     return { ok: false, error: 'Signal could not update that assignment.' }

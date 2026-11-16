@@ -24,24 +24,26 @@ export type FirestoreCourseDocument = FirestoreOwnedDocument & {
   name: string
 }
 
-export type FirestoreTaskDocument = FirestoreOwnedDocument & ScoreBreakdown & {
-  assignmentType: AssignmentType
-  calendarEventId?: string
-  careerAlignment?: number | null
-  classLevel: ClassLevel
-  courseId?: string
-  consequence?: number | null
-  dueDate?: string
-  estimatedMinutes: number
-  goalAlignment?: number | null
-  lastWorkedAt?: string
-  plannedStart?: string
-  status: 'done' | 'open' | 'scheduled'
-  title: string
-}
+export type FirestoreTaskDocument = FirestoreOwnedDocument &
+  ScoreBreakdown & {
+    assignmentType: AssignmentType
+    calendarEventId?: string
+    careerAlignment?: number | null
+    classLevel: ClassLevel
+    courseId?: string
+    consequence?: number | null
+    dueDate?: string
+    estimatedMinutes: number
+    goalAlignment?: number | null
+    lastWorkedAt?: string
+    plannedStart?: string
+    status: 'done' | 'open' | 'scheduled'
+    title: string
+  }
 
-export type FirestoreCalendarEventDocument = FirestoreOwnedDocument & ParsedCalendarEvent & {
-  courseId?: string
-  source: 'ics-file' | 'ics-url' | 'manual'
-  sourceKey: string
-}
+export type FirestoreCalendarEventDocument = FirestoreOwnedDocument &
+  ParsedCalendarEvent & {
+    courseId?: string
+    source: 'ics-file' | 'ics-url' | 'manual'
+    sourceKey: string
+  }

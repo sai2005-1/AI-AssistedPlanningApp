@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useEffect, useState, useTransition, type FormEvent } from "react"
+import { useEffect, useState, useTransition, type FormEvent } from 'react'
 
 import {
   addProjectMemberAction,
@@ -12,7 +12,7 @@ import {
   setProjectDeliverableStatusAction,
   updateProjectDeliverableAction,
   updateTeamProjectAction,
-} from "./team-actions"
+} from './team-actions'
 
 import type {
   DeliverableStatus,
@@ -20,12 +20,12 @@ import type {
   TeamDeliverable,
   TeamProjectBoard,
   TeamProjectSummary,
-} from "@/lib/team-types"
+} from '@/lib/team-types'
 
 const fieldClassName =
-  "w-full rounded-sm border border-[var(--line)] bg-[#0f1012] px-3 py-2 text-sm text-white outline-none focus:border-[var(--blue)]"
+  'w-full rounded-sm border border-[var(--line)] bg-[#0f1012] px-3 py-2 text-sm text-white outline-none focus:border-[var(--blue)]'
 
-const labelClassName = "grid gap-1 text-xs text-[var(--muted)]"
+const labelClassName = 'grid gap-1 text-xs text-[var(--muted)]'
 
 function localDateTimeValue(value: string) {
   const date = new Date(value)
@@ -38,14 +38,14 @@ function localDateTimeValue(value: string) {
 function toIsoDateTime(value: string) {
   const date = new Date(value)
 
-  return Number.isNaN(date.getTime()) ? "" : date.toISOString()
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString()
 }
 
 function deadlineLabel(value: string) {
   return new Date(value).toLocaleString([], {
-    dateStyle: "medium",
+    dateStyle: 'medium',
 
-    timeStyle: "short",
+    timeStyle: 'short',
   })
 }
 
@@ -72,17 +72,17 @@ export default function TeamDeliverables({
 }) {
   const [projects, setProjects] = useState<TeamProjectSummary[]>([])
 
-  const [selectedProjectId, setSelectedProjectId] = useState("")
+  const [selectedProjectId, setSelectedProjectId] = useState('')
 
   const [board, setBoard] = useState<TeamProjectBoard>()
 
   const [directoryMatches, setDirectoryMatches] = useState<DirectoryEntry[]>([])
 
-  const [searchValue, setSearchValue] = useState("")
+  const [searchValue, setSearchValue] = useState('')
 
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
 
-  const [notice, setNotice] = useState("")
+  const [notice, setNotice] = useState('')
 
   const [loading, setLoading] = useState(true)
 
@@ -92,26 +92,25 @@ export default function TeamDeliverables({
 
   const [showDeliverableForm, setShowDeliverableForm] = useState(false)
 
-  const [editingDeliverable, setEditingDeliverable] =
-    useState<TeamDeliverable>()
+  const [editingDeliverable, setEditingDeliverable] = useState<TeamDeliverable>()
 
   const [pending, startTransition] = useTransition()
 
-  const [projectTitle, setProjectTitle] = useState("")
+  const [projectTitle, setProjectTitle] = useState('')
 
-  const [projectDescription, setProjectDescription] = useState("")
+  const [projectDescription, setProjectDescription] = useState('')
 
-  const [projectFinalDeadline, setProjectFinalDeadline] = useState("")
+  const [projectFinalDeadline, setProjectFinalDeadline] = useState('')
 
-  const [deliverableTitle, setDeliverableTitle] = useState("")
+  const [deliverableTitle, setDeliverableTitle] = useState('')
 
-  const [deliverableDescription, setDeliverableDescription] = useState("")
+  const [deliverableDescription, setDeliverableDescription] = useState('')
 
-  const [deliverableDueAt, setDeliverableDueAt] = useState("")
+  const [deliverableDueAt, setDeliverableDueAt] = useState('')
 
-  const [deliverableAssigneeId, setDeliverableAssigneeId] = useState("")
+  const [deliverableAssigneeId, setDeliverableAssigneeId] = useState('')
 
-  const [parentDeliverableId, setParentDeliverableId] = useState("")
+  const [parentDeliverableId, setParentDeliverableId] = useState('')
 
   useEffect(() => {
     let active = true
@@ -126,9 +125,7 @@ export default function TeamDeliverables({
       } else {
         setProjects(result.data.projects)
 
-        setSelectedProjectId(
-          (current) => current || result.data.projects[0]?.id || "",
-        )
+        setSelectedProjectId((current) => current || result.data.projects[0]?.id || '')
       }
 
       setLoading(false)
@@ -178,11 +175,11 @@ export default function TeamDeliverables({
   function reportError(message: string) {
     setError(message)
 
-    setNotice("")
+    setNotice('')
   }
 
   function reportSuccess(message: string) {
-    setError("")
+    setError('')
 
     setNotice(message)
 
@@ -193,7 +190,7 @@ export default function TeamDeliverables({
     const refreshed = await loadTeamProjectBoardAction(projectId)
 
     if (!refreshed.ok) {
-      setError("")
+      setError('')
 
       setNotice(
         `${successMessage} The change was saved, but the board could not be refreshed: ${refreshed.error}`,
@@ -221,7 +218,7 @@ export default function TeamDeliverables({
     }
 
     if (!input.finalDeadline) {
-      reportError("Enter a valid final submission date and time.")
+      reportError('Enter a valid final submission date and time.')
 
       return
     }
@@ -295,12 +292,12 @@ export default function TeamDeliverables({
 
       setDirectoryMatches(availableMatches)
 
-      setError("")
+      setError('')
 
       setNotice(
         availableMatches.length
-          ? ""
-          : "No new matches. Teammates appear after they open this workspace.",
+          ? ''
+          : 'No new matches. Teammates appear after they open this workspace.',
       )
     })
   }
@@ -309,10 +306,7 @@ export default function TeamDeliverables({
     if (!selectedProjectId) return
 
     startTransition(async () => {
-      const result = await addProjectMemberAction(
-        selectedProjectId,
-        member.username,
-      )
+      const result = await addProjectMemberAction(selectedProjectId, member.username)
 
       if (!result.ok) {
         reportError(result.error)
@@ -320,9 +314,7 @@ export default function TeamDeliverables({
         return
       }
 
-      setDirectoryMatches((current) =>
-        current.filter((entry) => entry.id !== member.id),
-      )
+      setDirectoryMatches((current) => current.filter((entry) => entry.id !== member.id))
 
       await refreshBoard(selectedProjectId, result.message)
     })
@@ -339,7 +331,7 @@ export default function TeamDeliverables({
 
     setDeliverableAssigneeId(deliverable.assigneeId)
 
-    setParentDeliverableId(deliverable.parentDeliverableId ?? "")
+    setParentDeliverableId(deliverable.parentDeliverableId ?? '')
 
     setShowDeliverableForm(true)
   }
@@ -347,15 +339,15 @@ export default function TeamDeliverables({
   function resetDeliverableForm() {
     setEditingDeliverable(undefined)
 
-    setDeliverableTitle("")
+    setDeliverableTitle('')
 
-    setDeliverableDescription("")
+    setDeliverableDescription('')
 
-    setDeliverableDueAt("")
+    setDeliverableDueAt('')
 
-    setDeliverableAssigneeId("")
+    setDeliverableAssigneeId('')
 
-    setParentDeliverableId("")
+    setParentDeliverableId('')
 
     setShowDeliverableForm(false)
   }
@@ -368,15 +360,13 @@ export default function TeamDeliverables({
     const dueAt = toIsoDateTime(deliverableDueAt)
 
     if (!dueAt) {
-      reportError("Enter a valid milestone date and time.")
+      reportError('Enter a valid milestone date and time.')
 
       return
     }
 
     if (deadlineIsLate(dueAt, board.project.finalDeadline)) {
-      reportError(
-        "Milestones must be due at least 72 hours before final submission.",
-      )
+      reportError('Milestones must be due at least 72 hours before final submission.')
 
       return
     }
@@ -443,10 +433,7 @@ export default function TeamDeliverables({
   const hasLateDate =
     Boolean(board) &&
     Boolean(deliverableDueAt) &&
-    deadlineIsLate(
-      toIsoDateTime(deliverableDueAt),
-      board!.project.finalDeadline,
-    )
+    deadlineIsLate(toIsoDateTime(deliverableDueAt), board!.project.finalDeadline)
 
   return (
     <div className="grid gap-4">
@@ -469,11 +456,11 @@ export default function TeamDeliverables({
             onClick={() => {
               setEditingProject(false)
 
-              setProjectTitle("")
+              setProjectTitle('')
 
-              setProjectDescription("")
+              setProjectDescription('')
 
-              setProjectFinalDeadline("")
+              setProjectFinalDeadline('')
 
               setShowProjectForm((current) => !current)
             }}
@@ -491,9 +478,9 @@ export default function TeamDeliverables({
                 onChange={(event) => {
                   setSelectedProjectId(event.target.value)
 
-                  setError("")
+                  setError('')
 
-                  setNotice("")
+                  setNotice('')
                 }}
                 value={selectedProjectId}
               >
@@ -505,11 +492,7 @@ export default function TeamDeliverables({
               </select>
             </label>
             {isOwner && (
-              <button
-                className="button"
-                onClick={beginEditProject}
-                type="button"
-              >
+              <button className="button" onClick={beginEditProject} type="button">
                 Edit project
               </button>
             )}
@@ -521,7 +504,7 @@ export default function TeamDeliverables({
             onSubmit={submitProject}
           >
             <h2 className="text-sm font-semibold">
-              {editingProject ? "Edit project" : "Create a team project"}
+              {editingProject ? 'Edit project' : 'Create a team project'}
             </h2>
             <div className="grid gap-3 md:grid-cols-2">
               <label className={labelClassName}>
@@ -538,9 +521,7 @@ export default function TeamDeliverables({
                 Final submission
                 <input
                   className={fieldClassName}
-                  onChange={(event) =>
-                    setProjectFinalDeadline(event.target.value)
-                  }
+                  onChange={(event) => setProjectFinalDeadline(event.target.value)}
                   required
                   type="datetime-local"
                   value={projectFinalDeadline}
@@ -558,16 +539,8 @@ export default function TeamDeliverables({
               />
             </label>
             <div className="flex gap-2">
-              <button
-                className="button button--primary"
-                disabled={pending}
-                type="submit"
-              >
-                {pending
-                  ? "Saving…"
-                  : editingProject
-                    ? "Save project"
-                    : "Create project"}
+              <button className="button button--primary" disabled={pending} type="submit">
+                {pending ? 'Saving…' : editingProject ? 'Save project' : 'Create project'}
               </button>
               <button
                 className="button"
@@ -583,17 +556,15 @@ export default function TeamDeliverables({
           </form>
         )}
         {loading && (
-          <p className="p-4 text-sm text-[var(--muted)]">
-            Loading team projects…
-          </p>
+          <p className="p-4 text-sm text-[var(--muted)]">Loading team projects…</p>
         )}
         {!loading && projects.length === 0 && !showProjectForm && (
           <div className="empty-state compact">
             <span>NO TEAM PROJECTS</span>
             <strong>Create a project workspace</strong>
             <p>
-              Set the final deadline, add existing teammates, and break the work
-              into owned milestones.
+              Set the final deadline, add existing teammates, and break the work into
+              owned milestones.
             </p>
           </div>
         )}
@@ -622,7 +593,7 @@ export default function TeamDeliverables({
                   {board.members.map((member) => (
                     <span className="tag" key={member.id}>
                       {member.name} @{member.username}
-                      {member.role === "owner" ? " · OWNER" : ""}
+                      {member.role === 'owner' ? ' · OWNER' : ''}
                     </span>
                   ))}
                 </div>
@@ -654,10 +625,8 @@ export default function TeamDeliverables({
                         key={member.id}
                       >
                         <span className="text-xs">
-                          {member.name}{" "}
-                          <span className="text-[var(--muted)]">
-                            @{member.username}
-                          </span>
+                          {member.name}{' '}
+                          <span className="text-[var(--muted)]">@{member.username}</span>
                         </span>
                         <button
                           className="button"
@@ -697,9 +666,7 @@ export default function TeamDeliverables({
                 onSubmit={submitDeliverable}
               >
                 <h2 className="text-sm font-semibold">
-                  {editingDeliverable
-                    ? "Edit deliverable"
-                    : "New sub-deliverable"}
+                  {editingDeliverable ? 'Edit deliverable' : 'New sub-deliverable'}
                 </h2>
                 <div className="grid gap-3 md:grid-cols-2">
                   <label className={labelClassName}>
@@ -707,9 +674,7 @@ export default function TeamDeliverables({
                     <input
                       className={fieldClassName}
                       maxLength={160}
-                      onChange={(event) =>
-                        setDeliverableTitle(event.target.value)
-                      }
+                      onChange={(event) => setDeliverableTitle(event.target.value)}
                       required
                       value={deliverableTitle}
                     />
@@ -718,9 +683,7 @@ export default function TeamDeliverables({
                     Assigned teammate
                     <select
                       className={fieldClassName}
-                      onChange={(event) =>
-                        setDeliverableAssigneeId(event.target.value)
-                      }
+                      onChange={(event) => setDeliverableAssigneeId(event.target.value)}
                       required
                       value={deliverableAssigneeId}
                     >
@@ -736,9 +699,7 @@ export default function TeamDeliverables({
                     Target deadline
                     <input
                       className={fieldClassName}
-                      onChange={(event) =>
-                        setDeliverableDueAt(event.target.value)
-                      }
+                      onChange={(event) => setDeliverableDueAt(event.target.value)}
                       required
                       type="datetime-local"
                       value={deliverableDueAt}
@@ -748,9 +709,7 @@ export default function TeamDeliverables({
                     Parent deliverable
                     <select
                       className={fieldClassName}
-                      onChange={(event) =>
-                        setParentDeliverableId(event.target.value)
-                      }
+                      onChange={(event) => setParentDeliverableId(event.target.value)}
                       value={parentDeliverableId}
                     >
                       <option value="">Project root</option>
@@ -771,9 +730,7 @@ export default function TeamDeliverables({
                   <textarea
                     className={fieldClassName}
                     maxLength={2000}
-                    onChange={(event) =>
-                      setDeliverableDescription(event.target.value)
-                    }
+                    onChange={(event) => setDeliverableDescription(event.target.value)}
                     rows={2}
                     value={deliverableDescription}
                   />
@@ -785,8 +742,7 @@ export default function TeamDeliverables({
                       Deadline is past the 72-hour peer-review freeze (
                       {deadlineLabel(
                         new Date(
-                          Date.parse(board.project.finalDeadline) -
-                            72 * 60 * 60 * 1000,
+                          Date.parse(board.project.finalDeadline) - 72 * 60 * 60 * 1000,
                         ).toISOString(),
                       )}
                       ).
@@ -800,16 +756,12 @@ export default function TeamDeliverables({
                     type="submit"
                   >
                     {pending
-                      ? "Saving…"
+                      ? 'Saving…'
                       : editingDeliverable
-                        ? "Save changes"
-                        : "Create deliverable"}
+                        ? 'Save changes'
+                        : 'Create deliverable'}
                   </button>
-                  <button
-                    className="button"
-                    onClick={resetDeliverableForm}
-                    type="button"
-                  >
+                  <button className="button" onClick={resetDeliverableForm} type="button">
                     Cancel
                   </button>
                 </div>
@@ -820,8 +772,8 @@ export default function TeamDeliverables({
                 <span>NO MILESTONES</span>
                 <strong>Break the project into assigned work</strong>
                 <p>
-                  Every milestone needs an assignee and a target at least 72
-                  hours before final submission.
+                  Every milestone needs an assignee and a target at least 72 hours before
+                  final submission.
                 </p>
               </div>
             ) : (
@@ -866,9 +818,7 @@ export default function TeamDeliverables({
                                 {isOwner && (
                                   <button
                                     className="button"
-                                    onClick={() =>
-                                      beginEditDeliverable(deliverable)
-                                    }
+                                    onClick={() => beginEditDeliverable(deliverable)}
                                     type="button"
                                   >
                                     Edit
@@ -886,9 +836,7 @@ export default function TeamDeliverables({
                               <div className="mt-3 flex items-center justify-between gap-2">
                                 <span
                                   className={`tag ${
-                                    deliverable.status === "done"
-                                      ? "tag--green"
-                                      : ""
+                                    deliverable.status === 'done' ? 'tag--green' : ''
                                   }`}
                                 >
                                   {deliverable.status.toUpperCase()}
@@ -907,9 +855,7 @@ export default function TeamDeliverables({
                                     value={deliverable.status}
                                   >
                                     <option value="open">Open</option>
-                                    <option value="in-progress">
-                                      In progress
-                                    </option>
+                                    <option value="in-progress">In progress</option>
                                     <option value="done">Done</option>
                                   </select>
                                 )}

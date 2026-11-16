@@ -681,7 +681,7 @@
       "files_or_areas": [
         "src/collections/",
         "src/app/(frontend)/",
-        "GitHub Issues #1–#10"
+        "GitHub Issues #1\u2013#10"
       ],
       "observed_baseline": "Source review found Users, Tasks, CalendarEvents, Courses, Payload actions and app UI; not runtime-verified",
       "definition_of_done": [
@@ -1343,7 +1343,7 @@
       "title": "Configure lint and run checks without errors",
       "phase": "P4-quality",
       "priority": "P1",
-      "status": "not_started",
+      "status": "partial",
       "owner_proposed": "Chris",
       "owner_confirmed": false,
       "depends_on": [],
@@ -1360,9 +1360,16 @@
         "Add an appropriate lint/check command",
         "Run it, address reported issues, and capture command/result"
       ],
-      "evidence": [],
-      "implementation_notes": [],
-      "last_updated_on": "2026-11-15"
+      "evidence": [
+        "pnpm lint \u2014 passed with zero warnings",
+        "pnpm test:isolation \u2014 passed: 11 dedicated test files; no embedded tests",
+        "pnpm test \u2014 220 passed, 5 expected failures, 3 skipped; 2 emulator test files skipped",
+        "pnpm exec tsc --noEmit --incremental false \u2014 passed"
+      ],
+      "implementation_notes": [
+        "User authorized lint/test-isolation fixes and direct push to main. Branch chore/sprint2-lint-checks adds ESLint flat config, TypeScript dependencies, dedicated-test-file check, UTC test timezone, and app-source formatting. Managed Payload routes, schemas and environment files unchanged. Team review remains pending."
+      ],
+      "last_updated_on": "2026-11-16"
     },
     {
       "id": "T26",
@@ -1413,7 +1420,7 @@
         "GitHub Issues",
         "GitHub Project"
       ],
-      "observed_baseline": "GitHub Issues #1–#10 exist; board status and current assignments not verified",
+      "observed_baseline": "GitHub Issues #1\u2013#10 exist; board status and current assignments not verified",
       "definition_of_done": [
         "Issue assignments and acceptance criteria match plan",
         "In-progress/done statuses updated as work genuinely moves",
@@ -1627,10 +1634,10 @@
       ],
       "evidence": [
         "feature/theme-customizer; local HEAD and main both remain eeedef36a775d0d497a8719adbb638d86cc2b8d0",
-        "node_modules/.bin/tsc.cmd --noEmit — passed",
-        "node_modules/.bin/vitest.cmd run — 1 test file passed; 3 tests passed and 3 skipped",
-        "node scripts/validate-sprint2-progress.mjs — passed with 34 tasks",
-        "http://localhost:3000/ — authenticated dashboard preview displayed the theme dialog and preset/color controls"
+        "node_modules/.bin/tsc.cmd --noEmit \u2014 passed",
+        "node_modules/.bin/vitest.cmd run \u2014 1 test file passed; 3 tests passed and 3 skipped",
+        "node scripts/validate-sprint2-progress.mjs \u2014 passed with 34 tasks",
+        "http://localhost:3000/ \u2014 authenticated dashboard preview displayed the theme dialog and preset/color controls"
       ],
       "implementation_notes": [
         "User approved adding this scoped task for Issue #9; T02 remains unchanged.",
@@ -1848,6 +1855,15 @@
         "node_modules/.bin/tsc.cmd --noEmit",
         "node_modules/.bin/vitest.cmd run",
         "http://localhost:3000/"
+      ]
+    },
+    {
+      "on": "2026-11-16",
+      "actor": "user-authorized coding agent",
+      "change": "Recorded T25 lint and test-isolation checks; retained partial status pending team review. Updated oxfmt after 0.2 produced invalid TypeScript; invalid output reverted before validation.",
+      "evidence": [
+        "chore/sprint2-lint-checks",
+        "docs/sprint2/lint-test-checks.md"
       ]
     }
   ]

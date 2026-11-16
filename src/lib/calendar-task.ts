@@ -10,9 +10,7 @@ export type CalendarAssignmentInput = {
 export function taskDataFromCalendarAssignment(event: CalendarAssignmentInput) {
   const lower = event.title.toLowerCase()
   const courseMatch = event.title.match(/\b[A-Z]{2,5}[- ](\d{4})\b/)
-  const classLevel = (courseMatch
-    ? `${courseMatch[1][0]}000`
-    : '3000') as ClassLevel
+  const classLevel = (courseMatch ? `${courseMatch[1][0]}000` : '3000') as ClassLevel
   const assignmentType: AssignmentType =
     lower.includes('final') || lower.includes('midterm') || lower.includes('exam')
       ? 'exam'

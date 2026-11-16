@@ -60,13 +60,15 @@ describe.skipIf(!emulatorAvailable)('Firestore app-data repository', () => {
     expect(tasks).toHaveLength(1)
     expect(tasks[0].calendarEventId).toBeTruthy()
 
-    await expect(setUserEventCompleted(otherUserId, tasks[0].calendarEventId!, true)).rejects.toThrow(
-      'Event not found.',
-    )
+    await expect(
+      setUserEventCompleted(otherUserId, tasks[0].calendarEventId!, true),
+    ).rejects.toThrow('Event not found.')
     await setUserEventCompleted(ownerId, tasks[0].calendarEventId!, true)
 
     expect((await listUserTasks(ownerId))[0].status).toBe('done')
-    expect((await listUserEvents(ownerId, new Date(0).toISOString()))[0].completed).toBe(true)
+    expect((await listUserEvents(ownerId, new Date(0).toISOString()))[0].completed).toBe(
+      true,
+    )
     expect(await listUserTasks(otherUserId)).toHaveLength(0)
   })
 
@@ -82,7 +84,9 @@ describe.skipIf(!emulatorAvailable)('Firestore app-data repository', () => {
     const course = await createUserCourse(ownerId, input)
     expect(await listUserCourses(ownerId)).toEqual([course])
     expect(await listUserCourses(otherUserId)).toHaveLength(0)
-    await expect(createUserCourse(ownerId, input)).rejects.toThrow('already have a course')
+    await expect(createUserCourse(ownerId, input)).rejects.toThrow(
+      'already have a course',
+    )
 
     const updated = await updateUserCourse(ownerId, course.id, {
       color: 'green',
@@ -103,7 +107,9 @@ describe.skipIf(!emulatorAvailable)('Firestore app-data repository', () => {
       estimatedMinutes: 90,
       title: 'Course project',
     })
-    await expect(deleteUserCourse(ownerId, course.id)).rejects.toThrow('linked tasks and events')
+    await expect(deleteUserCourse(ownerId, course.id)).rejects.toThrow(
+      'linked tasks and events',
+    )
 
     await clearOwnedRecords('tasks', ownerId)
     await deleteUserCourse(ownerId, course.id)

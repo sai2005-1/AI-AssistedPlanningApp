@@ -23,7 +23,10 @@ function usernameKey(username: string) {
   return username.trim().toLocaleLowerCase('en-US')
 }
 
-function profileFromData(id: string, data: FirebaseFirestore.DocumentData): AppUser | null {
+function profileFromData(
+  id: string,
+  data: FirebaseFirestore.DocumentData,
+): AppUser | null {
   if (
     typeof data.email !== 'string' ||
     typeof data.name !== 'string' ||
@@ -88,10 +91,7 @@ async function currentUser(): Promise<AppUser | null> {
   }
 }
 
-async function signup(
-  idToken: string,
-  input: { name: string; username: string },
-) {
+async function signup(idToken: string, input: { name: string; username: string }) {
   const auth = getFirebaseAdminAuth()
   const decoded = await auth.verifyIdToken(idToken, true)
   const email = decoded.email?.trim().toLowerCase()
@@ -121,9 +121,10 @@ async function signup(
       name: input.name,
       role: 'student',
       username: input.username,
-      createdAt: typeof existingUser.data()?.createdAt === 'string'
-        ? existingUser.data()!.createdAt
-        : now,
+      createdAt:
+        typeof existingUser.data()?.createdAt === 'string'
+          ? existingUser.data()!.createdAt
+          : now,
       updatedAt: now,
     }
     transaction.set(userRef, profile, { merge: true })
@@ -147,10 +148,14 @@ async function logout() {
     try {
       const db = getTeamFirestore()
       for (const collection of ['tasks', 'calendarEvents']) {
-        const records = await db.collection(collection).where('ownerId', '==', user.id).get()
+        const records = await db
+          .collection(collection)
+          .where('ownerId', '==', user.id)
+          .get()
         for (let index = 0; index < records.docs.length; index += 400) {
           const batch = db.batch()
-          for (const record of records.docs.slice(index, index + 400)) batch.delete(record.ref)
+          for (const record of records.docs.slice(index, index + 400))
+            batch.delete(record.ref)
           await batch.commit()
         }
       }

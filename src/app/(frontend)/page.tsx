@@ -23,7 +23,9 @@ export default async function HomePage() {
     careerValue: Number(task.careerValue ?? 0),
     classLevel: task.classLevel,
     consequence: Number(task.consequence ?? 0),
-    courseCode: task.courseId ? String(courseCodes.get(task.courseId) ?? '') || undefined : undefined,
+    courseCode: task.courseId
+      ? String(courseCodes.get(task.courseId) ?? '') || undefined
+      : undefined,
     dueDate: task.dueDate ?? undefined,
     estimatedMinutes: Number(task.estimatedMinutes ?? 60),
     goalAlignment: Number(task.goalAlignment ?? 0),
@@ -49,7 +51,9 @@ export default async function HomePage() {
     title: event.title,
   }))
 
-  const persistedEventIds = new Set(tasks.map((task) => task.calendarEventId).filter(Boolean))
+  const persistedEventIds = new Set(
+    tasks.map((task) => task.calendarEventId).filter(Boolean),
+  )
   for (const event of calendarEvents) {
     if (event.kind !== 'deadline' || persistedEventIds.has(event.id)) continue
     const inferred = taskDataFromCalendarAssignment(event)

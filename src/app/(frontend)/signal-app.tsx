@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import {
   useEffect,
@@ -8,10 +8,10 @@ import {
   useTransition,
   type FormEvent,
   type ReactNode,
-} from "react"
+} from 'react'
 
-import { useRouter } from "next/navigation"
-import { signOut as signOutFirebase } from "firebase/auth"
+import { useRouter } from 'next/navigation'
+import { signOut as signOutFirebase } from 'firebase/auth'
 
 import {
   createCourseAction,
@@ -23,26 +23,35 @@ import {
   setCalendarEventCompletedAction,
   setTaskCompletedAction,
   updateCourseAction,
-} from "./actions"
+} from './actions'
 
-import { logoutAction } from "./auth-actions"
-import { advisorChatAction } from "./advisor-actions"
+import { logoutAction } from './auth-actions'
+import { advisorChatAction } from './advisor-actions'
 import {
   classifyLocalCommand,
   MAX_PROMPT_CHARS,
   recentChatHistory,
   type ChatTurn,
-} from "../../lib/advisor-chat"
+} from '../../lib/advisor-chat'
 
-import TeamDeliverables from "./team-deliverables"
+import TeamDeliverables from './team-deliverables'
 
-import type { AssignmentType, ClassLevel } from "@/lib/scoring"
+import type { AssignmentType, ClassLevel } from '@/lib/scoring'
 
-import type { AppUser } from "@/lib/app-auth"
-import { getFirebaseClientAuth } from "@/lib/firebase-client"
-import type { AppCourse } from "@/lib/app-data"
+import type { AppUser } from '@/lib/app-auth'
+import { getFirebaseClientAuth } from '@/lib/firebase-client'
+import type { AppCourse } from '@/lib/app-data'
 
-type Screen = "dashboard" | "score" | "calendar" | "time" | "copilot" | "advisor" | "team" | "completed" | "courses"
+type Screen =
+  | 'dashboard'
+  | 'score'
+  | 'calendar'
+  | 'time'
+  | 'copilot'
+  | 'advisor'
+  | 'team'
+  | 'completed'
+  | 'courses'
 
 export type TaskView = {
   academicValue: number
@@ -59,7 +68,7 @@ export type TaskView = {
   neglectFactor: number
   plannedStart?: string
   score: number
-  status: "open" | "scheduled" | "done"
+  status: 'open' | 'scheduled' | 'done'
   title: string
   urgency: number
   workload: number
@@ -72,7 +81,7 @@ export type CalendarEventView = {
 
   id: string
 
-  kind: "class" | "lab" | "office" | "deadline" | "study" | "other"
+  kind: 'class' | 'lab' | 'office' | 'deadline' | 'study' | 'other'
 
   location?: string
 
@@ -83,7 +92,7 @@ export type CalendarEventView = {
 
 type Message = {
   id: number
-  role: "assistant" | "user"
+  role: 'assistant' | 'user'
   text: string
 }
 
@@ -98,85 +107,85 @@ type ThemeColors = {
 type ThemeColorKey = keyof ThemeColors
 
 const themeColorKeys: ThemeColorKey[] = [
-  "accent",
-  "background",
-  "surface",
-  "card",
-  "text",
+  'accent',
+  'background',
+  'surface',
+  'card',
+  'text',
 ]
 
 const defaultTheme: ThemeColors = {
-  accent: "#3a76f0",
-  background: "#0b0c0e",
-  surface: "#121212",
-  card: "#1e1e1e",
-  text: "#f3f4f6",
+  accent: '#3a76f0',
+  background: '#0b0c0e',
+  surface: '#121212',
+  card: '#1e1e1e',
+  text: '#f3f4f6',
 }
 
 const themePresets: { id: string; label: string; colors: ThemeColors }[] = [
-  { id: "signal", label: "Signal", colors: defaultTheme },
+  { id: 'signal', label: 'Signal', colors: defaultTheme },
   {
-    id: "forest",
-    label: "Forest",
+    id: 'forest',
+    label: 'Forest',
     colors: {
-      accent: "#38b58d",
-      background: "#0d1412",
-      surface: "#141d1a",
-      card: "#202b26",
-      text: "#f1f5f2",
+      accent: '#38b58d',
+      background: '#0d1412',
+      surface: '#141d1a',
+      card: '#202b26',
+      text: '#f1f5f2',
     },
   },
   {
-    id: "ember",
-    label: "Ember",
+    id: 'ember',
+    label: 'Ember',
     colors: {
-      accent: "#f08a55",
-      background: "#17110e",
-      surface: "#211814",
-      card: "#30211b",
-      text: "#f8f2ed",
+      accent: '#f08a55',
+      background: '#17110e',
+      surface: '#211814',
+      card: '#30211b',
+      text: '#f8f2ed',
     },
   },
   {
-    id: "orchid",
-    label: "Orchid",
+    id: 'orchid',
+    label: 'Orchid',
     colors: {
-      accent: "#b18cf3",
-      background: "#120f19",
-      surface: "#1b1724",
-      card: "#292235",
-      text: "#f6f1fb",
+      accent: '#b18cf3',
+      background: '#120f19',
+      surface: '#1b1724',
+      card: '#292235',
+      text: '#f6f1fb',
     },
   },
   {
-    id: "tide",
-    label: "Tide",
+    id: 'tide',
+    label: 'Tide',
     colors: {
-      accent: "#6ab4c2",
-      background: "#0e1418",
-      surface: "#151e23",
-      card: "#202d33",
-      text: "#edf4f6",
+      accent: '#6ab4c2',
+      background: '#0e1418',
+      surface: '#151e23',
+      card: '#202d33',
+      text: '#edf4f6',
     },
   },
 ]
 
 const themeColorOptions: { key: ThemeColorKey; label: string }[] = [
-  { key: "accent", label: "Accent" },
-  { key: "background", label: "Page background" },
-  { key: "surface", label: "Panel surface" },
-  { key: "card", label: "Card surface" },
-  { key: "text", label: "Main text" },
+  { key: 'accent', label: 'Accent' },
+  { key: 'background', label: 'Page background' },
+  { key: 'surface', label: 'Panel surface' },
+  { key: 'card', label: 'Card surface' },
+  { key: 'text', label: 'Main text' },
 ]
 
-const themeStorageKey = "signal-theme-colors"
+const themeStorageKey = 'signal-theme-colors'
 
 function isThemeColors(value: unknown): value is ThemeColors {
-  if (typeof value !== "object" || value === null) return false
+  if (typeof value !== 'object' || value === null) return false
 
   for (const key of themeColorKeys) {
     const color = (value as Record<string, unknown>)[key]
-    if (typeof color !== "string" || !/^#[0-9a-f]{6}$/i.test(color)) {
+    if (typeof color !== 'string' || !/^#[0-9a-f]{6}$/i.test(color)) {
       return false
     }
   }
@@ -189,23 +198,23 @@ function matchesTheme(left: ThemeColors, right: ThemeColors) {
 }
 
 const nav: { id: Screen; label: string; index: string }[] = [
-  { id: "dashboard", label: "Priority feed", index: "01" },
+  { id: 'dashboard', label: 'Priority feed', index: '01' },
 
-  { id: "score", label: "Score anatomy", index: "02" },
+  { id: 'score', label: 'Score anatomy', index: '02' },
 
-  { id: "calendar", label: "Semester map", index: "03" },
+  { id: 'calendar', label: 'Semester map', index: '03' },
 
-  { id: "time", label: "Time allocator", index: "04" },
+  { id: 'time', label: 'Time allocator', index: '04' },
 
-  { id: "copilot", label: "Quick add", index: "05" },
+  { id: 'copilot', label: 'Quick add', index: '05' },
 
-  { id: "advisor", label: "AI advisor", index: "06" },
+  { id: 'advisor', label: 'AI advisor', index: '06' },
 
-  { id: "team", label: "Team deliverables", index: "07" },
+  { id: 'team', label: 'Team deliverables', index: '07' },
 
-  { id: "completed", label: "Completed", index: "08" },
+  { id: 'completed', label: 'Completed', index: '08' },
 
-  { id: "courses", label: "Courses", index: "09" },
+  { id: 'courses', label: 'Courses', index: '09' },
 ]
 
 function Button({
@@ -215,9 +224,9 @@ function Button({
 
   onClick,
 
-  tone = "default",
+  tone = 'default',
 
-  type = "button",
+  type = 'button',
 }: {
   children: ReactNode
 
@@ -225,9 +234,9 @@ function Button({
 
   onClick?: () => void
 
-  tone?: "default" | "primary" | "danger"
+  tone?: 'default' | 'primary' | 'danger'
 
-  type?: "button" | "submit"
+  type?: 'button' | 'submit'
 }) {
   return (
     <button
@@ -244,18 +253,18 @@ function Button({
 function Tag({
   children,
 
-  tone = "neutral",
+  tone = 'neutral',
 }: {
   children: ReactNode
 
-  tone?: "neutral" | "blue" | "green" | "red"
+  tone?: 'neutral' | 'blue' | 'green' | 'red'
 }) {
   return <span className={`tag tag--${tone}`}>{children}</span>
 }
 
 function Panel({
   children,
-  className = "",
+  className = '',
 }: {
   children: ReactNode
   className?: string
@@ -263,13 +272,7 @@ function Panel({
   return <section className={`panel ${className}`}>{children}</section>
 }
 
-function Kicker({
-  children,
-  right,
-}: {
-  children: ReactNode
-  right?: ReactNode
-}) {
+function Kicker({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
     <div className="kicker">
       <span>{children}</span>
@@ -279,11 +282,11 @@ function Kicker({
 }
 
 function dueLabel(value?: string) {
-  if (!value) return "No hard deadline"
+  if (!value) return 'No hard deadline'
 
   const hours = Math.round((new Date(value).getTime() - Date.now()) / 3_600_000)
 
-  if (hours < 0) return "Past due"
+  if (hours < 0) return 'Past due'
 
   if (hours < 24) return `Due in ${Math.max(1, hours)}h`
 
@@ -294,45 +297,31 @@ function plannedLabel(value?: string) {
   if (!value) return undefined
 
   return `Start ${new Date(value).toLocaleString([], {
-    day: "numeric",
+    day: 'numeric',
 
-    hour: "2-digit",
+    hour: '2-digit',
 
-    minute: "2-digit",
+    minute: '2-digit',
 
-    month: "short",
+    month: 'short',
   })}`
 }
 
-function Bars({
-  compact = false,
-  task,
-}: {
-  compact?: boolean
-  task: TaskView
-}) {
+function Bars({ compact = false, task }: { compact?: boolean; task: TaskView }) {
   const vectors = [
-    ["Urgency", task.urgency, dueLabel(task.dueDate)],
+    ['Urgency', task.urgency, dueLabel(task.dueDate)],
 
-    [
-      "Academic value",
-      task.academicValue,
-      `${task.classLevel} · ${task.assignmentType}`,
-    ],
+    ['Academic value', task.academicValue, `${task.classLevel} · ${task.assignmentType}`],
 
-    ["Career value", task.careerValue, "Career alignment"],
+    ['Career value', task.careerValue, 'Career alignment'],
 
-    ["Goal alignment", task.goalAlignment, "Declared goal fit"],
+    ['Goal alignment', task.goalAlignment, 'Declared goal fit'],
 
-    ["Consequence", task.consequence, "Cost of delay"],
+    ['Consequence', task.consequence, 'Cost of delay'],
 
-    [
-      "Workload",
-      task.workload,
-      `${Math.round(task.estimatedMinutes / 60)}h estimated`,
-    ],
+    ['Workload', task.workload, `${Math.round(task.estimatedMinutes / 60)}h estimated`],
 
-    ["Neglect factor", task.neglectFactor, "Time since last progress"],
+    ['Neglect factor', task.neglectFactor, 'Time since last progress'],
   ] as const
 
   const items = compact ? vectors.slice(0, 4) : vectors
@@ -389,55 +378,51 @@ function Dashboard({
 
   tasks: TaskView[]
 }) {
-  const upcomingTasks = tasks.filter((item) => item.status !== "done")
+  const upcomingTasks = tasks.filter((item) => item.status !== 'done')
 
   const task = upcomingTasks[selected] ?? upcomingTasks[0]
 
   return (
     <div className="dashboard-grid">
       <Panel className="priority-panel">
-        <Kicker right={<span>RANKED / LIVE</span>}>
-          TODAY&apos;S PRIORITIES
-        </Kicker>
+        <Kicker right={<span>RANKED / LIVE</span>}>TODAY&apos;S PRIORITIES</Kicker>
         {!upcomingTasks.length ? (
-          <EmptyState onAdd={() => go("copilot")} />
+          <EmptyState onAdd={() => go('copilot')} />
         ) : (
           <div className="priority-list">
             {upcomingTasks.map((item, index) => (
               <button
-                className={`task ${selected === index ? "task--active" : ""} ${
-                  item.status === "done" ? "task--done" : ""
+                className={`task ${selected === index ? 'task--active' : ''} ${
+                  item.status === 'done' ? 'task--done' : ''
                 }`}
                 key={item.id}
                 onClick={() => setSelected(index)}
               >
-                <span className="task-rank">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+                <span className="task-rank">{String(index + 1).padStart(2, '0')}</span>
                 <span className="task-main">
                   <strong>{item.title}</strong>
                   <small>
-                    {item.status === "done"
-                      ? "COMPLETED"
+                    {item.status === 'done'
+                      ? 'COMPLETED'
                       : `${item.courseCode ?? item.assignmentType} · ${
                           plannedLabel(item.plannedStart)
                             ? `${plannedLabel(item.plannedStart)} · `
-                            : ""
+                            : ''
                         }${dueLabel(item.dueDate)}`}
                   </small>
                 </span>
                 <span
                   className={`score ${
                     item.score >= 70
-                      ? "score--blue"
+                      ? 'score--blue'
                       : item.score >= 45
-                        ? "score--green"
-                        : "score--neutral"
+                        ? 'score--green'
+                        : 'score--neutral'
                   }`}
                   onClick={(event) => {
                     event.stopPropagation()
 
-                    go("score")
+                    go('score')
                   }}
                 >
                   {item.score}
@@ -448,9 +433,7 @@ function Dashboard({
         )}
       </Panel>
       <Panel className="inspect-panel">
-        <Kicker right={<Tag tone="blue">LIVE MODEL</Tag>}>
-          WHY THIS SCORE?
-        </Kicker>
+        <Kicker right={<Tag tone="blue">LIVE MODEL</Tag>}>WHY THIS SCORE?</Kicker>
         {task ? (
           <>
             <div className="inspect-title">
@@ -462,11 +445,10 @@ function Dashboard({
             </div>
             <Bars compact task={task} />
             <p className="explain">
-              Signal combines deadline pressure with course level, assignment
-              type, goals, and recent neglect. Scores recalculate whenever the
-              task changes.
+              Signal combines deadline pressure with course level, assignment type, goals,
+              and recent neglect. Scores recalculate whenever the task changes.
             </p>
-            <Button onClick={() => go("score")}>View all 7 vectors</Button>
+            <Button onClick={() => go('score')}>View all 7 vectors</Button>
             <Button onClick={() => onCompleted(task)} tone="primary">
               Mark complete
             </Button>
@@ -477,7 +459,7 @@ function Dashboard({
           </div>
         )}
       </Panel>
-      <button className="quick-strip" onClick={() => go("copilot")}>
+      <button className="quick-strip" onClick={() => go('copilot')}>
         <span>+</span>
         <span>Quick Add:</span>
         <em>&quot;OS lab due Friday, 2 hours&quot;</em>
@@ -496,13 +478,11 @@ function CompletedScreen({
 
   tasks: TaskView[]
 }) {
-  const completed = tasks.filter((task) => task.status === "done")
+  const completed = tasks.filter((task) => task.status === 'done')
 
   return (
     <Panel className="completed-panel">
-      <Kicker right={<span>{completed.length} ARCHIVED</span>}>
-        COMPLETED TASKS
-      </Kicker>
+      <Kicker right={<span>{completed.length} ARCHIVED</span>}>COMPLETED TASKS</Kicker>
       {completed.length ? (
         <div className="completed-list">
           {completed.map((task) => (
@@ -510,9 +490,7 @@ function CompletedScreen({
               <span>✓</span>
               <div>
                 <strong>{task.title}</strong>
-                <small>
-                  {task.courseCode ?? task.assignmentType} · COMPLETED
-                </small>
+                <small>{task.courseCode ?? task.assignmentType} · COMPLETED</small>
               </div>
               <Button onClick={() => onRestore(task)}>Restore</Button>
             </article>
@@ -521,9 +499,7 @@ function CompletedScreen({
       ) : (
         <div className="empty-state">
           <strong>No completed tasks yet</strong>
-          <p>
-            Checked assignments and micro-reviews will move here automatically.
-          </p>
+          <p>Checked assignments and micro-reviews will move here automatically.</p>
         </div>
       )}
     </Panel>
@@ -541,12 +517,12 @@ function CoursesScreen({
   onUpdated: (course: AppCourse, message: string) => void
   onRemoved: (courseId: string, message: string) => void
 }) {
-  const [code, setCode] = useState("")
-  const [name, setName] = useState("")
-  const [level, setLevel] = useState<ClassLevel>("3000")
-  const [color, setColor] = useState<AppCourse["color"]>("blue")
+  const [code, setCode] = useState('')
+  const [name, setName] = useState('')
+  const [level, setLevel] = useState<ClassLevel>('3000')
+  const [color, setColor] = useState<AppCourse['color']>('blue')
   const [editingId, setEditingId] = useState<string>()
-  const [status, setStatus] = useState("")
+  const [status, setStatus] = useState('')
   const [pending, startTransition] = useTransition()
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -560,8 +536,8 @@ function CoursesScreen({
       if (editingId) onUpdated(result.data, result.message)
       else onCreated(result.data, result.message)
       setEditingId(undefined)
-      setCode("")
-      setName("")
+      setCode('')
+      setName('')
     })
   }
 
@@ -571,7 +547,7 @@ function CoursesScreen({
     setName(course.name)
     setLevel(course.level)
     setColor(course.color)
-    setStatus("")
+    setStatus('')
   }
 
   function remove(courseId: string) {
@@ -589,17 +565,38 @@ function CoursesScreen({
         {courses.length ? (
           <div className="divide-y divide-[var(--line)] px-4">
             {courses.map((course) => (
-              <div className="flex items-center justify-between gap-3 py-3" key={course.id}>
+              <div
+                className="flex items-center justify-between gap-3 py-3"
+                key={course.id}
+              >
                 <div className="flex items-center gap-3">
-                  <Tag tone={course.color === "green" ? "green" : course.color === "gray" ? "neutral" : "blue"}>{course.code}</Tag>
+                  <Tag
+                    tone={
+                      course.color === 'green'
+                        ? 'green'
+                        : course.color === 'gray'
+                          ? 'neutral'
+                          : 'blue'
+                    }
+                  >
+                    {course.code}
+                  </Tag>
                   <div>
                     <strong className="block text-sm">{course.name}</strong>
                     <small className="text-[var(--muted)]">{course.level} LEVEL</small>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button disabled={pending} onClick={() => edit(course)}>Edit</Button>
-                  <Button disabled={pending} onClick={() => remove(course.id)} tone="danger">Remove</Button>
+                  <Button disabled={pending} onClick={() => edit(course)}>
+                    Edit
+                  </Button>
+                  <Button
+                    disabled={pending}
+                    onClick={() => remove(course.id)}
+                    tone="danger"
+                  >
+                    Remove
+                  </Button>
                 </div>
               </div>
             ))}
@@ -612,7 +609,7 @@ function CoursesScreen({
         )}
       </Panel>
       <Panel>
-        <Kicker>{editingId ? "EDIT COURSE" : "ADD COURSE"}</Kicker>
+        <Kicker>{editingId ? 'EDIT COURSE' : 'ADD COURSE'}</Kicker>
         <form className="grid gap-3 p-4" onSubmit={submit}>
           <div className="grid gap-3 md:grid-cols-2">
             <label className="grid gap-1 text-xs text-[var(--muted)]">
@@ -644,16 +641,20 @@ function CoursesScreen({
                 onChange={(event) => setLevel(event.target.value as ClassLevel)}
                 value={level}
               >
-                {["1000", "2000", "3000", "4000", "graduate", "independent"].map((value) => (
-                  <option key={value} value={value}>{value}</option>
-                ))}
+                {['1000', '2000', '3000', '4000', 'graduate', 'independent'].map(
+                  (value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ),
+                )}
               </select>
             </label>
             <label className="grid gap-1 text-xs text-[var(--muted)]">
               Color
               <select
                 className="w-full rounded-sm border border-[var(--line)] bg-[#0f1012] px-3 py-2 text-sm text-white"
-                onChange={(event) => setColor(event.target.value as AppCourse["color"])}
+                onChange={(event) => setColor(event.target.value as AppCourse['color'])}
                 value={color}
               >
                 <option value="blue">Blue</option>
@@ -662,20 +663,24 @@ function CoursesScreen({
               </select>
             </label>
           </div>
-          {status && <p aria-live="polite" className="text-xs text-[var(--muted)]">{status}</p>}
+          {status && (
+            <p aria-live="polite" className="text-xs text-[var(--muted)]">
+              {status}
+            </p>
+          )}
           <div>
             <div className="flex gap-2">
               <Button disabled={pending} tone="primary" type="submit">
-                {pending ? "Saving…" : editingId ? "Save course" : "Add course"}
+                {pending ? 'Saving…' : editingId ? 'Save course' : 'Add course'}
               </Button>
               {editingId && (
                 <Button
                   disabled={pending}
                   onClick={() => {
                     setEditingId(undefined)
-                    setCode("")
-                    setName("")
-                    setStatus("")
+                    setCode('')
+                    setName('')
+                    setStatus('')
                   }}
                 >
                   Cancel
@@ -702,13 +707,9 @@ function ScoreScreen({ task }: { task?: TaskView }) {
       <Panel className="score-modal">
         <div className="modal-head">
           <div>
-            <Kicker>
-              SCORE ATTRIBUTION / {task.id.slice(-6).toUpperCase()}
-            </Kicker>
+            <Kicker>SCORE ATTRIBUTION / {task.id.slice(-6).toUpperCase()}</Kicker>
             <h2>{task.title}</h2>
-            <p>
-              Deterministic priority model · recalculated from live task data
-            </p>
+            <p>Deterministic priority model · recalculated from live task data</p>
           </div>
           <div className="hero-score">
             <small>PRIORITY</small>
@@ -721,10 +722,10 @@ function ScoreScreen({ task }: { task?: TaskView }) {
           <span>MODEL NOTE</span>
           <p>
             {task.urgency >= 80
-              ? "Deadline pressure is the strongest signal right now."
+              ? 'Deadline pressure is the strongest signal right now.'
               : task.careerValue > task.academicValue
-                ? "Career alignment currently outweighs academic value."
-                : "Academic value and consequence are carrying this task."}
+                ? 'Career alignment currently outweighs academic value.'
+                : 'Academic value and consequence are carrying this task.'}
           </p>
         </div>
         <div className="formula">
@@ -750,7 +751,7 @@ function CalendarScreen({
   const [completingId, setCompletingId] = useState<string>()
 
   const [status, setStatus] = useState(
-    "Ready for an .ics file, Canvas feed, or public calendar URL.",
+    'Ready for an .ics file, Canvas feed, or public calendar URL.',
   )
 
   const fileRef = useRef<HTMLInputElement>(null)
@@ -767,7 +768,7 @@ function CalendarScreen({
         if (result.ok) onImported(result.message)
       } catch {
         setStatus(
-          "The import connection was interrupted. Retry once; existing events will be skipped.",
+          'The import connection was interrupted. Retry once; existing events will be skipped.',
         )
       }
     })
@@ -778,16 +779,13 @@ function CalendarScreen({
 
     startTransition(async () => {
       try {
-        const result = await setCalendarEventCompletedAction(
-          event.id,
-          !event.completed,
-        )
+        const result = await setCalendarEventCompletedAction(event.id, !event.completed)
 
         setStatus(result.ok ? result.message : result.error)
 
         if (result.ok) onImported(result.message)
       } catch {
-        setStatus("Signal could not update that assignment.")
+        setStatus('Signal could not update that assignment.')
       } finally {
         setCompletingId(undefined)
       }
@@ -824,14 +822,14 @@ function CalendarScreen({
             />
           </label>
           <Button disabled={pending} tone="primary" type="submit">
-            {pending ? "Parsing schedule…" : "Import calendar"}
+            {pending ? 'Parsing schedule…' : 'Import calendar'}
           </Button>
         </form>
         <div className="import-status">
           <div>
             <i>SYS</i>
             <span>
-              <strong>{pending ? "Import in progress" : "Parser ready"}</strong>
+              <strong>{pending ? 'Import in progress' : 'Parser ready'}</strong>
               <small>{status}</small>
             </span>
           </div>
@@ -849,45 +847,41 @@ function CalendarScreen({
               return (
                 <article
                   className={`event-row event-row--${event.kind} ${
-                    event.completed ? "event-row--completed" : ""
+                    event.completed ? 'event-row--completed' : ''
                   }`}
                   key={event.id}
                 >
                   <time dateTime={event.start}>
-                    <b>
-                      {start.toLocaleDateString(undefined, { day: "2-digit" })}
-                    </b>
+                    <b>{start.toLocaleDateString(undefined, { day: '2-digit' })}</b>
                     <span>
                       {start
-                        .toLocaleDateString(undefined, { month: "short" })
+                        .toLocaleDateString(undefined, { month: 'short' })
                         .toUpperCase()}
                     </span>
                   </time>
                   <div>
                     <small>
                       {event.allDay
-                        ? "ALL DAY"
+                        ? 'ALL DAY'
                         : start.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
+                            hour: '2-digit',
+                            minute: '2-digit',
                           })}
                     </small>
                     <strong>{event.title}</strong>
                     {event.location && <span>{event.location}</span>}
                   </div>
-                  {event.kind === "deadline" ? (
+                  {event.kind === 'deadline' ? (
                     <button
                       className="complete-toggle"
                       disabled={completingId === event.id}
                       onClick={() => toggleCompleted(event)}
                       type="button"
                     >
-                      {event.completed ? "COMPLETED" : "MARK COMPLETE"}
+                      {event.completed ? 'COMPLETED' : 'MARK COMPLETE'}
                     </button>
                   ) : (
-                    <Tag tone={event.kind === "lab" ? "green" : "blue"}>
-                      {event.kind}
-                    </Tag>
+                    <Tag tone={event.kind === 'lab' ? 'green' : 'blue'}>{event.kind}</Tag>
                   )}
                 </article>
               )
@@ -895,9 +889,7 @@ function CalendarScreen({
           ) : (
             <div className="empty-state">
               <strong>No calendar context yet</strong>
-              <p>
-                Import a real .ics calendar to map classes, labs, and deadlines.
-              </p>
+              <p>Import a real .ics calendar to map classes, labs, and deadlines.</p>
             </div>
           )}
         </div>
@@ -921,14 +913,14 @@ function TimeScreen({
 }) {
   const [pending, startTransition] = useTransition()
 
-  const activeTasks = tasks.filter((task) => task.status !== "done")
+  const activeTasks = tasks.filter((task) => task.status !== 'done')
 
   const demand = Math.round(
     activeTasks.reduce((total, task) => total + task.estimatedMinutes, 0) / 60,
   )
 
   const rows = useMemo(() => {
-    const result: Array<[string, string, Array<["busy" | "free", number]>]> = []
+    const result: Array<[string, string, Array<['busy' | 'free', number]>]> = []
 
     const cursor = new Date()
 
@@ -949,7 +941,7 @@ function TimeScreen({
 
       const intervals = events
 
-        .filter((event) => event.kind !== "deadline" && !event.completed)
+        .filter((event) => event.kind !== 'deadline' && !event.completed)
 
         .map((event) => [
           Math.max(windowStart.getTime(), new Date(event.start).getTime()),
@@ -966,29 +958,25 @@ function TimeScreen({
       for (const interval of intervals) {
         const last = merged[merged.length - 1]
 
-        if (last && interval[0] <= last[1])
-          last[1] = Math.max(last[1], interval[1])
+        if (last && interval[0] <= last[1]) last[1] = Math.max(last[1], interval[1])
         else merged.push([interval[0], interval[1]])
       }
 
-      const cells: Array<["busy" | "free", number]> = []
+      const cells: Array<['busy' | 'free', number]> = []
 
       let position = windowStart.getTime()
 
       for (const [start, end] of merged) {
         if (start > position)
-          cells.push(["free", ((start - position) / 43_200_000) * 100])
+          cells.push(['free', ((start - position) / 43_200_000) * 100])
 
-        cells.push(["busy", ((end - start) / 43_200_000) * 100])
+        cells.push(['busy', ((end - start) / 43_200_000) * 100])
 
         position = end
       }
 
       if (position < windowEnd.getTime()) {
-        cells.push([
-          "free",
-          ((windowEnd.getTime() - position) / 43_200_000) * 100,
-        ])
+        cells.push(['free', ((windowEnd.getTime() - position) / 43_200_000) * 100])
       }
 
       const busyMinutes = merged.reduce(
@@ -999,7 +987,7 @@ function TimeScreen({
       const freeHours = Math.max(0, 12 - busyMinutes / 60)
 
       result.push([
-        day.toLocaleDateString(undefined, { weekday: "short" }).toUpperCase(),
+        day.toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase(),
 
         `${freeHours.toFixed(freeHours % 1 ? 1 : 0)}h free`,
 
@@ -1041,11 +1029,7 @@ function TimeScreen({
               <b>{day}</b>
               <div className="timeline-bar">
                 {cells.map(([type, width], index) => (
-                  <span
-                    className={type}
-                    key={index}
-                    style={{ width: `${width}%` }}
-                  />
+                  <span className={type} key={index} style={{ width: `${width}%` }} />
                 ))}
               </div>
               <small>{total}</small>
@@ -1066,8 +1050,8 @@ function TimeScreen({
             <span>HRS FREE</span>
           </div>
         </div>
-        <Tag tone={over ? "red" : "green"}>
-          {over ? `CRUNCH ALERT: −${over} HRS` : "CAPACITY HEALTHY"}
+        <Tag tone={over ? 'red' : 'green'}>
+          {over ? `CRUNCH ALERT: −${over} HRS` : 'CAPACITY HEALTHY'}
         </Tag>
         <div className="capacity-track">
           <span
@@ -1083,19 +1067,19 @@ function TimeScreen({
         <Button
           disabled={pending || !tasks.length}
           onClick={replan}
-          tone={over ? "danger" : "primary"}
+          tone={over ? 'danger' : 'primary'}
         >
-          {pending ? "Replanning…" : "Replan priority work"}
+          {pending ? 'Replanning…' : 'Replan priority work'}
         </Button>
       </Panel>
       <div className="warning-box">
         <span>!</span>
         <div>
-          <strong>{over ? "CAPACITY CONFLICT" : "PLAN CHECK"}</strong>
+          <strong>{over ? 'CAPACITY CONFLICT' : 'PLAN CHECK'}</strong>
           <p>
             {over
               ? `${over} hours need a new home before the next deadline.`
-              : "Your current workload fits the available estimate."}
+              : 'Your current workload fits the available estimate.'}
           </p>
         </div>
         <Button onClick={replan}>Protect focus blocks</Button>
@@ -1113,13 +1097,13 @@ function parseQuickTask(value: string) {
 
   let dueDate: Date | undefined
 
-  if (lower.includes("tomorrow")) {
+  if (lower.includes('tomorrow')) {
     dueDate = new Date()
 
     dueDate.setDate(dueDate.getDate() + 1)
 
     dueDate.setHours(17, 0, 0, 0)
-  } else if (lower.includes("friday")) {
+  } else if (lower.includes('friday')) {
     dueDate = new Date()
 
     const distance = (5 - dueDate.getDay() + 7) % 7 || 7
@@ -1129,56 +1113,56 @@ function parseQuickTask(value: string) {
     dueDate.setHours(17, 0, 0, 0)
   }
 
-  const assignmentType: AssignmentType = lower.includes("exam")
-    ? "exam"
-    : lower.includes("lab")
-      ? "lab"
-      : lower.includes("project")
-        ? "project"
-        : lower.includes("read")
-          ? "reading"
-          : lower.includes("interview") || lower.includes("leetcode")
-            ? "career"
-            : "problem-set"
+  const assignmentType: AssignmentType = lower.includes('exam')
+    ? 'exam'
+    : lower.includes('lab')
+      ? 'lab'
+      : lower.includes('project')
+        ? 'project'
+        : lower.includes('read')
+          ? 'reading'
+          : lower.includes('interview') || lower.includes('leetcode')
+            ? 'career'
+            : 'problem-set'
 
   const levelMatch = lower.match(/\b([1-4])\d{3}\b/)
 
   const classLevel = (
     levelMatch
       ? `${levelMatch[1]}000`
-      : assignmentType === "career"
-        ? "independent"
-        : "3000"
+      : assignmentType === 'career'
+        ? 'independent'
+        : '3000'
   ) as ClassLevel
 
   const title = value
 
-    .replace(/\b(?:due\s+)?(?:tomorrow|friday)\b/gi, "")
+    .replace(/\b(?:due\s+)?(?:tomorrow|friday)\b/gi, '')
 
-    .replace(/\b\d+(?:\.\d+)?\s*(?:h|hr|hrs|hour|hours)\b/gi, "")
+    .replace(/\b\d+(?:\.\d+)?\s*(?:h|hr|hrs|hour|hours)\b/gi, '')
 
-    .replace(/\s+/g, " ")
+    .replace(/\s+/g, ' ')
 
-    .replace(/[,\s-]+$/, "")
+    .replace(/[,\s-]+$/, '')
 
     .trim()
 
   return {
     assignmentType,
 
-    careerAlignment: assignmentType === "career" ? 95 : 35,
+    careerAlignment: assignmentType === 'career' ? 95 : 35,
 
     classLevel,
 
-    consequence: assignmentType === "exam" ? 90 : 62,
+    consequence: assignmentType === 'exam' ? 90 : 62,
 
     dueDate: dueDate?.toISOString(),
 
     estimatedMinutes,
 
-    goalAlignment: assignmentType === "career" ? 92 : 68,
+    goalAlignment: assignmentType === 'career' ? 92 : 68,
 
-    title: title || "New study task",
+    title: title || 'New study task',
   }
 }
 
@@ -1193,18 +1177,16 @@ function QuickAdd({
 
   onOpenAdvisor: () => void
 }) {
-  const [value, setValue] = useState("")
+  const [value, setValue] = useState('')
 
-  const [courseId, setCourseId] = useState("")
+  const [courseId, setCourseId] = useState('')
 
-  const [status, setStatus] = useState(
-    "Describe the work, duration, and deadline.",
-  )
+  const [status, setStatus] = useState('Describe the work, duration, and deadline.')
 
   const [pending, startTransition] = useTransition()
 
   const parsed = useMemo(
-    () => parseQuickTask(value || "study leetcode 2 hours friday"),
+    () => parseQuickTask(value || 'study leetcode 2 hours friday'),
     [value],
   )
 
@@ -1222,7 +1204,7 @@ function QuickAdd({
       setStatus(result.ok ? result.message : result.error)
 
       if (result.ok) {
-        setValue("")
+        setValue('')
 
         onAdded(result.message)
       }
@@ -1237,9 +1219,7 @@ function QuickAdd({
         <span>PLACE</span>
       </div>
       <Panel className="copilot-box">
-        <Kicker right={<Tag tone="green">LOCAL PARSER</Tag>}>
-          SIGNAL QUICK ADD
-        </Kicker>
+        <Kicker right={<Tag tone="green">LOCAL PARSER</Tag>}>SIGNAL QUICK ADD</Kicker>
         <form onSubmit={submit}>
           <div className="prompt-line">
             <span>›</span>
@@ -1285,12 +1265,8 @@ function QuickAdd({
           </div>
           <div className="copilot-actions">
             <span>{status}</span>
-            <Button
-              disabled={pending || !value.trim()}
-              tone="primary"
-              type="submit"
-            >
-              {pending ? "Adding…" : "Add to plan"}
+            <Button disabled={pending || !value.trim()} tone="primary" type="submit">
+              {pending ? 'Adding…' : 'Add to plan'}
             </Button>
           </div>
         </form>
@@ -1319,15 +1295,15 @@ export function AdvisorScreen({
     {
       id: 1,
 
-      role: "assistant",
+      role: 'assistant',
 
-      text: "Ask Gemini for planning advice using details you choose to share. Switch to Local commands to add tasks, explain scores, parse a syllabus, build an exam plan, open Team Deliverables, or replan. Review and approve local changes before saving.",
+      text: 'Ask Gemini for planning advice using details you choose to share. Switch to Local commands to add tasks, explain scores, parse a syllabus, build an exam plan, open Team Deliverables, or replan. Review and approve local changes before saving.',
     },
   ])
 
-  const [value, setValue] = useState("")
+  const [value, setValue] = useState('')
 
-  const [mode, setMode] = useState<"gemini" | "local">("gemini")
+  const [mode, setMode] = useState<'gemini' | 'local'>('gemini')
   const messageId = useRef(1)
   const [chatHistory, setChatHistory] = useState<ChatTurn[]>([])
   const [proposal, setProposal] = useState<{
@@ -1340,7 +1316,7 @@ export function AdvisorScreen({
   function reply(text: string) {
     setMessages((current) => [
       ...current.slice(-39),
-      { id: ++messageId.current, role: "assistant", text },
+      { id: ++messageId.current, role: 'assistant', text },
     ])
   }
 
@@ -1353,12 +1329,12 @@ export function AdvisorScreen({
 
     setMessages((current) => [
       ...current.slice(-39),
-      { id: ++messageId.current, role: "user", text: prompt },
+      { id: ++messageId.current, role: 'user', text: prompt },
     ])
 
-    setValue("")
+    setValue('')
 
-    if (mode === "gemini") {
+    if (mode === 'gemini') {
       const history = recentChatHistory(chatHistory, prompt)
       startTransition(async () => {
         try {
@@ -1367,8 +1343,8 @@ export function AdvisorScreen({
             reply(result.text)
             setChatHistory([
               ...history,
-              { role: "user", text: prompt },
-              { role: "assistant", text: result.text },
+              { role: 'user', text: prompt },
+              { role: 'assistant', text: result.text },
             ])
           } else {
             reply(
@@ -1377,7 +1353,7 @@ export function AdvisorScreen({
           }
         } catch {
           reply(
-            "The chat connection failed. Local commands are still available. Nothing was saved.",
+            'The chat connection failed. Local commands are still available. Nothing was saved.',
           )
         }
       })
@@ -1385,11 +1361,9 @@ export function AdvisorScreen({
     }
 
     const command = classifyLocalCommand(prompt)
-    if (["add", "exam", "syllabus", "replan"].includes(command)) {
+    if (['add', 'exam', 'syllabus', 'replan'].includes(command)) {
       setProposal({ prompt, command })
-      reply(
-        "Review the local command below. It will run only after you approve it.",
-      )
+      reply('Review the local command below. It will run only after you approve it.')
       return
     }
     runLocalCommand(prompt)
@@ -1401,10 +1375,10 @@ export function AdvisorScreen({
 
     startTransition(async () => {
       try {
-        if (command === "syllabus") {
+        if (command === 'syllabus') {
           const result = await createWorkflowAction({
             prompt,
-            workflow: "syllabus",
+            workflow: 'syllabus',
           })
 
           const message = result.ok ? result.message : result.error
@@ -1416,10 +1390,10 @@ export function AdvisorScreen({
           return
         }
 
-        if (command === "exam") {
+        if (command === 'exam') {
           const result = await createWorkflowAction({
             prompt,
-            workflow: "exam",
+            workflow: 'exam',
           })
 
           const message = result.ok ? result.message : result.error
@@ -1431,9 +1405,9 @@ export function AdvisorScreen({
           return
         }
 
-        if (command === "team") {
+        if (command === 'team') {
           reply(
-            "Open Team Deliverables to create a project, choose registered teammates, and assign milestones.",
+            'Open Team Deliverables to create a project, choose registered teammates, and assign milestones.',
           )
 
           onOpenTeam()
@@ -1441,9 +1415,9 @@ export function AdvisorScreen({
           return
         }
 
-        if (command === "replan") {
+        if (command === 'replan') {
           const result = await replanTasksAction(
-            lower.includes("auto-reschedule") ? "week" : "fortnight",
+            lower.includes('auto-reschedule') ? 'week' : 'fortnight',
           )
 
           const message = result.ok ? result.message : result.error
@@ -1455,19 +1429,19 @@ export function AdvisorScreen({
           return
         }
 
-        if (command === "explain") {
+        if (command === 'explain') {
           reply(
             selectedTask
               ? `${selectedTask.title} is ${selectedTask.score}/100. Urgency contributes ${selectedTask.urgency}, academic value ${selectedTask.academicValue}, and goal alignment ${selectedTask.goalAlignment}.`
-              : "Add or select a task first, then I can explain every score vector.",
+              : 'Add or select a task first, then I can explain every score vector.',
           )
 
           return
         }
 
-        if (command === "add") {
+        if (command === 'add') {
           const result = await createTaskAction(
-            parseQuickTask(prompt.replace(/^add\s+/i, "")),
+            parseQuickTask(prompt.replace(/^add\s+/i, '')),
           )
 
           const message = result.ok ? result.message : result.error
@@ -1482,18 +1456,18 @@ export function AdvisorScreen({
         reply(
           selectedTask
             ? `Start with ${selectedTask.title}. Its ${selectedTask.score} score makes it the strongest next move; protect ${selectedTask.estimatedMinutes} minutes.`
-            : "Your plan is empty. Try “add calculus problem set due tomorrow, 90 minutes.”",
+            : 'Your plan is empty. Try “add calculus problem set due tomorrow, 90 minutes.”',
         )
       } catch {
         reply(
-          "The local command could not finish. Refresh your plan to check its current state before retrying.",
+          'The local command could not finish. Refresh your plan to check its current state before retrying.',
         )
       }
     })
   }
 
   function suggest(prompt: string) {
-    setMode("local")
+    setMode('local')
     setValue(prompt)
   }
 
@@ -1509,7 +1483,7 @@ export function AdvisorScreen({
         <Kicker
           right={
             <Tag tone="green">
-              {mode === "gemini" ? "GOOGLE GEMINI" : "LOCAL COMMANDS"}
+              {mode === 'gemini' ? 'GOOGLE GEMINI' : 'LOCAL COMMANDS'}
             </Tag>
           }
         >
@@ -1518,18 +1492,18 @@ export function AdvisorScreen({
         <div className="flex flex-wrap gap-2 px-4 py-2">
           <button
             type="button"
-            aria-pressed={mode === "gemini"}
+            aria-pressed={mode === 'gemini'}
             disabled={pending || Boolean(proposal)}
-            onClick={() => setMode("gemini")}
+            onClick={() => setMode('gemini')}
             className="rounded border border-[var(--line)] px-3 py-2 text-xs aria-pressed:bg-[var(--blue)]"
           >
             Ask Gemini
           </button>
           <button
             type="button"
-            aria-pressed={mode === "local"}
+            aria-pressed={mode === 'local'}
             disabled={pending || Boolean(proposal)}
-            onClick={() => setMode("local")}
+            onClick={() => setMode('local')}
             className="rounded border border-[var(--line)] px-3 py-2 text-xs aria-pressed:bg-[var(--blue)]"
           >
             Local commands
@@ -1547,24 +1521,20 @@ export function AdvisorScreen({
           </button>
         </div>
         <p className="px-4 pb-2 text-xs leading-relaxed text-[var(--muted)]">
-          In Gemini mode, your submitted prompts and recent AI conversation are
-          processed by Google. Stored tasks and calendar records are not
-          attached. Share only details you choose. AI advice is not saved to
-          your plan.
+          In Gemini mode, your submitted prompts and recent AI conversation are processed
+          by Google. Stored tasks and calendar records are not attached. Share only
+          details you choose. AI advice is not saved to your plan.
         </p>
         <div className="chat-log" aria-live="polite">
           {messages.map((message) => (
-            <div
-              className={`chat-bubble chat-bubble--${message.role}`}
-              key={message.id}
-            >
-              <small>{message.role === "user" ? "YOU" : "SIGNAL"}</small>
+            <div className={`chat-bubble chat-bubble--${message.role}`} key={message.id}>
+              <small>{message.role === 'user' ? 'YOU' : 'SIGNAL'}</small>
               <p>{message.text}</p>
             </div>
           ))}
           {pending && (
             <div className="typing">
-              {mode === "gemini" ? "ASKING GEMINI…" : "RUNNING LOCAL COMMAND…"}
+              {mode === 'gemini' ? 'ASKING GEMINI…' : 'RUNNING LOCAL COMMAND…'}
             </div>
           )}
         </div>
@@ -1575,19 +1545,16 @@ export function AdvisorScreen({
             className="mx-4 mb-3 rounded border border-[var(--line)] bg-[#151c29] p-3 text-xs"
           >
             <strong>
-              Approve{" "}
-              {proposal.command === "replan"
-                ? "replanning"
-                : "creating plan items"}
-              ?
+              Approve{' '}
+              {proposal.command === 'replan' ? 'replanning' : 'creating plan items'}?
             </strong>
             <p className="my-2 max-h-28 overflow-auto whitespace-pre-wrap">
               {proposal.prompt}
             </p>
             <p className="mb-3 text-[var(--muted)]">
-              {proposal.command === "replan"
-                ? "This may move planned task start times using the existing scheduler."
-                : "This runs the existing local parser and saves its generated tasks/calendar items. Review the result in your plan."}
+              {proposal.command === 'replan'
+                ? 'This may move planned task start times using the existing scheduler.'
+                : 'This runs the existing local parser and saves its generated tasks/calendar items. Review the result in your plan.'}
             </p>
             <div className="flex gap-2">
               <Button
@@ -1605,7 +1572,7 @@ export function AdvisorScreen({
                 disabled={pending}
                 onClick={() => {
                   setProposal(null)
-                  reply("Command cancelled. Nothing was saved.")
+                  reply('Command cancelled. Nothing was saved.')
                 }}
               >
                 Cancel
@@ -1616,13 +1583,13 @@ export function AdvisorScreen({
         <div className="suggestion-row">
           <button
             disabled={pending || Boolean(proposal)}
-            onClick={() => suggest("Explain this score")}
+            onClick={() => suggest('Explain this score')}
           >
             Explain score
           </button>
           <button
             disabled={pending || Boolean(proposal)}
-            onClick={() => suggest("Auto-reschedule my focus blocks this week")}
+            onClick={() => suggest('Auto-reschedule my focus blocks this week')}
           >
             Auto-reschedule
           </button>
@@ -1630,7 +1597,7 @@ export function AdvisorScreen({
             disabled={pending || Boolean(proposal)}
             onClick={() =>
               suggest(
-                "Create a 10-day spaced repetition study plan for my midterm in two weeks",
+                'Create a 10-day spaced repetition study plan for my midterm in two weeks',
               )
             }
           >
@@ -1640,7 +1607,7 @@ export function AdvisorScreen({
             disabled={pending || Boolean(proposal)}
             onClick={() =>
               suggest(
-                "Parse this syllabus:\nAssignment 1 — September 12\nMidterm — October 8\nWeekly reading — October 15",
+                'Parse this syllabus:\nAssignment 1 — September 12\nMidterm — October 8\nWeekly reading — October 15',
               )
             }
           >
@@ -1649,7 +1616,7 @@ export function AdvisorScreen({
           <button
             disabled={pending || Boolean(proposal)}
             onClick={() => {
-              setValue("Open Team Deliverables to assign project work.")
+              setValue('Open Team Deliverables to assign project work.')
               onOpenTeam()
             }}
           >
@@ -1663,7 +1630,7 @@ export function AdvisorScreen({
             placeholder="Paste a syllabus, build an exam plan, assign team work, or auto-reschedule…"
             rows={3}
             value={value}
-            maxLength={mode === "gemini" ? MAX_PROMPT_CHARS : 20000}
+            maxLength={mode === 'gemini' ? MAX_PROMPT_CHARS : 20000}
             disabled={pending || Boolean(proposal)}
           />
           <Button
@@ -1675,9 +1642,9 @@ export function AdvisorScreen({
           </Button>
         </form>
         <p className="offline-note">
-          Local commands work without Gemini and do not send prompts to Google.
-          Gemini replies are proposals, not completed changes. Use Local
-          commands and approve any changes you want to save.
+          Local commands work without Gemini and do not send prompts to Google. Gemini
+          replies are proposals, not completed changes. Use Local commands and approve any
+          changes you want to save.
         </p>
       </Panel>
     </div>
@@ -1707,7 +1674,7 @@ export default function SignalApp({
 
   const [, startMutationTransition] = useTransition()
 
-  const [screen, setScreen] = useState<Screen>("dashboard")
+  const [screen, setScreen] = useState<Screen>('dashboard')
 
   const [selected, setSelected] = useState(0)
 
@@ -1717,7 +1684,7 @@ export default function SignalApp({
 
   const [courses, setCourses] = useState(initialCourses)
 
-  const [notice, setNotice] = useState("")
+  const [notice, setNotice] = useState('')
 
   const [theme, setTheme] = useState<ThemeColors>(defaultTheme)
 
@@ -1737,7 +1704,7 @@ export default function SignalApp({
 
   useEffect(() => {
     let savedTheme = defaultTheme
-    let warning = ""
+    let warning = ''
 
     try {
       const saved = window.localStorage.getItem(themeStorageKey)
@@ -1747,7 +1714,7 @@ export default function SignalApp({
           savedTheme = parsed
         } else {
           window.localStorage.removeItem(themeStorageKey)
-          warning = "Saved theme settings were invalid and have been reset."
+          warning = 'Saved theme settings were invalid and have been reset.'
         }
       }
     } catch {
@@ -1763,11 +1730,11 @@ export default function SignalApp({
     if (!themeReady) return
 
     const root = document.documentElement
-    root.style.setProperty("--blue", theme.accent)
-    root.style.setProperty("--bg", theme.background)
-    root.style.setProperty("--surface", theme.surface)
-    root.style.setProperty("--card", theme.card)
-    root.style.setProperty("--text", theme.text)
+    root.style.setProperty('--blue', theme.accent)
+    root.style.setProperty('--bg', theme.background)
+    root.style.setProperty('--surface', theme.surface)
+    root.style.setProperty('--card', theme.card)
+    root.style.setProperty('--text', theme.text)
 
     try {
       window.localStorage.setItem(themeStorageKey, JSON.stringify(theme))
@@ -1788,29 +1755,29 @@ export default function SignalApp({
       }
     }
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setThemePanelOpen(false)
+      if (event.key === 'Escape') setThemePanelOpen(false)
     }
 
-    document.addEventListener("pointerdown", closeOnOutsideClick)
-    document.addEventListener("keydown", closeOnEscape)
+    document.addEventListener('pointerdown', closeOnOutsideClick)
+    document.addEventListener('keydown', closeOnEscape)
     return () => {
-      document.removeEventListener("pointerdown", closeOnOutsideClick)
-      document.removeEventListener("keydown", closeOnEscape)
+      document.removeEventListener('pointerdown', closeOnOutsideClick)
+      document.removeEventListener('keydown', closeOnEscape)
     }
   }, [themePanelOpen])
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
 
-        setScreen("copilot")
+        setScreen('copilot')
       }
     }
 
-    window.addEventListener("keydown", listener)
+    window.addEventListener('keydown', listener)
 
-    return () => window.removeEventListener("keydown", listener)
+    return () => window.removeEventListener('keydown', listener)
   }, [])
 
   function refresh(message: string) {
@@ -1840,7 +1807,7 @@ export default function SignalApp({
     })
   }
 
-  const upcomingTasks = tasks.filter((task) => task.status !== "done")
+  const upcomingTasks = tasks.filter((task) => task.status !== 'done')
 
   return (
     <main className="app-shell">
@@ -1855,7 +1822,7 @@ export default function SignalApp({
         <nav>
           {nav.map((item) => (
             <button
-              className={screen === item.id ? "active" : ""}
+              className={screen === item.id ? 'active' : ''}
               key={item.id}
               onClick={() => setScreen(item.id)}
             >
@@ -1967,14 +1934,14 @@ export default function SignalApp({
                 </section>
               )}
             </div>
-            <Button onClick={() => setScreen("advisor")}>Ask advisor</Button>
+            <Button onClick={() => setScreen('advisor')}>Ask advisor</Button>
             <Button disabled={authPending} onClick={signOut}>
-              {authPending ? "Signing out…" : "Sign out"}
+              {authPending ? 'Signing out…' : 'Sign out'}
             </Button>
           </div>
         </header>
         {notice && (
-          <button className="notice" onClick={() => setNotice("")}>
+          <button className="notice" onClick={() => setNotice('')}>
             {notice}
             <span>DISMISS</span>
           </button>
@@ -1982,22 +1949,22 @@ export default function SignalApp({
         <div className="screen-title">
           <div>
             <small>
-              SCREEN {active.index} / {String(nav.length).padStart(2, "0")}
+              SCREEN {active.index} / {String(nav.length).padStart(2, '0')}
             </small>
             <h1>{active.label}</h1>
           </div>
           <span>
             {new Date()
               .toLocaleDateString(undefined, {
-                weekday: "long",
-                month: "short",
-                day: "numeric",
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
               })
               .toUpperCase()}
           </span>
         </div>
         <div className="screen">
-          {screen === "dashboard" && (
+          {screen === 'dashboard' && (
             <Dashboard
               go={setScreen}
               onCompleted={(task) => setCompleted(task)}
@@ -2006,58 +1973,59 @@ export default function SignalApp({
               tasks={tasks}
             />
           )}
-          {screen === "score" && (
+          {screen === 'score' && (
             <ScoreScreen task={upcomingTasks[selected] ?? upcomingTasks[0]} />
           )}
-          {screen === "calendar" && (
+          {screen === 'calendar' && (
             <CalendarScreen events={events} onImported={refresh} />
           )}
-          {screen === "time" && (
+          {screen === 'time' && (
             <TimeScreen events={events} onReplanned={refresh} tasks={tasks} />
           )}
-          {screen === "copilot" && (
+          {screen === 'copilot' && (
             <QuickAdd
               courses={courses}
               onAdded={refresh}
-              onOpenAdvisor={() => setScreen("advisor")}
+              onOpenAdvisor={() => setScreen('advisor')}
             />
           )}
-          {screen === "advisor" && (
+          {screen === 'advisor' && (
             <AdvisorScreen
               onChanged={refresh}
-              onOpenTeam={() => setScreen("team")}
+              onOpenTeam={() => setScreen('team')}
               selectedTask={upcomingTasks[selected] ?? upcomingTasks[0]}
             />
           )}
-          {screen === "team" && (
-            <TeamDeliverables
-              currentUserId={currentUser.id}
-              onChanged={refresh}
-            />
+          {screen === 'team' && (
+            <TeamDeliverables currentUserId={currentUser.id} onChanged={refresh} />
           )}
-          {screen === "completed" && (
+          {screen === 'completed' && (
             <CompletedScreen
               onRestore={(task) => setCompleted(task, false)}
               tasks={tasks}
             />
           )}
-          {screen === "courses" && (
+          {screen === 'courses' && (
             <CoursesScreen
               courses={courses}
               onCreated={(course, message) => {
                 setCourses((current) =>
-                  [...current, course].sort((left, right) => left.code.localeCompare(right.code)),
+                  [...current, course].sort((left, right) =>
+                    left.code.localeCompare(right.code),
+                  ),
                 )
                 refresh(message)
               }}
               onUpdated={(course, message) => {
                 setCourses((current) =>
-                  current.map((item) => item.id === course.id ? course : item),
+                  current.map((item) => (item.id === course.id ? course : item)),
                 )
                 refresh(message)
               }}
               onRemoved={(courseId, message) => {
-                setCourses((current) => current.filter((course) => course.id !== courseId))
+                setCourses((current) =>
+                  current.filter((course) => course.id !== courseId),
+                )
                 refresh(message)
               }}
             />
@@ -2066,7 +2034,7 @@ export default function SignalApp({
         <div className="mobile-nav">
           {nav.map((item) => (
             <button
-              className={screen === item.id ? "active" : ""}
+              className={screen === item.id ? 'active' : ''}
               key={item.id}
               onClick={() => setScreen(item.id)}
             >

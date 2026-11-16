@@ -35,7 +35,10 @@ function dateFromText(text: string, now: Date) {
     result.setDate(result.getDate() + 14)
     return result
   }
-  const match = text.match(isoDatePattern) ?? text.match(monthPattern) ?? text.match(numericDatePattern)
+  const match =
+    text.match(isoDatePattern) ??
+    text.match(monthPattern) ??
+    text.match(numericDatePattern)
   if (!match) return null
   const hasYear = /\d{4}/.test(match[0])
   const candidate = new Date(hasYear ? match[0] : `${match[0]}, ${now.getFullYear()}`)
@@ -58,10 +61,12 @@ function addHours(date: Date, hours: number) {
 
 function taskType(title: string): AssignmentType {
   const value = title.toLowerCase()
-  if (value.includes('exam') || value.includes('midterm') || value.includes('test')) return 'exam'
+  if (value.includes('exam') || value.includes('midterm') || value.includes('test'))
+    return 'exam'
   if (value.includes('read')) return 'reading'
   if (value.includes('lab')) return 'lab'
-  if (value.includes('project') || value.includes('proposal') || value.includes('deck')) return 'project'
+  if (value.includes('project') || value.includes('proposal') || value.includes('deck'))
+    return 'project'
   return 'problem-set'
 }
 
@@ -78,7 +83,10 @@ function cleanTitle(line: string) {
 export function buildSyllabusPlan(prompt: string, now = new Date()): WorkflowPlan {
   const tasks: PlannedTask[] = []
   const events: PlannedEvent[] = []
-  for (const line of prompt.split(/\n|;/).map((value) => value.trim()).filter(Boolean)) {
+  for (const line of prompt
+    .split(/\n|;/)
+    .map((value) => value.trim())
+    .filter(Boolean)) {
     const parsedDate = dateFromText(line, now)
     if (!parsedDate) continue
     const due = atTime(parsedDate, 17)
@@ -111,7 +119,8 @@ export function buildExamPlan(prompt: string, now = new Date()): WorkflowPlan {
   kickoff.setDate(kickoff.getDate() - 14)
   kickoff.setHours(8, 0, 0, 0)
   const offsets = [0, 2, 4, 6, 7, 8, 9, 10, 11, 13]
-  const topic = cleanTitle(prompt.replace(/\bin\s+(?:two|2)\s+weeks?\b/i, '')) || 'Midterm'
+  const topic =
+    cleanTitle(prompt.replace(/\bin\s+(?:two|2)\s+weeks?\b/i, '')) || 'Midterm'
   const tasks: PlannedTask[] = offsets.map((offset, index) => {
     const session = new Date(kickoff)
     session.setDate(session.getDate() + offset)

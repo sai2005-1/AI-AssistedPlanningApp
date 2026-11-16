@@ -75,7 +75,8 @@ function inferKind(title: string): ParsedCalendarEvent['kind'] {
 function expandEvent(raw: RawEvent): ParsedCalendarEvent[] {
   const parsedStart = parseDate(raw.DTSTART)
   const summary = clean(raw.SUMMARY?.value)
-  if (!parsedStart || !summary || raw.STATUS?.value.toUpperCase() === 'CANCELLED') return []
+  if (!parsedStart || !summary || raw.STATUS?.value.toUpperCase() === 'CANCELLED')
+    return []
   const parsedEnd = parseDate(raw.DTEND)
   const parsedDuration = raw.DURATION?.value.match(
     /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/,
@@ -86,7 +87,9 @@ function expandEvent(raw: RawEvent): ParsedCalendarEvent[] {
       Number(parsedDuration[3] ?? 0) * 60_000 +
       Number(parsedDuration[4] ?? 0) * 1000
     : 0
-  const dateDuration = parsedEnd ? parsedEnd.date.getTime() - parsedStart.date.getTime() : 0
+  const dateDuration = parsedEnd
+    ? parsedEnd.date.getTime() - parsedStart.date.getTime()
+    : 0
   const duration =
     (dateDuration > 0 && dateDuration) ||
     durationFromProperty ||
@@ -99,7 +102,8 @@ function expandEvent(raw: RawEvent): ParsedCalendarEvent[] {
       raw['X-CANVAS-COMPLETED']?.value.toUpperCase() === 'TRUE',
     description: clean(raw.DESCRIPTION?.value).slice(0, 2000),
     kind:
-      uid.toLowerCase().includes('assignment') || clean(raw.DESCRIPTION?.value).toLowerCase().includes('assignment')
+      uid.toLowerCase().includes('assignment') ||
+      clean(raw.DESCRIPTION?.value).toLowerCase().includes('assignment')
         ? ('deadline' as const)
         : inferKind(summary),
     location: clean(raw.LOCATION?.value).slice(0, 200),
@@ -129,7 +133,9 @@ function expandEvent(raw: RawEvent): ParsedCalendarEvent[] {
   const events: ParsedCalendarEvent[] = []
 
   if (rule.FREQ === 'WEEKLY' && rule.BYDAY) {
-    const targetDays = rule.BYDAY.split(',').map((day) => dayIndexes[day]).filter(Number.isInteger)
+    const targetDays = rule.BYDAY.split(',')
+      .map((day) => dayIndexes[day])
+      .filter(Number.isInteger)
     const cursor = new Date(parsedStart.date)
     while (cursor.getTime() <= horizon && events.length < count) {
       if (cursor >= parsedStart.date && targetDays.includes(cursor.getDay())) {

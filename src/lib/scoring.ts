@@ -70,7 +70,9 @@ export function calculateScore(input: ScoreInput, now = new Date()): ScoreBreakd
   const assignmentType = input.assignmentType ?? 'personal'
   const classLevel = input.classLevel ?? 'independent'
   const academicValue = clamp(academicByLevel[classLevel] + typeBoost[assignmentType])
-  const careerValue = clamp(input.careerAlignment ?? (assignmentType === 'career' ? 92 : 35))
+  const careerValue = clamp(
+    input.careerAlignment ?? (assignmentType === 'career' ? 92 : 35),
+  )
   const goalAlignment = clamp(input.goalAlignment ?? 50)
   const consequence = clamp(input.consequence ?? (assignmentType === 'exam' ? 90 : 55))
   const workload = clamp(((input.estimatedMinutes ?? 60) / 240) * 100)

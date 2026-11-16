@@ -6,7 +6,10 @@ import {
   deleteUser,
   getAuth,
 } from 'firebase/auth'
-import { deleteApp as deleteAdminApp, initializeApp as initializeAdmin } from 'firebase-admin/app'
+import {
+  deleteApp as deleteAdminApp,
+  initializeApp as initializeAdmin,
+} from 'firebase-admin/app'
 import { getAuth as getAdminAuth } from 'firebase-admin/auth'
 
 const emulatorHost = process.env.FIREBASE_AUTH_EMULATOR_HOST
@@ -14,7 +17,9 @@ const projectId = process.env.GCLOUD_PROJECT || 'demo-signal'
 const emulatorAvailable = Boolean(emulatorHost)
 let clientApp: ReturnType<typeof initializeApp> | undefined
 let adminApp: ReturnType<typeof initializeAdmin> | undefined
-let createdUser: Awaited<ReturnType<typeof createUserWithEmailAndPassword>>['user'] | undefined
+let createdUser:
+  | Awaited<ReturnType<typeof createUserWithEmailAndPassword>>['user']
+  | undefined
 
 afterEach(async () => {
   if (createdUser) await deleteUser(createdUser).catch(() => undefined)
@@ -37,7 +42,9 @@ describe.skipIf(!emulatorAvailable)('Firebase Auth session migration', () => {
       `auth-client-${Date.now()}`,
     )
     const clientAuth = getAuth(clientApp)
-    const host = emulatorHost?.startsWith('http') ? emulatorHost : `http://${emulatorHost}`
+    const host = emulatorHost?.startsWith('http')
+      ? emulatorHost
+      : `http://${emulatorHost}`
     connectAuthEmulator(clientAuth, host, { disableWarnings: true })
 
     const credential = await createUserWithEmailAndPassword(

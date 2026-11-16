@@ -17,9 +17,7 @@ import { loginAction, signupAction } from './auth-actions'
 function authErrorMessage(error: unknown) {
   if (error instanceof FirebaseClientConfigurationError) return error.message
   const code =
-    error && typeof error === 'object' && 'code' in error
-      ? String(error.code)
-      : ''
+    error && typeof error === 'object' && 'code' in error ? String(error.code) : ''
   if (code === 'auth/email-already-in-use') return 'That email is already in use.'
   if (code === 'auth/invalid-email') return 'Enter a valid email address.'
   if (code === 'auth/invalid-credential') return 'Invalid email or password.'
@@ -39,7 +37,9 @@ export default function AuthScreen() {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
-    const email = String(form.get('email') ?? '').trim().toLowerCase()
+    const email = String(form.get('email') ?? '')
+      .trim()
+      .toLowerCase()
     const password = String(form.get('password') ?? '')
     setError('')
     startTransition(async () => {
@@ -48,7 +48,9 @@ export default function AuthScreen() {
         auth = getFirebaseClientAuth()
         if (mode === 'login') {
           const credential = await signInWithEmailAndPassword(auth, email, password)
-          const result = await loginAction({ idToken: await credential.user.getIdToken() })
+          const result = await loginAction({
+            idToken: await credential.user.getIdToken(),
+          })
           if (!result.ok) {
             await signOut(auth)
             setError(result.error)
@@ -104,10 +106,16 @@ export default function AuthScreen() {
           </p>
         </div>
         <div className="auth-tabs">
-          <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>
+          <button
+            className={mode === 'login' ? 'active' : ''}
+            onClick={() => setMode('login')}
+          >
             Log in
           </button>
-          <button className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')}>
+          <button
+            className={mode === 'signup' ? 'active' : ''}
+            onClick={() => setMode('signup')}
+          >
             Sign up
           </button>
         </div>
@@ -157,10 +165,16 @@ export default function AuthScreen() {
           </label>
           {error && <p className="auth-error">{error}</p>}
           <button className="auth-submit" disabled={pending} type="submit">
-            {pending ? 'VERIFYING…' : mode === 'login' ? 'OPEN WORKSPACE' : 'CREATE PRIVATE WORKSPACE'}
+            {pending
+              ? 'VERIFYING…'
+              : mode === 'login'
+                ? 'OPEN WORKSPACE'
+                : 'CREATE PRIVATE WORKSPACE'}
           </button>
         </form>
-        <p className="auth-privacy">HTTP-only session · isolated Firestore records · no cross-account access</p>
+        <p className="auth-privacy">
+          HTTP-only session · isolated Firestore records · no cross-account access
+        </p>
       </section>
     </main>
   )
