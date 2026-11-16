@@ -50,7 +50,10 @@ server-only values and must never use a `NEXT_PUBLIC_` prefix.
 
 ## Local emulators
 
-Run the local Firebase Emulator Suite with:
+Use the Emulator Suite for isolated local work and tests. The default
+`pnpm dev` command selects emulator mode, starts Auth/Firestore/Storage
+emulators, and runs Next.js inside that emulator environment. To start the
+emulators separately, use:
 
 ```sh
 pnpm emulators
@@ -73,6 +76,31 @@ Emulator mode does not require service-account credentials. Do not set emulator
 hosts when using the cloud development project. Run the Firebase integration
 tests against isolated emulators with `pnpm test:firebase`; `pnpm test` runs
 unit tests and skips emulator-only cases when emulators are absent.
+
+## Cloud development mode
+
+Use cloud mode when developers need shared persistent data, when validating a
+deployed preview, or when testing Firebase project configuration that the
+emulators cannot represent. Keep a dedicated development Firebase project;
+never point this app at production for routine development. Cloud writes may
+incur usage charges and persist for all collaborators, so use test accounts and
+seed data deliberately.
+
+Configure the project's Firebase Web App values in `NEXT_PUBLIC_FIREBASE_*`
+and the server service account in `FIREBASE_PROJECT_ID`,
+`FIREBASE_CLIENT_EMAIL`, and `FIREBASE_PRIVATE_KEY`. Set both
+`FIREBASE_MODE=cloud` and `NEXT_PUBLIC_FIREBASE_MODE=cloud`, then run:
+
+```sh
+pnpm dev:cloud
+```
+
+Do not set `FIRESTORE_EMULATOR_HOST`, `FIREBASE_AUTH_EMULATOR_HOST`,
+`NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST`, or `STORAGE_EMULATOR_HOST` in cloud
+mode. Server and client initialization reject mixed cloud/emulator settings.
+For deployment, set the same mode and project variables through the platform's
+environment settings; never expose service-account credentials as
+`NEXT_PUBLIC_*` values.
 
 To seed development data, first sign up through the app while the Auth and
 Firestore emulators are running. Then run the seed script with that emulator
