@@ -1,80 +1,106 @@
 @startuml
-title Sprint 2 - Implemented Domain Model
+title Firebase Firestore Application Data Model
 hide methods
+left to right direction
 skinparam classAttributeIconSize 0
 skinparam shadowing false
 skinparam packageStyle rectangle
 
 legend right
-  Existing Payload collections are inside "Current app".
-  Sprint 2 additions for issue #4 are Cloud Firestore documents.
-  Existing app users are referenced by their Payload string IDs.
-  Selected domain fields are shown; this is not a full schema export.
+  Firebase Authentication owns credentials; passwords are never stored in Firestore.
+  Every app-data write/read uses Firebase Admin repositories and an ownerId check.
+  Firestore Rules deny direct browser access because Admin SDK calls bypass Rules.
 endlegend
 
-package "Current app" {
-  class User {
-    id: PayloadID
+package "Firebase Authentication" {
+  class AuthIdentity <<Firebase Auth>> {
+    uid: string [provider key]
     email: string
+    emailVerified: boolean
+  }
+}
+
+package "Cloud Firestore" {
+  abstract class OwnedDocument {
+    ownerId: string
+    createdAt: ISO string
+    updatedAt: ISO string
+  }
+
+  class UserProfile <<users/{profileId}>> {
+    authUid: string
+    email: string
+    name: string
     username: string
-    name: string
-    role: student | test | admin
+    role: admin | student | test
+    createdAt: ISO string
+    updatedAt: ISO string
   }
 
-  class Course {
-    id: PayloadID
-    code: string {unique}
-    name: string
-    level: enum
-    color: enum
+  class UsernameReservation <<usernames/{normalizedUsername}>> {
+    profileId: string
   }
 
-  class Task {
-    id: PayloadID
+  class AuthProfileMap <<authUserProfiles/{firebaseUid}>> {
+    profileId: string
+  }
+
+  class Course <<courses/{courseId}>> {
+    code: string [unique per owner]
+    name: string
+    level: ClassLevel
+    color: blue | green | gray
+  }
+
+  class Task <<tasks/{taskId}>> {
     title: string
-    classLevel: enum
-    assignmentType: enum
-    dueDate: datetime?
-    plannedStart: datetime?
+    assignmentType: AssignmentType
+    classLevel: ClassLevel
+    courseId: string?
+    calendarEventId: string?
+    dueDate: ISO string?
+    plannedStart: ISO string?
     estimatedMinutes: number
+    careerAlignment: number?
+    consequence: number?
+    goalAlignment: number?
+    lastWorkedAt: ISO string?
     status: open | scheduled | done
-    score: number [computed]
-    owner: User?
-    course: Course?
-    calendarEvent: CalendarEvent?
+    score: number
+    urgency: number
+    academicValue: number
+    careerValue: number
+    goalAlignment: number
+    consequence: number
+    workload: number
+    neglectFactor: number
   }
 
-  class CalendarEvent {
-    id: PayloadID
+  class CalendarEvent <<calendarEvents/{eventId}>> {
     title: string
-    start: datetime
-    end: datetime
+    start: ISO string
+    end: ISO string
     allDay: boolean
     completed: boolean
-    kind: enum
+    kind: class | lab | office | deadline | study | other
     location: string?
     description: string?
     uid: string
     source: ics-file | ics-url | manual
-    sourceKey: string? {indexed}
-    owner: User?
-    course: Course?
+    sourceKey: string
+    courseId: string?
   }
-}
 
-package "Sprint 2 - Cloud Firestore" {
-  class TeamProject {
-    id: string [document ID]
+  class TeamProject <<teamProjects/{projectId}>> {
     title: string
-    description: string [may be empty]
+    description: string
     finalDeadline: Timestamp
     ownerId: string
     createdAt: Timestamp
     updatedAt: Timestamp
   }
 
-  class ProjectMember {
-    documentId: encoded userId
+  class ProjectMember <<members/{encodedUserId}>> {
     userId: string
     name: string
     username: string
@@ -82,23 +108,21 @@ package "Sprint 2 - Cloud Firestore" {
     createdAt: Timestamp
   }
 
-  class Deliverable {
-    id: string [document ID]
+  class Deliverable <<deliverables/{deliverableId}>> {
     projectId: string
     parentDeliverableId: string?
     assigneeId: string
     assigneeName: string
     assigneeUsername: string
     title: string
-    description: string [may be empty]
+    description: string
     dueAt: Timestamp
     status: open | in-progress | done
     createdAt: Timestamp
     updatedAt: Timestamp
   }
 
-  class TeamUserDirectory {
-    documentId: encoded userId
+  class TeamUserDirectory <<teamUserDirectory/{encodedUserId}>> {
     userId: string
     name: string
     username: string
@@ -107,54 +131,65 @@ package "Sprint 2 - Cloud Firestore" {
     updatedAt: Timestamp
   }
 
-  class UserProjectIndex {
+  class UserProjectIndex <<projects/{projectId}>> {
     projectId: string
     role: owner | member
     createdAt: Timestamp
   }
 }
 
-User "0..1" <-- "0..*" Task : owns
-Course "0..1" <-- "0..*" Task : for
-CalendarEvent "0..1" <-- "0..*" Task : imported from
-User "0..1" <-- "0..*" CalendarEvent : owns
-Course "0..1" <-- "0..*" CalendarEvent : for
-
-User "1" <-- "0..*" TeamProject : ownerId reference
-TeamProject "1" <-- "1..*" ProjectMember : members subcollection
-User "1" <-- "0..*" ProjectMember : userId reference
-TeamProject "1" <-- "0..*" Deliverable : deliverables subcollection
+OwnedDocument <|-- Course
+OwnedDocument <|-- Task
+OwnedDocument <|-- CalendarEvent
+AuthIdentity "1" -- "1" AuthProfileMap : uid mapping
+AuthProfileMap "*" --> "1" UserProfile : profileId
+UserProfile "1" -- "1" UsernameReservation : normalized username
+Course "0..1" <-- "0..*" Task : courseId
+CalendarEvent "0..1" <-- "0..*" Task : calendarEventId
+Course "0..1" <-- "0..*" CalendarEvent : courseId
+UserProfile "1" <-- "0..*" Course : ownerId
+UserProfile "1" <-- "0..*" Task : ownerId
+UserProfile "1" <-- "0..*" CalendarEvent : ownerId
+UserProfile "1" <-- "0..*" TeamProject : ownerId
+TeamProject "1" *-- "1..*" ProjectMember : members subcollection
+TeamProject "1" *-- "0..*" Deliverable : deliverables subcollection
+ProjectMember "1" <-- "0..*" Deliverable : assigneeId
 Deliverable "0..1" <-- "0..*" Deliverable : parent / children
-ProjectMember "1" <-- "0..*" Deliverable : assignee membership
-User "1" <-- "0..1" TeamUserDirectory : userId reference
-TeamUserDirectory "1" <-- "0..*" UserProjectIndex : projects subcollection
-TeamProject "1" <-- "0..*" UserProjectIndex : projectId reference
+UserProfile "1" <-- "0..1" TeamUserDirectory : userId
+TeamUserDirectory "1" *-- "0..*" UserProjectIndex : projects subcollection
+TeamProject "1" <-- "0..*" UserProjectIndex : projectId
+
+note right of Task
+  Owner-scoped indexes:
+  ownerId + score DESC
+  ownerId + calendarEventId
+  ownerId + courseId
+end note
+
+note right of CalendarEvent
+  Owner-scoped indexes:
+  ownerId + start
+  ownerId + sourceKey
+  ownerId + courseId
+end note
+
+note bottom of Course
+  Index: ownerId + code.
+  Document ID includes a deterministic
+  hash of ownerId and normalized code.
+end note
 
 note bottom of Deliverable
-  Enforced invariants:
-  - assignee must be a member of the project
-  - parent and child belong to the same project
-  - dueAt <= project.finalDeadline - 72 hours
+  Server-enforced invariants:
+  - assignee must be a project member
+  - parent must be in the same project
+  - dueAt <= finalDeadline - 72 hours
+  Membership document ID is encoded userId.
 end note
 
-note right of ProjectMember
-  Unique membership is enforced by using
-  the encoded userId as the subcollection
-  document ID.
-end note
-
-note right of TeamUserDirectory
-  Created lazily by workspace loading,
-  directory search (2+ normalized characters),
-  or project creation; not by Payload signup.
-  Contains only a user's name and username
-  plus normalized search fields. No email
-  or credentials are copied from Payload.
-end note
-
-note bottom of Task
-  Task and CalendarEvent owner fields are optional
-  in the Payload schema. App-user creates assign
-  the owner in a hook; CMS-admin creates may omit it.
+note bottom of AuthProfileMap
+  Signup transaction creates profile,
+  username reservation, and uid mapping.
+  Session cookie contains no Firestore data.
 end note
 @enduml

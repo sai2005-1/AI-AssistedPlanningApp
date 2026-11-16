@@ -1,85 +1,85 @@
 @startuml
-title Issue #4 - Create and Assign a Team Deliverable
+title Firebase Auth, Firestore Task Creation, and Priority Feed
 hide footbox
 skinparam shadowing false
 
-actor "Project owner" as Owner
-boundary "Deliverable board" as UI
-control "Server Action" as Action
-control "Team data-access layer" as Store
-control "App authentication" as Auth
-database "Payload" as Payload
-database "Cloud Firestore" as Firestore
+actor Student
+boundary "Signal browser UI" as UI
+control "Firebase Web SDK" as WebSDK
+database "Firebase Authentication" as Auth
+control "Next.js Server Actions" as Actions
+control "App auth / session service" as Session
+control "Firestore repositories" as Repo
+database "Firestore (cloud or emulator)" as Firestore
 
-Owner -> UI: Enter title, description, assignee,\nand target deadline
-note over UI
-  Creation path for an already loaded project.
-  UI rejects invalid dates and deadlines after the freeze
-  before submitting; server checks remain authoritative.
+note over WebSDK,Firestore
+  FIREBASE_MODE selects one backend for the whole process:
+  emulator mode uses loopback Auth/Firestore; cloud mode requires
+  a dedicated development project and server service-account credentials.
+  Firestore Rules deny browser reads/writes. Server repositories use
+  Admin SDK and enforce ownership themselves.
 end note
-UI -> Action: createProjectDeliverableAction(projectId, input)
-Action -> Auth: requireAppUser()
-opt app-session cookie exists
-  Auth -> Payload: JWTAuthentication()
-  Payload --> Auth: Authentication result (or throw)
-end
-Auth --> Action: AppUser, null, or throw
 
-alt unauthenticated or authentication failure
-  Action --> UI: Structured sign-in error or generic fallback
-  UI --> Owner: Show error
+== Sign up and establish application session ==
+Student -> UI: Enter email, password, name, username
+UI -> WebSDK: createUserWithEmailAndPassword(email, password)
+WebSDK -> Auth: Create Firebase Auth identity
+Auth --> WebSDK: User credential
+WebSDK --> UI: ID token
+UI -> Actions: signupAction(idToken, profile fields)
+Actions -> Session: verify ID token and profile input
+Session -> Auth: verifyIdToken(idToken)
+Auth --> Session: Firebase UID and verified claims
+Session -> Firestore: Transactionally write UserProfile,\nUsernameReservation, AuthProfileMap
+Firestore --> Session: Commit or error
+Session -> Auth: createSessionCookie(idToken)
+Auth --> Session: HTTP-only session cookie
+Session --> Actions: AppUser and session cookie
+Actions --> UI: Serializable success or error
+
+== Add a task and reload the priority feed ==
+Student -> UI: Enter task and optionally choose a course
+UI -> Actions: createTaskAction(parsed task, courseId?)
+Actions -> Session: requireAppUser()
+Session -> Auth: verifySessionCookie(cookie, checkRevoked=true)
+Auth --> Session: Firebase UID
+Session -> Firestore: Resolve AuthProfileMap and UserProfile
+Firestore --> Session: Owner profile
+Session --> Actions: AppUser or unauthenticated
+
+alt no authenticated app user
+  Actions --> UI: Sign-in error
 else authenticated
-  Action -> Action: Validate project ID; allowlist, validate,\nand normalize input
-
-  alt invalid submitted fields
-    Action --> UI: Structured input error; no repository call
-    UI --> Owner: Show error
-  else valid submitted fields
-    Action -> Store: createProjectDeliverable(user, projectId, input)
-    Store -> Store: getTeamFirestore() (may throw)
-    opt Firestore configured
-      group Firestore transaction (abort on a failed check)
-        Store -> Firestore: Read project, requester membership,\nand assignee membership
-        Firestore --> Store: Project and membership documents
-        Store -> Store: Check project, requester membership, owner,\nassignee membership, then dueAt <= finalDeadline - 72h
-        opt preceding checks pass and parent supplied
-          Store -> Firestore: Read parent chain within this project
-          Firestore --> Store: Parent documents
-          Store -> Store: Reject missing parent, cycle, or depth > 50
-        end
-        opt all checks pass
-          Store -> Firestore: Write deliverable in transaction\n(status=open, timestamps, assignee snapshot)
-          Firestore --> Store: Commit succeeds (or throws)
-        end
-      end
+  Actions -> Actions: Allowlist/validate task fields and normalize dates
+  alt invalid task input
+    Actions --> UI: Validation error; no database write
+  else valid input
+    Actions -> Repo: createUserTask(ownerId, typed input)
+    opt courseId supplied
+      Repo -> Firestore: Read course document
+      Firestore --> Repo: Course ownerId and fields
+      Repo -> Repo: Require course.ownerId == ownerId
     end
-
-    alt validation, configuration, or database failure
-      Store --> Action: Throw error
-      Action --> UI: Structured domain/configuration error\nor generic failure for unexpected errors
-      UI --> Owner: Show error
-    else committed
-      Store --> Action: { id }
-      Action --> UI: Serializable success result
-      UI -> Action: loadTeamProjectBoardAction(projectId)
-      Action -> Auth: requireAppUser() again
-      opt app-session cookie exists
-        Auth -> Payload: JWTAuthentication()
-        Payload --> Auth: Authentication result (or throw)
-      end
-      Auth --> Action: Current AppUser, null, or throw
-      opt authenticated and valid project ID
-        Action -> Store: loadTeamProjectBoard(user.id, projectId)
-        Store -> Firestore: Read project and requester membership;\nif authorized, read members and deliverables
-        Firestore --> Store: Documents (or error)
-        Store --> Action: TeamProjectBoard (or throw)
-      end
-      Action --> UI: Serializable success or error result
-      alt reload succeeded
-        UI --> Owner: Display updated board in assignee lanes
-      else reload failed
-        UI --> Owner: Saved, but board could not be refreshed
-      end
+    Repo -> Repo: Calculate score; omit absent optional fields;\nconstruct FirestoreTaskDocument
+    Repo -> Firestore: Write tasks/{taskId}
+    Firestore --> Repo: Commit or error
+    alt write succeeded
+      Repo --> Actions: Created task ID
+      Actions --> UI: Serializable success result
+      UI -> UI: router.refresh()
+      UI -> Actions: Request refreshed home page
+      Actions -> Session: requireAppUser()
+      Session --> Actions: Verified AppUser
+      Actions -> Repo: listUserTasks(ownerId), listUserCourses(ownerId),\nlistUserEvents(ownerId)
+      Repo -> Firestore: Owner-scoped queries using committed indexes
+      Firestore --> Repo: Task, course, and event documents
+      Repo --> Actions: Typed view data
+      Actions --> UI: Render sorted Priority Feed
+      UI --> Student: Show new task with score and course label
+    else write rejected
+      Firestore --> Repo: Firestore error
+      Repo --> Actions: Error
+      Actions --> UI: Save error; no success refresh
     end
   end
 end
