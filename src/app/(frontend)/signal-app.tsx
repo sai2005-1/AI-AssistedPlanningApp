@@ -14,12 +14,15 @@ import { useRouter } from "next/navigation"
 import { signOut as signOutFirebase } from "firebase/auth"
 
 import {
+  createCourseAction,
+  deleteCourseAction,
   createTaskAction,
   createWorkflowAction,
   importCalendarAction,
   replanTasksAction,
   setCalendarEventCompletedAction,
   setTaskCompletedAction,
+  updateCourseAction,
 } from "./actions"
 
 import { logoutAction } from "./auth-actions"
@@ -37,52 +40,34 @@ import type { AssignmentType, ClassLevel } from "@/lib/scoring"
 
 import type { AppUser } from "@/lib/app-auth"
 import { getFirebaseClientAuth } from "@/lib/firebase-client"
+import type { AppCourse } from "@/lib/app-data"
 
-type Screen = "dashboard" | "score" | "calendar" | "time" | "copilot" | "advisor" | "team" | "completed"
+type Screen = "dashboard" | "score" | "calendar" | "time" | "copilot" | "advisor" | "team" | "completed" | "courses"
 
 export type TaskView = {
   academicValue: number
-
   assignmentType: AssignmentType
-
   careerValue: number
-
   calendarEventId?: string
-
   classLevel: ClassLevel
-
   consequence: number
-
   courseCode?: string
-
   dueDate?: string
-
   estimatedMinutes: number
-
   goalAlignment: number
-
   id: string
-
   neglectFactor: number
-
   plannedStart?: string
-
   score: number
-
   status: "open" | "scheduled" | "done"
-
   title: string
-
   urgency: number
-
   workload: number
 }
 
 export type CalendarEventView = {
   allDay: boolean
-
   completed: boolean
-
   end: string
 
   id: string
@@ -118,6 +103,8 @@ const nav: { id: Screen; label: string; index: string }[] = [
   { id: "team", label: "Team deliverables", index: "07" },
 
   { id: "completed", label: "Completed", index: "08" },
+
+  { id: "courses", label: "Courses", index: "09" },
 ]
 
 function Button({
@@ -439,6 +426,165 @@ function CompletedScreen({
         </div>
       )}
     </Panel>
+  )
+}
+
+function CoursesScreen({
+  courses,
+  onCreated,
+  onUpdated,
+  onRemoved,
+}: {
+  courses: AppCourse[]
+  onCreated: (course: AppCourse, message: string) => void
+  onUpdated: (course: AppCourse, message: string) => void
+  onRemoved: (courseId: string, message: string) => void
+}) {
+  const [code, setCode] = useState("")
+  const [name, setName] = useState("")
+  const [level, setLevel] = useState<ClassLevel>("3000")
+  const [color, setColor] = useState<AppCourse["color"]>("blue")
+  const [editingId, setEditingId] = useState<string>()
+  const [status, setStatus] = useState("")
+  const [pending, startTransition] = useTransition()
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    startTransition(async () => {
+      const result = editingId
+        ? await updateCourseAction(editingId, { name, level, color })
+        : await createCourseAction({ code, name, level, color })
+      setStatus(result.ok ? result.message : result.error)
+      if (!result.ok) return
+      if (editingId) onUpdated(result.data, result.message)
+      else onCreated(result.data, result.message)
+      setEditingId(undefined)
+      setCode("")
+      setName("")
+    })
+  }
+
+  function edit(course: AppCourse) {
+    setEditingId(course.id)
+    setCode(course.code)
+    setName(course.name)
+    setLevel(course.level)
+    setColor(course.color)
+    setStatus("")
+  }
+
+  function remove(courseId: string) {
+    startTransition(async () => {
+      const result = await deleteCourseAction(courseId)
+      setStatus(result.ok ? result.message : result.error)
+      if (result.ok) onRemoved(courseId, result.message)
+    })
+  }
+
+  return (
+    <div className="grid gap-4">
+      <Panel>
+        <Kicker right={<span>{courses.length} COURSES</span>}>COURSE CATALOG</Kicker>
+        {courses.length ? (
+          <div className="divide-y divide-[var(--line)] px-4">
+            {courses.map((course) => (
+              <div className="flex items-center justify-between gap-3 py-3" key={course.id}>
+                <div className="flex items-center gap-3">
+                  <Tag tone={course.color === "green" ? "green" : course.color === "gray" ? "neutral" : "blue"}>{course.code}</Tag>
+                  <div>
+                    <strong className="block text-sm">{course.name}</strong>
+                    <small className="text-[var(--muted)]">{course.level} LEVEL</small>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button disabled={pending} onClick={() => edit(course)}>Edit</Button>
+                  <Button disabled={pending} onClick={() => remove(course.id)} tone="danger">Remove</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state compact">
+            <strong>No courses yet</strong>
+            <p>Add courses here, then link them to tasks when using Quick Add.</p>
+          </div>
+        )}
+      </Panel>
+      <Panel>
+        <Kicker>{editingId ? "EDIT COURSE" : "ADD COURSE"}</Kicker>
+        <form className="grid gap-3 p-4" onSubmit={submit}>
+          <div className="grid gap-3 md:grid-cols-2">
+            <label className="grid gap-1 text-xs text-[var(--muted)]">
+              Course code
+              <input
+                className="w-full rounded-sm border border-[var(--line)] bg-[#0f1012] px-3 py-2 text-sm text-white"
+                maxLength={20}
+                onChange={(event) => setCode(event.target.value)}
+                placeholder="ITSC 3155"
+                readOnly={Boolean(editingId)}
+                required
+                value={code}
+              />
+            </label>
+            <label className="grid gap-1 text-xs text-[var(--muted)]">
+              Course name
+              <input
+                className="w-full rounded-sm border border-[var(--line)] bg-[#0f1012] px-3 py-2 text-sm text-white"
+                maxLength={120}
+                onChange={(event) => setName(event.target.value)}
+                required
+                value={name}
+              />
+            </label>
+            <label className="grid gap-1 text-xs text-[var(--muted)]">
+              Level
+              <select
+                className="w-full rounded-sm border border-[var(--line)] bg-[#0f1012] px-3 py-2 text-sm text-white"
+                onChange={(event) => setLevel(event.target.value as ClassLevel)}
+                value={level}
+              >
+                {["1000", "2000", "3000", "4000", "graduate", "independent"].map((value) => (
+                  <option key={value} value={value}>{value}</option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-1 text-xs text-[var(--muted)]">
+              Color
+              <select
+                className="w-full rounded-sm border border-[var(--line)] bg-[#0f1012] px-3 py-2 text-sm text-white"
+                onChange={(event) => setColor(event.target.value as AppCourse["color"])}
+                value={color}
+              >
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="gray">Gray</option>
+              </select>
+            </label>
+          </div>
+          {status && <p aria-live="polite" className="text-xs text-[var(--muted)]">{status}</p>}
+          <div>
+            <div className="flex gap-2">
+              <Button disabled={pending} tone="primary" type="submit">
+                {pending ? "Saving…" : editingId ? "Save course" : "Add course"}
+              </Button>
+              {editingId && (
+                <Button
+                  disabled={pending}
+                  onClick={() => {
+                    setEditingId(undefined)
+                    setCode("")
+                    setName("")
+                    setStatus("")
+                  }}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </div>
+        </form>
+      </Panel>
+    </div>
   )
 }
 
@@ -936,15 +1082,19 @@ function parseQuickTask(value: string) {
 }
 
 function QuickAdd({
+  courses,
   onAdded,
 
   onOpenAdvisor,
 }: {
+  courses: AppCourse[]
   onAdded: (message: string) => void
 
   onOpenAdvisor: () => void
 }) {
   const [value, setValue] = useState("")
+
+  const [courseId, setCourseId] = useState("")
 
   const [status, setStatus] = useState(
     "Describe the work, duration, and deadline.",
@@ -963,7 +1113,10 @@ function QuickAdd({
     if (!value.trim()) return
 
     startTransition(async () => {
-      const result = await createTaskAction(parseQuickTask(value))
+      const result = await createTaskAction({
+        ...parseQuickTask(value),
+        ...(courseId ? { courseId } : {}),
+      })
 
       setStatus(result.ok ? result.message : result.error)
 
@@ -998,6 +1151,21 @@ function QuickAdd({
             <kbd>↵</kbd>
           </div>
           <div className="parse-label">INSTANT PARSE / READY TO SCORE</div>
+          <label className="mx-5 grid gap-1 text-xs text-[var(--muted)]">
+            Course
+            <select
+              className="rounded-sm border border-[var(--line)] bg-[#0f1012] px-3 py-2 text-sm text-white"
+              onChange={(event) => setCourseId(event.target.value)}
+              value={courseId}
+            >
+              <option value="">No course</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.code} · {course.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <div className="parse-grid">
             <div>
               <small>TITLE</small>
@@ -1418,11 +1586,15 @@ export function AdvisorScreen({
 export default function SignalApp({
   currentUser,
 
+  initialCourses,
+
   initialEvents,
 
   initialTasks,
 }: {
   currentUser: AppUser
+
+  initialCourses: AppCourse[]
 
   initialEvents: CalendarEventView[]
 
@@ -1442,6 +1614,8 @@ export default function SignalApp({
 
   const [events, setEvents] = useState(initialEvents)
 
+  const [courses, setCourses] = useState(initialCourses)
+
   const [notice, setNotice] = useState("")
 
   const active = nav.find((item) => item.id === screen)!
@@ -1449,6 +1623,8 @@ export default function SignalApp({
   useEffect(() => setTasks(initialTasks), [initialTasks])
 
   useEffect(() => setEvents(initialEvents), [initialEvents])
+
+  useEffect(() => setCourses(initialCourses), [initialCourses])
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -1584,6 +1760,7 @@ export default function SignalApp({
           )}
           {screen === "copilot" && (
             <QuickAdd
+              courses={courses}
               onAdded={refresh}
               onOpenAdvisor={() => setScreen("advisor")}
             />
@@ -1605,6 +1782,27 @@ export default function SignalApp({
             <CompletedScreen
               onRestore={(task) => setCompleted(task, false)}
               tasks={tasks}
+            />
+          )}
+          {screen === "courses" && (
+            <CoursesScreen
+              courses={courses}
+              onCreated={(course, message) => {
+                setCourses((current) =>
+                  [...current, course].sort((left, right) => left.code.localeCompare(right.code)),
+                )
+                refresh(message)
+              }}
+              onUpdated={(course, message) => {
+                setCourses((current) =>
+                  current.map((item) => item.id === course.id ? course : item),
+                )
+                refresh(message)
+              }}
+              onRemoved={(courseId, message) => {
+                setCourses((current) => current.filter((course) => course.id !== courseId))
+                refresh(message)
+              }}
             />
           )}
         </div>

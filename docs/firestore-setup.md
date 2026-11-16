@@ -63,7 +63,7 @@ unit tests and skips emulator-only cases when emulators are absent.
 - `authUserProfiles/{firebaseUid}` maps Firebase Auth identities to profile IDs.
 - `tasks/{taskId}` stores personal tasks and `ownerId`.
 - `calendarEvents/{eventId}` stores imported/planned events and `ownerId`.
-- `courses/{courseId}` stores course metadata referenced by tasks/events.
+- `courses/{courseId}` stores user-owned course metadata referenced by tasks.
 - `teamProjects`, member subcollections, deliverable subcollections, and
   `teamUserDirectory` keep the existing team-workspace model.
 
@@ -72,20 +72,22 @@ The Admin SDK bypasses Firestore Rules. Authorization therefore lives in
 `src/lib/team-deliverables.ts`; rules remain deny-by-default for browser
 Firestore access. The committed indexes cover current owner-scoped queries.
 
-## Existing Payload data and cutover status
+## Payload boundary
 
-New app signups, sessions, task writes, calendar imports, workflow plans,
-completion changes, and dashboard reads now use Firebase services. The existing
-Payload collections and generated admin/API routes remain available while
-their records await a verified export and reconciliation. The app does not
-dual-write between Payload and Firestore.
+The app's authentication, courses, tasks, calendar events, and team workspaces
+use Firebase services. `src/payload.config.ts` retains `buildFigmaConfig()` and
+registers only the Figma-managed `Admins` collection for the platform control
+plane. The generated Payload admin/API routes remain, but the retired app
+collections are no longer registered or available through those routes.
 
-Existing Payload users, tasks, calendar events, courses, CMS content, and media
-have **not** been imported by this change. Firebase Auth does not accept
-Payload password hashes as Firebase credentials; existing users need a
-verified account-link/reset flow that preserves profile IDs referenced by team
-projects. Do not switch production traffic or remove Payload collections until
-the team has exported the source data, migrated it to a development Firebase
-project, reconciled counts and ownership, and verified rollback. Payload content
-export/migration tooling was unavailable in this workspace, so no document
-mutation or ad hoc REST transfer was run.
+The former Payload CMS collections (`Users`, `Tasks`, `CalendarEvents`,
+`Courses`, `Media`, `Folders`, `Tags`, and `Posts`) were intentionally
+unregistered without export, following the user's confirmation that no
+important app data needed preservation. Their old records are not imported or
+available through the current app configuration. Firebase Auth credentials and
+profiles are independent of Payload Admin accounts.
+
+The old Media upload collection had no frontend consumer. It is retired rather
+than replaced by an unused upload interface; if app media uploads are added,
+store metadata in Firestore and binaries in Firebase Storage with explicit
+owner-scoped authorization. Storage rules currently deny direct client access.

@@ -4,14 +4,6 @@ import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { en as adminLanguage } from '@payloadcms/translations/languages/en'
 import { fileURLToPath } from 'url'
 import { Admins } from './collections/Admins'
-import { Media } from './collections/Media'
-import { Folders } from './collections/Folders'
-import { Tags } from './collections/Tags'
-import { Posts } from './collections/Posts'
-import { Courses } from './collections/Courses'
-import { Tasks } from './collections/Tasks'
-import { CalendarEvents } from './collections/CalendarEvents'
-import { Users } from './collections/Users'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -35,7 +27,7 @@ export default buildFigmaConfig({
     fallbackLanguage: 'en',
     supportedLanguages: { 'en': adminLanguage },
   },
-  collections: [Admins, Users, Media, Folders, Tags, Posts, Courses, Tasks, CalendarEvents],
+  collections: [Admins],
   localization: {
     locales: [{ code: 'en', label: 'English' }],
     fallback: true,

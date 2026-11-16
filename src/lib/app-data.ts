@@ -15,6 +15,7 @@ const COURSES = 'courses'
 export type AppTaskInput = ScoreInput & {
   assignmentType: NonNullable<ScoreInput['assignmentType']>
   classLevel: NonNullable<ScoreInput['classLevel']>
+  courseId?: string
   estimatedMinutes: number
   title: string
 }
@@ -37,6 +38,14 @@ export type AppCalendarEvent = ParsedCalendarEvent & {
   courseId?: string
   id: string
   source: 'ics-file' | 'ics-url' | 'manual'
+}
+
+export type AppCourse = {
+  code: string
+  color: 'blue' | 'green' | 'gray'
+  id: string
+  level: NonNullable<ScoreInput['classLevel']>
+  name: string
 }
 
 function deterministicId(scope: string, value: string) {
@@ -118,35 +127,119 @@ export async function listUserEvents(userId: string, from = new Date().toISOStri
   return result.docs.map((snapshot) => eventFromSnapshot(snapshot.id, snapshot.data()))
 }
 
-export async function getCoursesByIds(ids: string[]) {
-  const uniqueIds = [...new Set(ids)]
+export async function listUserCourses(userId: string): Promise<AppCourse[]> {
+  const result = await getTeamFirestore()
+    .collection(COURSES)
+    .where('ownerId', '==', userId)
+    .orderBy('code', 'asc')
+    .limit(100)
+    .get()
+  return result.docs.map((snapshot) => ({
+    code: String(snapshot.data().code ?? ''),
+    color: snapshot.data().color === 'green' || snapshot.data().color === 'gray'
+      ? snapshot.data().color
+      : 'blue',
+    id: snapshot.id,
+    level: snapshot.data().level,
+    name: String(snapshot.data().name ?? ''),
+  }))
+}
+
+export async function createUserCourse(
+  userId: string,
+  input: Omit<AppCourse, 'id'>,
+): Promise<AppCourse> {
   const db = getTeamFirestore()
-  const snapshots = await Promise.all(
-    uniqueIds.map((id) => db.collection(COURSES).doc(id).get()),
-  )
-  return new Map(
-    snapshots.filter((snapshot) => snapshot.exists).map((snapshot) => [snapshot.id, snapshot.data()?.code]),
-  )
+  const code = input.code.trim().toUpperCase()
+  const reference = db.collection(COURSES).doc(`course_${deterministicId(userId, code)}`)
+  await db.runTransaction(async (transaction) => {
+    const existing = await transaction.get(reference)
+    if (existing.exists) throw new Error('You already have a course with that code.')
+    transaction.set(reference, {
+      ...input,
+      code,
+      ownerId: userId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+  })
+  return { ...input, code, id: reference.id }
+}
+
+export async function updateUserCourse(
+  userId: string,
+  courseId: string,
+  input: Pick<AppCourse, 'color' | 'level' | 'name'>,
+): Promise<AppCourse> {
+  const db = getTeamFirestore()
+  const reference = db.collection(COURSES).doc(courseId)
+  await db.runTransaction(async (transaction) => {
+    const course = await transaction.get(reference)
+    if (!course.exists || course.data()?.ownerId !== userId) {
+      throw new Error('Course not found.')
+    }
+    transaction.update(reference, { ...input, updatedAt: new Date().toISOString() })
+  })
+  const course = await reference.get()
+  return {
+    code: String(course.data()?.code ?? ''),
+    color: input.color,
+    id: courseId,
+    level: input.level,
+    name: input.name,
+  }
+}
+
+export async function deleteUserCourse(userId: string, courseId: string) {
+  const db = getTeamFirestore()
+  const reference = db.collection(COURSES).doc(courseId)
+  const tasks = db.collection(TASKS).where('ownerId', '==', userId).where('courseId', '==', courseId)
+  const events = db.collection(EVENTS).where('ownerId', '==', userId).where('courseId', '==', courseId)
+  await db.runTransaction(async (transaction) => {
+    const [course, linkedTasks, linkedEvents] = await Promise.all([
+      transaction.get(reference),
+      transaction.get(tasks),
+      transaction.get(events),
+    ])
+    if (!course.exists || course.data()?.ownerId !== userId) {
+      throw new Error('Course not found.')
+    }
+    if (!linkedTasks.empty || !linkedEvents.empty) {
+      throw new Error('Remove this course from linked tasks and events before deleting it.')
+    }
+    transaction.delete(reference)
+  })
 }
 
 export async function createUserTask(userId: string, input: AppTaskInput) {
   const db = getTeamFirestore()
+  if (input.courseId) {
+    const course = await db.collection(COURSES).doc(input.courseId).get()
+    if (!course.exists || course.data()?.ownerId !== userId) {
+      throw new Error('Choose one of your courses.')
+    }
+  }
   const reference = db.collection(TASKS).doc()
   const score = calculateScore(input)
   const now = new Date().toISOString()
-  await reference.set({
-    ...input,
+  const taskData = {
+    assignmentType: input.assignmentType,
+    classLevel: input.classLevel,
+    estimatedMinutes: input.estimatedMinutes,
+    title: input.title,
+    ...(input.careerAlignment !== undefined ? { careerAlignment: input.careerAlignment } : {}),
+    ...(input.consequence !== undefined ? { consequence: input.consequence } : {}),
+    ...(input.courseId ? { courseId: input.courseId } : {}),
+    ...(input.dueDate ? { dueDate: input.dueDate } : {}),
+    ...(input.goalAlignment !== undefined ? { goalAlignment: input.goalAlignment } : {}),
     ...score,
     ownerId: userId,
     status: 'open',
     createdAt: now,
     updatedAt: now,
-  })
-  return taskFromSnapshot(reference.id, {
-    ...input,
-    ...score,
-    status: 'open',
-  })
+  }
+  await reference.set(taskData)
+  return taskFromSnapshot(reference.id, taskData)
 }
 
 export async function createWorkflow(userId: string, plan: WorkflowPlan) {
